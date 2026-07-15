@@ -254,16 +254,16 @@ local function refresh(w, event, touchState)
   text(765, 137, string.format("min   %.0f", stat(3, "min")), RIGHT + SMLSIZE, C.white)
   -- Reuse the Tmcu field here so
   -- this dashboard can show useful FC data.
-  text(765, 160, string.format("MCU TEMP  %.0f \128C", sensor(7)), RIGHT + SMLSIZE, C.white)
+  text(765, 160, string.format("MCU TEMP  %.0f °C", sensor(7)), RIGHT + SMLSIZE, C.white)
 
   panel(X(295), Y(236), W(495), H(144))
   local labels = { "AMPS", "Cell", "BEC", "ESC Temp" }
-  local values = { string.format("%.1fA", curr), string.format("%.2fV", vcel), string.format("%.1fV", vbec), string.format("%.0f\128C", tesc) }
+  local values = { string.format("%.1fA", curr), string.format("%.2fV", vcel), string.format("%.1fV", vbec), string.format("%.0f°C", tesc) }
   local subs = {
     string.format("max %.1fA", amps(stat(2, "max"))),
     string.format("min %.2fV", volts(stat(15, "min"))),
     string.format("min %.1fV", volts(stat(12, "min"))),
-    string.format("max %.0f\128C", stat(6, "max")),
+    string.format("max %.0f°C", stat(6, "max")),
   }
   for i = 1, 4 do
     local cx = 295 + (i - 1) * 124
