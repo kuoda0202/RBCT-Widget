@@ -1,5 +1,7 @@
 # RBCT Helicopter Dashboard Widget
 
+![Preview](264695.jpg)
+
 (English below)
 
 **RBCT** 是一個專為 EdgeTX 開發的直昇機儀表板小工具 (Widget)，完美適配 RadioMaster TX16S MK3 的 800x480 高畫質全彩螢幕。提供完整、直覺的飛行數據監控介面。
