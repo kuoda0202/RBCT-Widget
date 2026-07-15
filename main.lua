@@ -16,6 +16,7 @@ local options = {
   { "Banks", VALUE, 3, 2, 6 },
   { "Theme", CHOICE, 5, { "Red", "Orange", "Yellow", "Green", "Blue", "Indigo", "Violet" } },
   { "LED Color", CHOICE, 7, { "Red", "Orange", "Yellow", "Green", "Blue", "Indigo", "Violet", "OFF" } },
+  { "Arm Source", SOURCE, 0 },
 }
 
 local C = {
@@ -212,7 +213,14 @@ local function refresh(w, event, touchState)
   if heli_pic then lcd.drawBitmap(heli_pic, X(20), Y(70)) end
   text(145, 230, "0 Flights", CENTER + SMLSIZE, C.dim)
   local gov_on = gov > 0
-  local arm_on = sensor(13) > 0
+  
+  local arm_on = false
+  if w.options.ArmSource and w.options.ArmSource ~= 0 then
+    local arm_val = getValue(w.options.ArmSource)
+    if type(arm_val) == "number" then arm_on = arm_val > 0 end
+  else
+    arm_on = sensor(13) > 0 -- Fallback to telemetry sensor if no switch is configured
+  end
   
   lcd.drawFilledRectangle(X(20), Y(260), W(110), H(28), C.panel2)
   text(75, 265, "GOV", CENTER + SMLSIZE, C.white)
@@ -220,9 +228,9 @@ local function refresh(w, event, touchState)
   text(75, 298, gov_on and "ON" or "OFF", CENTER + MIDSIZE, C.white)
 
   lcd.drawFilledRectangle(X(140), Y(260), W(110), H(28), C.panel2)
-  text(195, 265, "ARM", CENTER + SMLSIZE, C.white)
+  text(195, 265, "STATUS", CENTER + SMLSIZE, C.white)
   lcd.drawFilledRectangle(X(140), Y(288), W(110), H(42), arm_on and C.red or C.green)
-  text(195, 298, arm_on and "ON" or "OFF", CENTER + MIDSIZE, C.white)
+  text(195, 298, arm_on and "ARMED" or "SAFE", CENTER + MIDSIZE, C.white)
   text(145, 365, string.format("BATTERY  %dS  %.1fV", cells, vbat), CENTER + SMLSIZE, C.dim)
   text(145, 387, string.format("%.0f mAh used", capa), CENTER + SMLSIZE, C.dim)
 
