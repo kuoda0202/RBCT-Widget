@@ -211,11 +211,18 @@ local function refresh(w, event, touchState)
   panel(X(10), Y(70), W(270), H(284))
   if heli_pic then lcd.drawBitmap(heli_pic, X(20), Y(70)) end
   text(145, 230, "0 Flights", CENTER + SMLSIZE, C.dim)
-  local on = gov > 0
-  lcd.drawFilledRectangle(X(35), Y(260), W(220), H(28), C.panel2)
-  text(145, 265, "GOVERNOR", CENTER + SMLSIZE, C.white)
-  lcd.drawFilledRectangle(X(35), Y(288), W(220), H(42), on and C.green or C.red)
-  text(145, 298, on and "ON" or "OFF", CENTER + MIDSIZE, C.white)
+  local gov_on = gov > 0
+  local arm_on = sensor(13) > 0
+  
+  lcd.drawFilledRectangle(X(20), Y(260), W(110), H(28), C.panel2)
+  text(75, 265, "GOV", CENTER + SMLSIZE, C.white)
+  lcd.drawFilledRectangle(X(20), Y(288), W(110), H(42), gov_on and C.green or C.red)
+  text(75, 298, gov_on and "ON" or "OFF", CENTER + MIDSIZE, C.white)
+
+  lcd.drawFilledRectangle(X(140), Y(260), W(110), H(28), C.panel2)
+  text(195, 265, "ARM", CENTER + SMLSIZE, C.white)
+  lcd.drawFilledRectangle(X(140), Y(288), W(110), H(42), arm_on and C.red or C.green)
+  text(195, 298, arm_on and "ON" or "OFF", CENTER + MIDSIZE, C.white)
   text(145, 365, string.format("BATTERY  %dS  %.1fV", cells, vbat), CENTER + SMLSIZE, C.dim)
   text(145, 387, string.format("%.0f mAh used", capa), CENTER + SMLSIZE, C.dim)
 
