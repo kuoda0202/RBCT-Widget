@@ -209,7 +209,7 @@ local function refresh(w, event, touchState)
 
   -- Left: the model-specific helicopter image and governor status.
   panel(X(10), Y(70), W(270), H(284))
-  if heli_pic then lcd.drawBitmap(heli_pic, X(20), Y(70)) end
+  if heli_pic then lcd.drawBitmap(heli_pic, X(49), Y(93)) end
   text(145, 230, "0 Flights", CENTER + SMLSIZE, C.dim)
   local gov_on = gov > 0
   
