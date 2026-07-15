@@ -8,12 +8,14 @@ local NAME = "RBCT"
 local sensors = { "Vbat", "Curr", "Hspd", "Capa", "Bat%", "Tesc", "Tmcu", "1RSS", "2RSS", "RQly", "Thr", "Vbec", "ARM", "Gov", "Vcel", "FM" }
 local id, mm = {}, {}
 local heli_pic, loaded_model_key
+local led_cache = { last_color = -1 }
 
 local options = {
   { "Timer", VALUE, 1, 1, 3 }, -- TX16S MK3 model timer 1..3
   { "Bank Source", SOURCE, 0 }, -- select the MK3 channel/switch that controls the FBL bank
   { "Banks", VALUE, 3, 2, 6 },
   { "Theme", CHOICE, 5, { "Red", "Orange", "Yellow", "Green", "Blue", "Indigo", "Violet" } },
+  { "LED Color", CHOICE, 7, { "Red", "Orange", "Yellow", "Green", "Blue", "Indigo", "Violet", "OFF" } },
 }
 
 local C = {
@@ -165,6 +167,24 @@ local function refresh(w, event, touchState)
   local function W(v) return math.floor(v * sx) end
   local function H(v) return math.floor(v * sy) end
   local function text(px, py, str, flags, color) lcd.drawText(X(px), Y(py), str, flags + color) end
+
+  if LED_STRIP_LENGTH and LED_STRIP_LENGTH > 0 and setRGBLedColor and applyRGBLedColors then
+    local led_opt = w.options.LEDColor or 7
+    if led_cache.last_color ~= led_opt then
+      led_cache.last_color = led_opt
+      if led_opt < 7 then
+        local t = themes[led_opt + 1]
+        for i = 0, LED_STRIP_LENGTH - 1 do
+          setRGBLedColor(i, t[1], t[2], t[3])
+        end
+      else
+        for i = 0, LED_STRIP_LENGTH - 1 do
+          setRGBLedColor(i, 0, 0, 0)
+        end
+      end
+      applyRGBLedColors()
+    end
+  end
 
   local vbat, curr, hspd, capa = volts(sensor(1)), amps(sensor(2)), sensor(3), sensor(4)
   local tesc, vbec, gov, vcel = sensor(6), volts(sensor(12)), sensor(14), volts(sensor(15))
