@@ -202,7 +202,6 @@ local function refresh(w, event, touchState)
   local dt = getDateTime()
   local clock = string.format("%02d:%02d", dt.hour or 0, dt.min or 0)
   text(14, 10, modelName ~= "" and modelName or "ELECTRIC", MIDSIZE, C.white)
-  text(14, 32, bankText(w), SMLSIZE, C.dim)
   text(400, 8, timer, CENTER + DBLSIZE, timerColor)
   text(640, 16, string.format("%.2f V", txVoltage), BOLD + SMLSIZE, C.white)
   text(785, 16, clock, RIGHT + SMLSIZE, C.dim)
@@ -261,9 +260,12 @@ local function refresh(w, event, touchState)
     text(cx + 62, 341, subs[i], CENTER + SMLSIZE, C.dim)
   end
 
+  panel(X(295), Y(402), W(124), H(44))
+  text(357, 412, bankText(w), CENTER + MIDSIZE, C.white)
+
   if not telemetry then
-    lcd.drawFilledRectangle(X(295), Y(402), W(495), H(44), C.red)
-    text(542, 412, "NO DATA", CENTER + MIDSIZE, C.white)
+    lcd.drawFilledRectangle(X(419), Y(402), W(371), H(44), C.red)
+    text(604, 412, "NO DATA", CENTER + MIDSIZE, C.white)
   else
     text(20, 420, string.format("BATTERY  %dS  %.1fV / %.0f mAh used", cells, vbat, capa), SMLSIZE, C.dim)
   end
