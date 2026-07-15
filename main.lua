@@ -8,14 +8,16 @@ local NAME = "RBCT"
 local sensors = { "Vbat", "Curr", "Hspd", "Capa", "Bat%", "Tesc", "Tmcu", "1RSS", "2RSS", "RQly", "Thr", "Vbec", "ARM", "Gov", "Vcel", "FM" }
 local id, mm = {}, {}
 local heli_pic, loaded_model_key
-local led_cache = { last_color = -1 }
+local led_cache = { enabled = nil, color = nil }
 
 local options = {
   { "Timer", VALUE, 1, 1, 3 }, -- TX16S MK3 model timer 1..3
-  { "Bank Source", SOURCE, 0 }, -- select the MK3 channel/switch that controls the FBL bank
-  { "Banks", VALUE, 3, 2, 6 },
+  -- Match DBK_MK3Min: map one physical three-position switch to Banks 1..3.
+  { "BankSwitch", SOURCE, 0 },
   { "Theme", CHOICE, 5, { "Red", "Orange", "Yellow", "Green", "Blue", "Indigo", "Violet" } },
-  { "LED Color", CHOICE, 7, { "Red", "Orange", "Yellow", "Green", "Blue", "Indigo", "Violet", "OFF" } },
+  -- Same physical LED switch option used by KRC_Dashboard.
+  { "DispLED", BOOL, 0 },
+  { "LED Color", CHOICE, 5, { "Red", "Orange", "Yellow", "Green", "Blue", "Indigo", "Violet" } },
   { "Arm Source", SOURCE, 0 },
 }
 
@@ -23,7 +25,7 @@ local C = {
   bg = lcd.RGB(7, 22, 72), blue = lcd.RGB(0, 126, 255),
   panel = lcd.RGB(15, 48, 122), panel2 = lcd.RGB(22, 61, 143),
   white = lcd.RGB(242, 247, 255), dim = lcd.RGB(147, 193, 255),
-  red = lcd.RGB(255, 67, 84), green = lcd.RGB(48, 231, 107), black = lcd.RGB(0, 0, 0),
+  red = lcd.RGB(255, 67, 84),    green = lcd.RGB(0, 180, 0), black = lcd.RGB(0, 0, 0),
 }
 
 -- Seven selectable rainbow-colour themes. Blue is the default.
@@ -140,26 +142,24 @@ local function timerText(w)
 end
 
 local function bankText(w)
-  local source = w.options.BankSource
-  if not source or source == 0 then return "BANK --" end
-  local value = getValue(source)
-  if type(value) ~= "number" then return "BANK --" end
-  
-  local count = math.max(2, math.min(6, w.options.Banks or 3))
-  local bank = 1
-  
-  if count == 3 then
-    if value < -10 then bank = 1
-    elseif value > 10 then bank = 3
-    else bank = 2 end
-  elseif count == 2 then
-    if value < 0 then bank = 1 else bank = 2 end
-  else
-    value = math.max(-1024, math.min(1024, value))
-    bank = math.floor((value + 1024) * count / 2049) + 1
+  local source = w.options.BankSwitch
+  if source and source ~= 0 then
+    local value = getValue(source)
+    if type(value) == "number" then
+      -- Same three-position thresholds used by DBK_MK3Min.
+      local bank = 2
+      if value < -300 then bank = 1
+      elseif value > 300 then bank = 3 end
+      return string.format("BANK %d", bank)
+    end
   end
-  
-  return string.format("BANK %d", bank)
+
+  -- DBK-compatible fallbacks make Bank usable even before a source is chosen.
+  local fm_idx = getFlightMode and getFlightMode() or nil
+  if type(fm_idx) == "number" then return string.format("BANK %d", math.max(1, math.min(3, fm_idx + 1))) end
+  local fm = getValue("FM")
+  if type(fm) == "number" then return string.format("BANK %d", math.max(1, math.min(6, math.floor(fm) + 1))) end
+  return "BANK 1"
 end
 
 local function panel(x, y, w, h)
@@ -189,13 +189,12 @@ local function refresh(w, event, touchState)
   end
 
   if LED_STRIP_LENGTH and LED_STRIP_LENGTH > 0 and setRGBLedColor and applyRGBLedColors then
-    local led_opt = w.options.LEDColor or 7
-    local target_color = arm_on and led_opt or 7 -- OFF when safe
-    
-    if led_cache.last_color ~= target_color then
-      led_cache.last_color = target_color
-      if target_color < 7 then
-        local t = themes[target_color + 1]
+    local enabled = w.options.DispLED == 1
+    local color = math.max(1, math.min(#themes, w.options.LEDColor or 5))
+    if led_cache.enabled ~= enabled or led_cache.color ~= color then
+      led_cache.enabled, led_cache.color = enabled, color
+      if enabled then
+        local t = themes[color]
         for i = 0, LED_STRIP_LENGTH - 1 do
           setRGBLedColor(i, t[1], t[2], t[3])
         end
@@ -224,27 +223,30 @@ local function refresh(w, event, touchState)
   local clock = string.format("%02d:%02d", dt.hour or 0, dt.min or 0)
   text(14, 10, modelName ~= "" and modelName or "ELECTRIC", MIDSIZE, C.white)
   text(400, 8, timer, CENTER + DBLSIZE, timerColor)
-  text(640, 16, string.format("%.2f V", txVoltage), BOLD + SMLSIZE, C.white)
-  text(785, 16, clock, RIGHT + SMLSIZE, C.dim)
+  text(600, 16, string.format("%.1fV", txVoltage), BOLD + SMLSIZE, C.white)
+  text(740, 16, "/", RIGHT + BOLD + SMLSIZE, C.white)
+  text(790, 16, clock, RIGHT + BOLD + SMLSIZE, C.dim)
   lcd.drawLine(X(0), Y(58), X(800), Y(58), SOLID, C.blue)
 
   -- Left: the model-specific helicopter image and governor status.
-  panel(X(10), Y(70), W(270), H(284))
-  if heli_pic then lcd.drawBitmap(heli_pic, X(49), Y(93)) end
-  text(145, 230, "0 Flights", CENTER + SMLSIZE, C.dim)
+  -- Match the lower edge of the right-hand telemetry frame (y = 380).
+  panel(X(10), Y(70), W(270), H(310))
+  if heli_pic then lcd.drawBitmap(heli_pic, X(49), Y(115)) end
+  text(145, 272, "0 Flights", CENTER + SMLSIZE, C.dim)
   local gov_on = gov > 0
   
-  lcd.drawFilledRectangle(X(20), Y(260), W(110), H(28), C.panel2)
-  text(75, 265, "GOV", CENTER + SMLSIZE, C.white)
-  lcd.drawFilledRectangle(X(20), Y(288), W(110), H(42), gov_on and C.green or C.red)
-  text(75, 298, gov_on and "ON" or "OFF", CENTER + MIDSIZE, C.white)
+  lcd.drawFilledRectangle(X(30), Y(302), W(110), H(28), C.panel2)
+  text(85, 307, "GOV", CENTER + SMLSIZE, C.white)
+  lcd.drawFilledRectangle(X(30), Y(330), W(110), H(42), gov_on and C.green or C.red)
+  text(85, 340, gov_on and "ON" or "OFF", CENTER + MIDSIZE, C.white)
 
-  lcd.drawFilledRectangle(X(140), Y(260), W(110), H(28), C.panel2)
-  text(195, 265, "STATUS", CENTER + SMLSIZE, C.white)
-  lcd.drawFilledRectangle(X(140), Y(288), W(110), H(42), arm_on and C.red or C.green)
-  text(195, 298, arm_on and "ARMED" or "SAFE", CENTER + MIDSIZE, C.white)
-  text(145, 365, string.format("BATTERY  %dS  %.1fV", cells, vbat), CENTER + SMLSIZE, C.dim)
-  text(145, 387, string.format("%.0f mAh used", capa), CENTER + SMLSIZE, C.dim)
+  lcd.drawFilledRectangle(X(150), Y(302), W(110), H(28), C.panel2)
+  text(205, 307, "STATUS", CENTER + SMLSIZE, C.white)
+  lcd.drawFilledRectangle(X(150), Y(330), W(110), H(42), arm_on and C.red or C.green)
+  text(205, 340, arm_on and "ARMED" or "SAFE", CENTER + MIDSIZE, C.white)
+  -- Battery summary sits below the left frame, in the bottom status area.
+  text(145, 397, string.format("BATTERY  %dS  %.1fV", cells, vbat), CENTER + SMLSIZE, C.dim)
+  text(145, 419, string.format("%.0f mAh used", capa), CENTER + SMLSIZE, C.dim)
 
   -- Right: Headspeed and ESC blocks.
   panel(X(295), Y(70), W(495), H(150))
@@ -278,13 +280,10 @@ local function refresh(w, event, touchState)
     elseif i == 4 then val_color = esc_temp_color end
     
     local num, unit = nums[i], units[i]
-    local nw = string.len(num) * 18
-    local uw = (unit == "°C") and 16 or (string.len(unit) * 11)
-    local total_w = nw + uw + 2
-    local start_x = cx + 62 - (total_w / 2)
+    local split_x = cx + 62 + (string.len(num) - 3) * 12 + 20
     
-    text(start_x, 284, num, DBLSIZE, val_color)
-    text(start_x + nw + 2, 302, unit, 0, val_color)
+    text(split_x, 284, num, RIGHT + DBLSIZE, val_color)
+    text(split_x + 2, 302, unit, 0, val_color)
     
     text(cx + 62, 341, subs[i], CENTER + SMLSIZE, C.dim)
   end
