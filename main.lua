@@ -1,4 +1,5 @@
 -- RBCT helicopter dashboard for EdgeTX / TX16S MK3.
+-- Author: 雷恩 / Ryan Kuo
 -- Model picture order: Model Setup bitmap (/IMAGES), RBCT/modelImage/<model>.png,
 -- RBCT/modelImage/<model without its first character>.png, then default.png.
 local NAME = "RBCT"
