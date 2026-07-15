@@ -13,10 +13,8 @@ local led_cache = { enabled = nil, color = nil }
 
 local options = {
   { "Timer", VALUE, 1, 1, 3 }, -- TX16S MK3 model timer 1..3
-  -- Match DBK_MK3Min: map one physical three-position switch to Banks 1..3.
   { "BankSwitch", SOURCE, 0 },
   { "Theme", CHOICE, 5, { "Red", "Orange", "Yellow", "Green", "Blue", "Indigo", "Violet" } },
-  -- Same physical LED switch option used by KRC_Dashboard.
   { "DispLED", BOOL, 0 },
   { "LED Color", CHOICE, 5, { "Red", "Orange", "Yellow", "Green", "Blue", "Indigo", "Violet" } },
   { "Arm Source", SOURCE, 0 },
