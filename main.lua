@@ -229,7 +229,7 @@ local function refresh(w, event, touchState)
   lcd.drawLine(X(0), Y(58), X(800), Y(58), SOLID, C.blue)
 
   -- Left: the model-specific helicopter image and governor status.
-  panel(X(10), Y(70), W(270), H(284))
+  panel(X(10), Y(70), W(270), H(310))
   if heli_pic then lcd.drawBitmap(heli_pic, X(49), Y(93)) end
   text(145, 230, "0 Flights", CENTER + SMLSIZE, C.dim)
   local gov_on = gov > 0
@@ -243,8 +243,8 @@ local function refresh(w, event, touchState)
   text(195, 265, "STATUS", CENTER + SMLSIZE, C.white)
   lcd.drawFilledRectangle(X(140), Y(288), W(110), H(42), arm_on and C.red or C.green)
   text(195, 298, arm_on and "ARMED" or "SAFE", CENTER + MIDSIZE, C.white)
-  text(145, 365, string.format("BATTERY  %dS  %.1fV", cells, vbat), CENTER + SMLSIZE, C.dim)
-  text(145, 387, string.format("%.0f mAh used", capa), CENTER + SMLSIZE, C.dim)
+  text(145, 340, string.format("BATTERY  %dS  %.1fV", cells, vbat), CENTER + SMLSIZE, C.dim)
+  text(145, 362, string.format("%.0f mAh used", capa), CENTER + SMLSIZE, C.dim)
 
   -- Right: Headspeed and ESC blocks.
   panel(X(295), Y(70), W(495), H(150))
