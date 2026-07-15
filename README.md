@@ -5,9 +5,11 @@
 
 (English below)
 
-**RBCT** 是一個專為 EdgeTX 開發的直昇機儀表板小工具 (Widget)，完美適配 RadioMaster TX16S MK3 的 800x480 高畫質全彩螢幕。提供完整、直覺的飛行數據監控介面。
+**RBCT** 是一個專為 EdgeTX 開發的直昇機儀表板小工具 (Widget)，支援多種螢幕解析度自動適應，完美適配 RadioMaster TX16S MK3 (800x480)、TX16S MKII (480x272) 以及 TX15 MAX (480x320) 等全彩觸控螢幕。提供完整、直覺的飛行數據監控介面。
 
 ## 🌟 核心功能
+
+*   **跨機種解析度自適應**：自動偵測螢幕大小，無論是 800x480 或 480 寬度的螢幕，皆能自動調整字體與圖片比例，維持最佳顯示效果。
 
 *   **即時遙測數據顯示**：監控並顯示包含電池總電壓 (Vbat)、電流 (A)、消耗容量 (mAh)、BEC 電壓、單節最低電壓 (Cell) 以及 ESC / MCU 溫度。
 *   **旋翼轉速監控 (Headspeed)**：即時顯示目前轉速 (RPM)，並記錄飛行過程中的最高 (max) 與最低 (min) 轉速。
@@ -45,9 +47,11 @@
 
 ## 🇬🇧 English Description
 
-**RBCT** is a comprehensive and visually rich helicopter dashboard widget for EdgeTX, specially designed for the RadioMaster TX16S MK3 (800x480 resolution display). 
+**RBCT** is a comprehensive and visually rich helicopter dashboard widget for EdgeTX. It features dynamic resolution scaling, perfectly supporting the RadioMaster TX16S MK3 (800x480), TX16S MKII (480x272), and TX15 MAX (480x320) color displays. 
 
 ### Features
+
+*   **Dynamic Resolution Scaling**: Automatically adapts layout, font sizes, and image scaling for different screens, ensuring a perfect fit across multiple radio models.
 *   **Real-Time Telemetry Display**: Monitors and displays critical flight data including Battery Voltage, Current (Amps), Capacity (mAh), BEC Voltage, Lowest Cell Voltage, and ESC/MCU Temperatures.
 *   **Headspeed Tracking**: Displays current Headspeed (RPM) along with maximum and minimum RPM statistics during the flight.
 *   **Governor Status**: Clear visual indicator for Governor ON/OFF state.

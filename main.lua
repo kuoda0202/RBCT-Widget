@@ -179,6 +179,11 @@ local function refresh(w, event, touchState)
   local function H(v) return math.floor(v * sy) end
   local function text(px, py, str, flags, color) lcd.drawText(X(px), Y(py), str, flags + color) end
 
+  local f_xxl, f_dbl, f_mid, f_sml, f_0 = XXLSIZE, DBLSIZE, MIDSIZE, SMLSIZE, 0
+  if sw < 600 then
+    f_xxl, f_dbl, f_mid, f_sml, f_0 = DBLSIZE, MIDSIZE, 0, SMLSIZE, SMLSIZE
+  end
+
   local arm_on = false
   if w.options.ArmSource and w.options.ArmSource ~= 0 then
     local arm_val = getValue(w.options.ArmSource)
@@ -220,42 +225,42 @@ local function refresh(w, event, touchState)
   local txVoltage = getValue("tx-voltage") or getValue("TxBt") or 0
   local dt = getDateTime()
   local clock = string.format("%02d:%02d", dt.hour or 0, dt.min or 0)
-  text(14, 10, modelName ~= "" and modelName or "ELECTRIC", MIDSIZE, C.white)
-  text(400, 8, timer, CENTER + DBLSIZE, timerColor)
-  text(600, 16, string.format("%.1fV", txVoltage), BOLD + SMLSIZE, C.white)
-  text(689, 16, "/", RIGHT + BOLD + SMLSIZE, C.white)
-  text(790, 16, clock, RIGHT + BOLD + SMLSIZE, C.dim)
+  text(14, 10, modelName ~= "" and modelName or "ELECTRIC", f_mid, C.white)
+  text(400, 8, timer, CENTER + f_dbl, timerColor)
+  text(600, 16, string.format("%.1fV", txVoltage), BOLD + f_sml, C.white)
+  text(689, 16, "/", RIGHT + BOLD + f_sml, C.white)
+  text(790, 16, clock, RIGHT + BOLD + f_sml, C.dim)
   lcd.drawLine(X(0), Y(58), X(800), Y(58), SOLID, C.blue)
 
   -- Left: the model-specific helicopter image and governor status.
   -- Match the lower edge of the right-hand telemetry frame (y = 380).
   panel(X(10), Y(70), W(270), H(310))
-  if heli_pic then lcd.drawBitmap(heli_pic, X(49), Y(115)) end
-  text(145, 272, "0 Flights", CENTER + SMLSIZE, C.dim)
+  if heli_pic then lcd.drawBitmap(heli_pic, X(49), Y(115), math.floor(sx * 100)) end
+  text(145, 272, "0 Flights", CENTER + f_sml, C.dim)
   local gov_on = gov > 0
   
   lcd.drawFilledRectangle(X(30), Y(302), W(110), H(28), C.panel2)
-  text(85, 307, "GOV", CENTER + SMLSIZE, C.white)
+  text(85, 307, "GOV", CENTER + f_sml, C.white)
   lcd.drawFilledRectangle(X(30), Y(330), W(110), H(42), gov_on and C.green or C.red)
-  text(85, 340, gov_on and "ON" or "OFF", CENTER + MIDSIZE, C.white)
+  text(85, 340, gov_on and "ON" or "OFF", CENTER + f_mid, C.white)
 
   lcd.drawFilledRectangle(X(150), Y(302), W(110), H(28), C.panel2)
-  text(205, 307, "STATUS", CENTER + SMLSIZE, C.white)
+  text(205, 307, "STATUS", CENTER + f_sml, C.white)
   lcd.drawFilledRectangle(X(150), Y(330), W(110), H(42), arm_on and C.red or C.green)
-  text(205, 340, arm_on and "ARMED" or "SAFE", CENTER + MIDSIZE, C.white)
+  text(205, 340, arm_on and "ARMED" or "SAFE", CENTER + f_mid, C.white)
   -- Battery summary sits below the left frame, in the bottom status area.
-  text(145, 397, string.format("BATTERY  %dS  %.1fV", cells, vbat), CENTER + SMLSIZE, C.dim)
-  text(145, 419, string.format("%.0f mAh used", capa), CENTER + SMLSIZE, C.dim)
+  text(145, 397, string.format("BATTERY  %dS  %.1fV", cells, vbat), CENTER + f_sml, C.dim)
+  text(145, 419, string.format("%.0f mAh used", capa), CENTER + f_sml, C.dim)
 
   -- Right: Headspeed and ESC blocks.
   panel(X(295), Y(70), W(495), H(150))
-  text(318, 84, "HEADSPEED  RPM", MIDSIZE, C.white)
-  text(320, 117, string.format("%.0f", hspd), XXLSIZE, C.white)
-  text(765, 114, string.format("max  %.0f", stat(3, "max")), RIGHT + SMLSIZE, C.white)
-  text(765, 137, string.format("min   %.0f", stat(3, "min")), RIGHT + SMLSIZE, C.white)
+  text(318, 84, "HEADSPEED  RPM", f_mid, C.white)
+  text(320, 117, string.format("%.0f", hspd), f_xxl, C.white)
+  text(765, 114, string.format("max  %.0f", stat(3, "max")), RIGHT + f_sml, C.white)
+  text(765, 137, string.format("min   %.0f", stat(3, "min")), RIGHT + f_sml, C.white)
   -- Reuse the Tmcu field here so
   -- this dashboard can show useful FC data.
-  text(765, 160, string.format("MCU TEMP  %.0f °C", sensor(7)), RIGHT + SMLSIZE, C.white)
+  text(765, 160, string.format("MCU TEMP  %.0f °C", sensor(7)), RIGHT + f_sml, C.white)
 
   panel(X(295), Y(236), W(495), H(144))
   local labels = { "AMPS", "Cell", "BEC", "ESC Temp" }
@@ -272,7 +277,7 @@ local function refresh(w, event, touchState)
   for i = 1, 4 do
     local cx = 295 + (i - 1) * 124
     if i > 1 then lcd.drawLine(X(cx), Y(236), X(cx), Y(380), SOLID, C.blue) end
-    text(cx + 62, 252, labels[i], CENTER + SMLSIZE, C.dim)
+    text(cx + 62, 252, labels[i], CENTER + f_sml, C.dim)
     
     local val_color = C.white
     if i == 2 then val_color = cell_color
@@ -281,20 +286,20 @@ local function refresh(w, event, touchState)
     local num, unit = nums[i], units[i]
     local split_x = cx + 62 + (string.len(num) - 3) * 12 + 20
     
-    text(split_x, 284, num, RIGHT + DBLSIZE, val_color)
-    text(split_x + 2, 302, unit, 0, val_color)
+    text(split_x, 284, num, RIGHT + f_dbl, val_color)
+    text(split_x + 2, 302, unit, f_0, val_color)
     
-    text(cx + 62, 341, subs[i], CENTER + SMLSIZE, C.dim)
+    text(cx + 62, 341, subs[i], CENTER + f_sml, C.dim)
   end
 
   panel(X(295), Y(402), W(124), H(44))
-  text(357, 415, bankText(w), CENTER, C.white)
+  text(357, 415, bankText(w), CENTER + f_0, C.white)
 
   if not telemetry then
     lcd.drawFilledRectangle(X(434), Y(402), W(356), H(44), C.red)
-    text(612, 412, "NO DATA", CENTER + MIDSIZE, C.white)
+    text(612, 412, "NO DATA", CENTER + f_mid, C.white)
   else
-    text(20, 420, string.format("BATTERY  %dS  %.1fV / %.0f mAh used", cells, vbat, capa), SMLSIZE, C.dim)
+    text(20, 420, string.format("BATTERY  %dS  %.1fV / %.0f mAh used", cells, vbat, capa), f_sml, C.dim)
   end
 end
 
