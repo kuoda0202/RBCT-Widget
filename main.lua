@@ -277,8 +277,8 @@ local function refresh(w, event, touchState)
   text(357, 412, bankText(w), CENTER + MIDSIZE, C.white)
 
   if not telemetry then
-    lcd.drawFilledRectangle(X(419), Y(402), W(371), H(44), C.red)
-    text(604, 412, "NO DATA", CENTER + MIDSIZE, C.white)
+    lcd.drawFilledRectangle(X(434), Y(402), W(356), H(44), C.red)
+    text(612, 412, "NO DATA", CENTER + MIDSIZE, C.white)
   else
     text(20, 420, string.format("BATTERY  %dS  %.1fV / %.0f mAh used", cells, vbat, capa), SMLSIZE, C.dim)
   end
