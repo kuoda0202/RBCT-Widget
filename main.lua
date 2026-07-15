@@ -266,11 +266,17 @@ local function refresh(w, event, touchState)
     string.format("max %.0f°C", stat(6, "max")),
   }
   local cell_color = (vcel > 0 and vcel < 3.8) and C.red or C.white
+  local esc_temp_color = tesc > 60 and C.red or C.white
   for i = 1, 4 do
     local cx = 295 + (i - 1) * 124
     if i > 1 then lcd.drawLine(X(cx), Y(236), X(cx), Y(380), SOLID, C.blue) end
     text(cx + 62, 252, labels[i], CENTER + SMLSIZE, C.dim)
-    text(cx + 62, 284, values[i], CENTER + DBLSIZE, i == 2 and cell_color or C.white)
+    
+    local val_color = C.white
+    if i == 2 then val_color = cell_color
+    elseif i == 4 then val_color = esc_temp_color end
+    
+    text(cx + 62, 284, values[i], CENTER + DBLSIZE, val_color)
     text(cx + 62, 341, subs[i], CENTER + SMLSIZE, C.dim)
   end
 
