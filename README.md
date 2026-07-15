@@ -13,6 +13,7 @@
 *   **定速狀態指示 (Governor)**：提供醒目直覺的定速開啟/關閉 (ON/OFF) 狀態圖示。
 *   **FBL 停懸段數 (Banks)**：根據您設定的遙控器開關或通道，動態顯示當前使用的 FBL 停懸段數 (Bank)。
 *   **自訂儀表板主題色**：內建 7 種高對比主題色彩 (紅、橘、黃、綠、藍、靛、紫)，可依個人喜好自由切換。
+*   **實體方向桿光圈控制**：直接在小工具中同步控制支援此功能的遙控器 (如 TX16S MK3) 方向桿 RGB 光圈，支援 7 種顏色與關閉選項。
 *   **動態模型圖片**：自動讀取位於 `/IMAGES` 或 `/WIDGETS/RBCT/modelImage/` 的模型圖片。若無圖片則自動載入預設圖。
 *   **飛行計時器整合**：於儀表板顯眼處同步顯示所選的遙控器計時器。
 
@@ -29,6 +30,7 @@
 *   **Bank Source (段數來源)**：選擇用來控制 FBL Bank 切換的通道 (Channel) 或開關。
 *   **Banks (段數數量)**：設定可用的 Bank 總數 (2 至 6 段)。
 *   **Theme (主題)**：選擇您喜歡的面板顏色。
+*   **LED Color (光圈顏色)**：設定遙控器實體方向桿光圈的顏色 (7色可選或 OFF)。
 
 ## 🚁 模型圖片設定
 
@@ -49,6 +51,7 @@
 *   **Governor Status**: Clear visual indicator for Governor ON/OFF state.
 *   **FBL Bank Switching**: Dynamically displays the current FBL (Flybarless) Bank number based on your switch configuration.
 *   **Customizable Themes**: Choose from 7 built-in color themes (Red, Orange, Yellow, Green, Blue, Indigo, Violet) to match your preference.
+*   **Physical Gimbal LED Control**: Directly control the physical RGB gimbal rings on supported radios (like TX16S MK3) from the widget, with 7 color options or OFF.
 *   **Dynamic Model Images**: Automatically loads model pictures from `/IMAGES` or `/WIDGETS/RBCT/modelImage/`. Falls back to a default image if no specific image is found.
 *   **Timer Integration**: Displays your selected flight timer prominently on the dashboard.
 
