@@ -1,5 +1,6 @@
 # RBCT Helicopter Dashboard Widget
 
+**Author / 作者**: 雷恩 / Ryan Kuo
 ![Preview](264695.jpg)
 
 (English below)
