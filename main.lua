@@ -144,10 +144,21 @@ local function bankText(w)
   if not source or source == 0 then return "BANK --" end
   local value = getValue(source)
   if type(value) ~= "number" then return "BANK --" end
+  
   local count = math.max(2, math.min(6, w.options.Banks or 3))
-  value = math.max(-1024, math.min(1024, value))
-  -- Divide the normal EdgeTX source range (-1024..1024) into equal banks.
-  local bank = math.floor((value + 1024) * count / 2049) + 1
+  local bank = 1
+  
+  if count == 3 then
+    if value < -10 then bank = 1
+    elseif value > 10 then bank = 3
+    else bank = 2 end
+  elseif count == 2 then
+    if value < 0 then bank = 1 else bank = 2 end
+  else
+    value = math.max(-1024, math.min(1024, value))
+    bank = math.floor((value + 1024) * count / 2049) + 1
+  end
+  
   return string.format("BANK %d", bank)
 end
 
