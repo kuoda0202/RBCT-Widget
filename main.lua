@@ -169,12 +169,22 @@ local function refresh(w, event, touchState)
   local function H(v) return math.floor(v * sy) end
   local function text(px, py, str, flags, color) lcd.drawText(X(px), Y(py), str, flags + color) end
 
+  local arm_on = false
+  if w.options.ArmSource and w.options.ArmSource ~= 0 then
+    local arm_val = getValue(w.options.ArmSource)
+    if type(arm_val) == "number" then arm_on = arm_val > 0 end
+  else
+    arm_on = sensor(13) > 0 -- Fallback to telemetry sensor
+  end
+
   if LED_STRIP_LENGTH and LED_STRIP_LENGTH > 0 and setRGBLedColor and applyRGBLedColors then
     local led_opt = w.options.LEDColor or 7
-    if led_cache.last_color ~= led_opt then
-      led_cache.last_color = led_opt
-      if led_opt < 7 then
-        local t = themes[led_opt + 1]
+    local target_color = arm_on and led_opt or 7 -- OFF when safe
+    
+    if led_cache.last_color ~= target_color then
+      led_cache.last_color = target_color
+      if target_color < 7 then
+        local t = themes[target_color + 1]
         for i = 0, LED_STRIP_LENGTH - 1 do
           setRGBLedColor(i, t[1], t[2], t[3])
         end
@@ -212,14 +222,6 @@ local function refresh(w, event, touchState)
   if heli_pic then lcd.drawBitmap(heli_pic, X(49), Y(93)) end
   text(145, 230, "0 Flights", CENTER + SMLSIZE, C.dim)
   local gov_on = gov > 0
-  
-  local arm_on = false
-  if w.options.ArmSource and w.options.ArmSource ~= 0 then
-    local arm_val = getValue(w.options.ArmSource)
-    if type(arm_val) == "number" then arm_on = arm_val > 0 end
-  else
-    arm_on = sensor(13) > 0 -- Fallback to telemetry sensor if no switch is configured
-  end
   
   lcd.drawFilledRectangle(X(20), Y(260), W(110), H(28), C.panel2)
   text(75, 265, "GOV", CENTER + SMLSIZE, C.white)
