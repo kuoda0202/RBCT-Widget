@@ -258,7 +258,8 @@ local function refresh(w, event, touchState)
 
   panel(X(295), Y(236), W(495), H(144))
   local labels = { "AMPS", "Cell", "BEC", "ESC Temp" }
-  local values = { string.format("%.1fA", curr), string.format("%.2fV", vcel), string.format("%.1fV", vbec), string.format("%.0f°C", tesc) }
+  local nums = { string.format("%.1f", curr), string.format("%.2f", vcel), string.format("%.1f", vbec), string.format("%.0f", tesc) }
+  local units = { "A", "V", "V", "°C" }
   local subs = {
     string.format("max %.1fA", amps(stat(2, "max"))),
     string.format("min %.2fV", volts(stat(15, "min"))),
@@ -276,7 +277,15 @@ local function refresh(w, event, touchState)
     if i == 2 then val_color = cell_color
     elseif i == 4 then val_color = esc_temp_color end
     
-    text(cx + 62, 284, values[i], CENTER + DBLSIZE, val_color)
+    local num, unit = nums[i], units[i]
+    local pcx = X(cx + 62)
+    local nw = lcd.getTextWidth and lcd.getTextWidth(num, DBLSIZE) or W(40)
+    local uw = lcd.getTextWidth and lcd.getTextWidth(unit, 0) or W(15)
+    local px = pcx - math.floor((nw + uw + W(2)) / 2)
+    
+    lcd.drawText(px, Y(284), num, DBLSIZE + val_color)
+    lcd.drawText(px + nw + W(2), Y(300), unit, val_color)
+    
     text(cx + 62, 341, subs[i], CENTER + SMLSIZE, C.dim)
   end
 
