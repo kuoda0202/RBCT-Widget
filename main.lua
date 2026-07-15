@@ -229,7 +229,7 @@ local function refresh(w, event, touchState)
   lcd.drawLine(X(0), Y(58), X(800), Y(58), SOLID, C.blue)
 
   -- Left: the model-specific helicopter image and governor status.
-  panel(X(10), Y(70), W(270), H(310))
+  panel(X(10), Y(70), W(270), H(284))
   if heli_pic then lcd.drawBitmap(heli_pic, X(49), Y(93)) end
   text(145, 230, "0 Flights", CENTER + SMLSIZE, C.dim)
   local gov_on = gov > 0
@@ -243,8 +243,8 @@ local function refresh(w, event, touchState)
   text(195, 265, "STATUS", CENTER + SMLSIZE, C.white)
   lcd.drawFilledRectangle(X(140), Y(288), W(110), H(42), arm_on and C.red or C.green)
   text(195, 298, arm_on and "ARMED" or "SAFE", CENTER + MIDSIZE, C.white)
-  text(145, 340, string.format("BATTERY  %dS  %.1fV", cells, vbat), CENTER + SMLSIZE, C.dim)
-  text(145, 362, string.format("%.0f mAh used", capa), CENTER + SMLSIZE, C.dim)
+  text(145, 365, string.format("BATTERY  %dS  %.1fV", cells, vbat), CENTER + SMLSIZE, C.dim)
+  text(145, 387, string.format("%.0f mAh used", capa), CENTER + SMLSIZE, C.dim)
 
   -- Right: Headspeed and ESC blocks.
   panel(X(295), Y(70), W(495), H(150))
@@ -278,19 +278,19 @@ local function refresh(w, event, touchState)
     elseif i == 4 then val_color = esc_temp_color end
     
     local num, unit = nums[i], units[i]
-    local pcx = X(cx + 62)
-    local nw = lcd.getTextWidth and lcd.getTextWidth(num, DBLSIZE) or W(40)
-    local uw = lcd.getTextWidth and lcd.getTextWidth(unit, 0) or W(15)
-    local px = pcx - math.floor((nw + uw + W(2)) / 2)
+    local nw = string.len(num) * 18
+    local uw = (unit == "°C") and 16 or (string.len(unit) * 11)
+    local total_w = nw + uw + 2
+    local start_x = cx + 62 - (total_w / 2)
     
-    lcd.drawText(px, Y(284), num, DBLSIZE + val_color)
-    lcd.drawText(px + nw + W(2), Y(300), unit, val_color)
+    text(start_x, 284, num, DBLSIZE, val_color)
+    text(start_x + nw + 2, 302, unit, 0, val_color)
     
     text(cx + 62, 341, subs[i], CENTER + SMLSIZE, C.dim)
   end
 
   panel(X(295), Y(402), W(124), H(44))
-  text(357, 412, bankText(w), CENTER + MIDSIZE, C.white)
+  text(357, 415, bankText(w), CENTER, C.white)
 
   if not telemetry then
     lcd.drawFilledRectangle(X(434), Y(402), W(356), H(44), C.red)
