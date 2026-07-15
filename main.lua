@@ -224,7 +224,7 @@ local function refresh(w, event, touchState)
   text(14, 10, modelName ~= "" and modelName or "ELECTRIC", MIDSIZE, C.white)
   text(400, 8, timer, CENTER + DBLSIZE, timerColor)
   text(600, 16, string.format("%.1fV", txVoltage), BOLD + SMLSIZE, C.white)
-  text(685, 16, "/", RIGHT + BOLD + SMLSIZE, C.white)
+  text(689, 16, "/", RIGHT + BOLD + SMLSIZE, C.white)
   text(790, 16, clock, RIGHT + BOLD + SMLSIZE, C.dim)
   lcd.drawLine(X(0), Y(58), X(800), Y(58), SOLID, C.blue)
 
