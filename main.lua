@@ -3,8 +3,8 @@
 -- RBCT/modelImage/<model without its first character>.png, then default.png.
 local NAME = "RBCT"
 
--- Keep this list byte-for-byte compatible with DBK_MK3Min.  The order is
--- also deliberately the same, so an existing DBK telemetry setup works here.
+-- Keep this list byte-for-byte compatible with standard telemetry. The order is
+-- deliberately arranged to ensure standard telemetry setup works here.
 local sensors = { "Vbat", "Curr", "Hspd", "Capa", "Bat%", "Tesc", "Tmcu", "1RSS", "2RSS", "RQly", "Thr", "Vbec", "ARM", "Gov", "Vcel", "FM" }
 local id, mm = {}, {}
 local heli_pic, loaded_model_key
@@ -23,8 +23,7 @@ local C = {
   red = lcd.RGB(255, 67, 84), green = lcd.RGB(48, 231, 107), black = lcd.RGB(0, 0, 0),
 }
 
--- Seven selectable rainbow-colour themes. Blue is the default, matching the
--- original VBar-style dashboard.
+-- Seven selectable rainbow-colour themes. Blue is the default.
 local themes = {
   { 235,  62,  72 }, -- Red
   { 255, 135,   0 }, -- Orange
@@ -76,7 +75,7 @@ local function modelImagePath(m)
   if name ~= "" then
     local p = "/WIDGETS/RBCT/modelImage/" .. name .. ".png"
     if fstat(p) then return p end
-    -- DBK_MK3Min uses a leading model-type marker (for example >RS5).
+    -- Handle cases with a leading model-type marker (for example >RS5).
     p = "/WIDGETS/RBCT/modelImage/" .. string.sub(name, 2) .. ".png"
     if fstat(p) then return p end
   end
@@ -115,7 +114,7 @@ local function background(w)
 end
 
 local function volts(v)
-  -- DBK_MK3Min / EdgeTX returns these telemetry values in volts already.
+  -- EdgeTX returns these telemetry values in volts already.
   -- Only protect against the uncommon centivolt representation; never turn
   -- a normal 11.1 V flight pack into 1.1 V.
   if v > 100 then return v / 100 end
@@ -200,14 +199,14 @@ local function refresh(w, event, touchState)
   text(145, 365, string.format("BATTERY  %dS  %.1fV", cells, vbat), CENTER + SMLSIZE, C.dim)
   text(145, 387, string.format("%.0f mAh used", capa), CENTER + SMLSIZE, C.dim)
 
-  -- Right: VBar-like headspeed and ESC blocks.
+  -- Right: Headspeed and ESC blocks.
   panel(X(295), Y(70), W(495), H(150))
   text(318, 84, "HEADSPEED  RPM", MIDSIZE, C.white)
   text(320, 117, string.format("%.0f", hspd), XXLSIZE, C.white)
   text(765, 114, string.format("max  %.0f", stat(3, "max")), RIGHT + SMLSIZE, C.white)
   text(765, 137, string.format("min   %.0f", stat(3, "min")), RIGHT + SMLSIZE, C.white)
-  -- DBK_MK3Min has no tail-RPM definition. Reuse its Tmcu field here so
-  -- this dashboard remains fully compatible while showing useful FC data.
+  -- Reuse the Tmcu field here so
+  -- this dashboard can show useful FC data.
   text(765, 160, string.format("MCU TEMP  %.0f \128C", sensor(7)), RIGHT + SMLSIZE, C.white)
 
   panel(X(295), Y(236), W(495), H(144))
