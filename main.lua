@@ -3,6 +3,7 @@
 -- Model picture order: Model Setup bitmap (/IMAGES), RBCT/modelImage/<model>.png,
 -- RBCT/modelImage/<model without its first character>.png, then default.png.
 local NAME = "RBCT"
+local VERSION = "v 1.0.001"
 
 -- Keep this list byte-for-byte compatible with standard telemetry. The order is
 -- deliberately arranged to ensure standard telemetry setup works here.
@@ -18,6 +19,8 @@ local options = {
   { "DispLED", BOOL, 0 },
   { "LED Color", CHOICE, 5, { "Red", "Orange", "Yellow", "Green", "Blue", "Indigo", "Violet" } },
   { "Arm Source", SOURCE, 0 },
+  { "Arm Invert", BOOL, 0 },
+  { "UserName", STRING, "Pilot" },
 }
 
 local C = {
@@ -107,11 +110,25 @@ local function update(w, opts) w.options = opts end
 
 local function background(w)
   resolveSensors()
+
+  -- 自動偵測更換電池或重置遙測
+  local cur_vbat = sensor(1)
+  if cur_vbat == 0 and mm[1] and mm[1].max and mm[1].max > 0 then
+    resetMinMax()
+  end
+
+  local cur_capa = sensor(4)
+  if cur_capa < 10 and mm[4] and mm[4].max and mm[4].max > 50 then
+    resetMinMax()
+  end
+
   for i = 1, #sensors do
     local v = sensor(i)
     if id[i] then
       mm[i].cur = v
-      mm[i].min = mm[i].min and math.min(mm[i].min, v) or v
+      if v ~= 0 then
+        mm[i].min = mm[i].min and math.min(mm[i].min, v) or v
+      end
       mm[i].max = mm[i].max and math.max(mm[i].max, v) or v
     end
   end
@@ -126,8 +143,8 @@ local function volts(v)
 end
 
 local function amps(v)
+  -- 移除 v > 200 的限制，避免 700 級直昇機大電流時顯示錯誤縮水 10 倍
   if v > 2000 then return v / 100 end
-  if v > 200 then return v / 10 end
   return v
 end
 
@@ -185,9 +202,16 @@ local function refresh(w, event, touchState)
   end
 
   local arm_on = false
-  if w.options.ArmSource and w.options.ArmSource ~= 0 then
-    local arm_val = getValue(w.options.ArmSource)
-    if type(arm_val) == "number" then arm_on = arm_val > 0 end
+  if w.options["Arm Source"] and w.options["Arm Source"] ~= 0 then
+    local arm_val = getValue(w.options["Arm Source"])
+    if type(arm_val) == "boolean" then 
+      arm_on = arm_val
+    elseif type(arm_val) == "number" then 
+      arm_on = arm_val > 0 
+    end
+    if w.options["Arm Invert"] == 1 then
+      arm_on = not arm_on
+    end
   else
     arm_on = sensor(13) > 0 -- Fallback to telemetry sensor
   end
@@ -214,7 +238,9 @@ local function refresh(w, event, touchState)
   local vbat, curr, hspd, capa = volts(sensor(1)), amps(sensor(2)), sensor(3), sensor(4)
   local tesc, vbec, gov, vcel = sensor(6), volts(sensor(12)), sensor(14), volts(sensor(15))
   local timer, timerColor = timerText(w)
-  local cells = vbat > 0 and math.max(1, math.floor(vbat / 4.2 + 0.85)) or 0
+  -- 使用最高紀錄的電池電壓 (剛接上時的靜止電壓) 來計算 S 數，避免飛行中因壓降導致 S 數亂跳
+  local max_vbat = stat(1, "max")
+  local cells = max_vbat > 0 and math.max(1, math.floor(max_vbat / 4.2 + 0.85)) or 0
   local telemetry = false
   for i = 1, #sensors do if id[i] and stat(i, "cur") ~= 0 then telemetry = true break end end
 
@@ -228,7 +254,6 @@ local function refresh(w, event, touchState)
   text(14, 10, modelName ~= "" and modelName or "ELECTRIC", f_mid, C.white)
   text(400, 8, timer, CENTER + f_dbl, timerColor)
   text(600, 16, string.format("%.1fV", txVoltage), BOLD + f_sml, C.white)
-  text(689, 16, "/", RIGHT + BOLD + f_sml, C.white)
   text(790, 16, clock, RIGHT + BOLD + f_sml, C.dim)
   lcd.drawLine(X(0), Y(58), X(800), Y(58), SOLID, C.blue)
 
@@ -251,6 +276,7 @@ local function refresh(w, event, touchState)
   -- Battery summary sits below the left frame, in the bottom status area.
   text(145, 397, string.format("BATTERY  %dS  %.1fV", cells, vbat), CENTER + f_sml, C.dim)
   text(145, 419, string.format("%.0f mAh used", capa), CENTER + f_sml, C.dim)
+  text(145, 441, VERSION, CENTER + f_sml, C.dim)
 
   -- Right: Headspeed and ESC blocks.
   panel(X(295), Y(70), W(495), H(150))
@@ -272,7 +298,8 @@ local function refresh(w, event, touchState)
     string.format("min %.1fV", volts(stat(12, "min"))),
     string.format("max %.0f°C", stat(6, "max")),
   }
-  local cell_color = (vcel > 0 and vcel < 3.8) and C.red or C.white
+  -- 將單芯警告電壓從 3.8V 調降至合理的 3.5V，避免起飛後一直閃紅字
+  local cell_color = (vcel > 0 and vcel < 3.5) and C.red or C.white
   local esc_temp_color = tesc > 60 and C.red or C.white
   for i = 1, 4 do
     local cx = 295 + (i - 1) * 124
@@ -299,7 +326,10 @@ local function refresh(w, event, touchState)
     lcd.drawFilledRectangle(X(434), Y(402), W(356), H(44), C.red)
     text(612, 412, "NO DATA", CENTER + f_mid, C.white)
   else
-    text(20, 420, string.format("BATTERY  %dS  %.1fV / %.0f mAh used", cells, vbat, capa), f_sml, C.dim)
+    local user_name = w.options.UserName or ""
+    if user_name ~= "" then
+      text(612, 412, user_name, CENTER + f_mid, C.white)
+    end
   end
 end
 

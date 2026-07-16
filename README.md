@@ -43,6 +43,20 @@
 *   將圖片放入 `/WIDGETS/RBCT/modelImage/` 目錄，並將檔名命名為與「模型名稱」完全一致。
 *   或者直接透過 EdgeTX 系統內建的模型圖片設定，小工具也會自動抓取顯示。
 
+## 📝 最新更新 (Latest Updates)
+
+### v1.0.001 重大更新與 Bug 修復
+*   **介面自訂**：新增 `UserName` 選項，在有遙測訊號時，可將右下角的 "NO DATA" 區塊替換為您專屬的英文簽名 (無底框純白字體設計)。
+*   **功能新增**：在設定選單中新增 `Arm Invert` (反向解鎖) 功能，方便不同遙控器開關習慣的飛友自行反轉 ARM/SAFE 的判斷邏輯。
+*   **介面優化**：移除右上角電壓與時間中間多餘的斜線 `/`，讓畫面更乾淨；並於左下角加入淡淡的版本號浮水印 (`v 1.0.001`)。
+*   **版面修復**：修正接上電池後，左下角電池資訊與 "NO DATA" 文字發生重疊的顯示錯誤。
+*   **邏輯修復 (重大)**：修正了原版程式碼會將超過 200A 的電流強制縮小 10 倍的嚴重 Bug，現在 700/800 級直昇機的大電流也能精準顯示！
+*   **邏輯修復**：修正了 `Arm Source` 設定無法正確讀取實體開關，導致上鎖 (SAFE) 狀態卡住的問題。
+*   **邏輯修復**：修正了飛行中因大螺距壓降導致「電池 S 數」亂跳的問題，現在 S 數會在接上電池時準確鎖定。
+*   **邏輯修復**：將單芯電壓的紅色警告閾值由過高的 3.8V 調降至合理的 3.5V，避免正常飛行時產生視覺干擾。
+*   **邏輯修復**：修正使用邏輯開關 (Logical Switch) 觸發解鎖 (Arm) 時會導致腳本崩潰的錯誤。
+*   **邏輯修復**：修正更換電池時，最高/最低電壓與轉速不會自動重置，且最低數值永遠卡在 0 的問題。
+
 ---
 
 ## 🇬🇧 English Description
@@ -65,3 +79,15 @@
 1. Copy the `RBCT` folder into the `WIDGETS` directory on your SD card (`/WIDGETS/RBCT`).
 2. On your radio, navigate to the Telemetry screen setup.
 3. Select the `RBCT` widget and assign it to a full-screen layout.
+
+### Changelog (v1.0.001)
+*   **Customization**: Added a `UserName` option to display your custom pilot name (clean white text with no frame) instead of "NO DATA" when telemetry is active.
+*   **New Feature**: Added an `Arm Invert` option in the settings to easily reverse the physical switch logic for ARMED/SAFE statuses.
+*   **UI Tweaks**: Removed the redundant `/` symbol between Tx voltage and clock for a cleaner header, and added a faint version watermark (`v 1.0.001`) below the battery capacity.
+*   **UI Fix**: Fixed a layout bug where battery information overlapped with the "NO DATA" text in the bottom left corner when a battery was connected.
+*   **Critical Fix**: Removed an incorrect >200A limit that caused high currents (common in 700/800 class helicopters) to be displayed 10x smaller.
+*   **Bug Fix**: Fixed the `Arm Source` setting so it correctly reads physical switches, preventing the ARMED status from getting stuck.
+*   **Bug Fix**: Locked the automatic battery cell count (S) to the maximum recorded voltage to prevent the cell count from randomly changing during in-flight voltage sag.
+*   **Bug Fix**: Lowered the overly sensitive single-cell voltage warning threshold from 3.8V to 3.5V to avoid false red alarms during normal flights.
+*   **Bug Fix**: Fixed a script crash when using Logical Switches (boolean values) as the Arm Source.
+*   **Bug Fix**: Fixed an issue where Min/Max telemetry values (like lowest voltage) would get stuck at 0 and fail to automatically reset when changing to a new battery.
