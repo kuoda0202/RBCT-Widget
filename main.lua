@@ -3,7 +3,7 @@
 -- Model picture order: Model Setup bitmap (/IMAGES), RBCT/modelImage/<model>.png,
 -- RBCT/modelImage/<model without its first character>.png, then default.png.
 local NAME = "RBCT"
-local VERSION = "v 1.0.001"
+local VERSION = "v 1.0.002"
 
 -- Keep this list byte-for-byte compatible with standard telemetry. The order is
 -- deliberately arranged to ensure standard telemetry setup works here.
@@ -15,9 +15,10 @@ local led_cache = { enabled = nil, color = nil }
 local options = {
   { "Timer", VALUE, 1, 1, 3 }, -- TX16S MK3 model timer 1..3
   { "BankSwitch", SOURCE, 0 },
-  { "Theme", CHOICE, 5, { "Red", "Orange", "Yellow", "Green", "Blue", "Indigo", "Violet" } },
+  { "Theme", CHOICE, 4, { "Red", "Orange", "Yellow", "Green", "Blue", "Indigo", "Violet", "Black", "TRN" } },
+  { "Transp BG", BOOL, 0 },
   { "DispLED", BOOL, 0 },
-  { "LED Color", CHOICE, 5, { "Red", "Orange", "Yellow", "Green", "Blue", "Indigo", "Violet" } },
+  { "LED Color", CHOICE, 4, { "Red", "Orange", "Yellow", "Green", "Blue", "Indigo", "Violet", "Rainbow" } },
   { "Arm Source", SOURCE, 0 },
   { "Arm Invert", BOOL, 0 },
   { "UserName", STRING, "Pilot" },
@@ -28,9 +29,10 @@ local C = {
   panel = lcd.RGB(15, 48, 122), panel2 = lcd.RGB(22, 61, 143),
   white = lcd.RGB(242, 247, 255), dim = lcd.RGB(147, 193, 255),
   red = lcd.RGB(255, 67, 84),    green = lcd.RGB(0, 180, 0), black = lcd.RGB(0, 0, 0),
+  orange = lcd.RGB(255, 135, 0),
 }
 
--- Seven selectable rainbow-colour themes. Blue is the default.
+-- Selectable colour themes. Blue is the default.
 local themes = {
   { 235,  62,  72 }, -- Red
   { 255, 135,   0 }, -- Orange
@@ -39,6 +41,8 @@ local themes = {
   {   0, 126, 255 }, -- Blue
   {  82,  82, 220 }, -- Indigo
   { 175,  70, 235 }, -- Violet
+  { 128, 128, 128 }, -- Black
+  { 255, 255, 255 }, -- TRN
 }
 
 local function setTheme(n)
@@ -178,8 +182,19 @@ local function bankText(w)
   return "BANK 1"
 end
 
-local function panel(x, y, w, h)
-  lcd.drawFilledRectangle(x, y, w, h, C.panel)
+local function drawBgRect(x, y, w, h, color, is_transp)
+  if is_transp then
+    for i = 0, h - 1, 2 do
+      lcd.drawLine(x, y + i, x + w - 1, y + i, SOLID, C.blue)
+    end
+  else
+    lcd.drawFilledRectangle(x, y, w, h, color)
+  end
+end
+
+local function panel(x, y, w, h, is_trn, is_transp)
+  if is_trn then return end
+  drawBgRect(x, y, w, h, C.panel, is_transp)
   lcd.drawRectangle(x, y, w, h, C.blue)
 end
 
@@ -194,8 +209,14 @@ local function refresh(w, event, touchState)
   local function Y(v) return y + math.floor(v * sy) end
   local function W(v) return math.floor(v * sx) end
   local function H(v) return math.floor(v * sy) end
-  local function text(px, py, str, flags, color) lcd.drawText(X(px), Y(py), str, flags + color) end
-
+  local is_trn = (w.options.Theme == 9)
+  local is_transp = (w.options["Transp BG"] == 1)
+  local function text(px, py, str, flags, color)
+    if (is_trn or is_transp) and color ~= C.black then
+      lcd.drawText(X(px) + 2, Y(py) + 2, str, flags + C.black)
+    end
+    lcd.drawText(X(px), Y(py), str, flags + color)
+  end
   local f_xxl, f_dbl, f_mid, f_sml, f_0 = XXLSIZE, DBLSIZE, MIDSIZE, SMLSIZE, 0
   if sw < 600 then
     f_xxl, f_dbl, f_mid, f_sml, f_0 = DBLSIZE, MIDSIZE, 0, SMLSIZE, SMLSIZE
@@ -218,20 +239,40 @@ local function refresh(w, event, touchState)
 
   if LED_STRIP_LENGTH and LED_STRIP_LENGTH > 0 and setRGBLedColor and applyRGBLedColors then
     local enabled = w.options.DispLED == 1
-    local color = math.max(1, math.min(#themes, w.options.LEDColor or 5))
-    if led_cache.enabled ~= enabled or led_cache.color ~= color then
-      led_cache.enabled, led_cache.color = enabled, color
-      if enabled then
-        local t = themes[color]
+    local color_opt = w.options["LED Color"]
+    local color_idx = type(color_opt) == "number" and color_opt or 4
+    local is_rainbow = (color_idx == 7) or (color_idx == 8)
+
+    if enabled and is_rainbow then
+      local offset = math.floor(getTime() / 15)
+      if led_cache.enabled ~= enabled or led_cache.color ~= 99 or led_cache.offset ~= offset then
+        led_cache.enabled, led_cache.color, led_cache.offset = enabled, 99, offset
         for i = 0, LED_STRIP_LENGTH - 1 do
+          local t = themes[((i + offset) % 7) + 1]
           setRGBLedColor(i, t[1], t[2], t[3])
         end
-      else
-        for i = 0, LED_STRIP_LENGTH - 1 do
-          setRGBLedColor(i, 0, 0, 0)
-        end
+        applyRGBLedColors()
       end
-      applyRGBLedColors()
+    else
+      -- Solid color logic (preserving original mapping behavior)
+      local color = math.max(1, math.min(7, color_idx))
+      -- If 0-based index was passed, we ideally want +1. But we keep it safe:
+      if color_idx == 0 then color = 1 elseif color_idx > 0 and color_idx < 7 then color = color_idx + 1 end
+      
+      if led_cache.enabled ~= enabled or led_cache.color ~= color then
+        led_cache.enabled, led_cache.color = enabled, color
+        if enabled then
+          local t = themes[color]
+          for i = 0, LED_STRIP_LENGTH - 1 do
+            setRGBLedColor(i, t[1], t[2], t[3])
+          end
+        else
+          for i = 0, LED_STRIP_LENGTH - 1 do
+            setRGBLedColor(i, 0, 0, 0)
+          end
+        end
+        applyRGBLedColors()
+      end
     end
   end
 
@@ -244,8 +285,12 @@ local function refresh(w, event, touchState)
   local telemetry = false
   for i = 1, #sensors do if id[i] and stat(i, "cur") ~= 0 then telemetry = true break end end
 
-  lcd.drawFilledRectangle(x, y, sw, sh, C.bg)
-  lcd.drawRectangle(x, y, sw, sh, C.blue)
+  if not is_transp and not is_trn then
+    lcd.drawFilledRectangle(x, y, sw, sh, C.bg)
+  end
+  if not is_trn then
+    lcd.drawRectangle(x, y, sw, sh, C.blue)
+  end
   -- Header: model name, selected MK3 timer, and transmitter battery/clock.
   local modelName = (model.getInfo() or {}).name or ""
   local txVoltage = getValue("tx-voltage") or getValue("TxBt") or 0
@@ -255,40 +300,55 @@ local function refresh(w, event, touchState)
   text(400, 8, timer, CENTER + f_dbl, timerColor)
   text(600, 16, string.format("%.1fV", txVoltage), BOLD + f_sml, C.white)
   text(790, 16, clock, RIGHT + BOLD + f_sml, C.dim)
-  lcd.drawLine(X(0), Y(58), X(800), Y(58), SOLID, C.blue)
+  if not is_trn then lcd.drawLine(X(0), Y(58), X(800), Y(58), SOLID, C.blue) end
 
   -- Left: the model-specific helicopter image and governor status.
-  -- Match the lower edge of the right-hand telemetry frame (y = 380).
-  panel(X(10), Y(70), W(270), H(310))
-  if heli_pic then lcd.drawBitmap(heli_pic, X(49), Y(115), math.floor(sx * 100)) end
-  text(145, 272, "0 Flights", CENTER + f_sml, C.dim)
+  -- Match the lower edge of the bottom right-hand frames (y = 470).
+  panel(X(10), Y(70), W(270), H(400), is_trn, is_transp)
+  if heli_pic then lcd.drawBitmap(heli_pic, X(49), Y(80), math.floor(sx * 100)) end
+  text(145, 210, "0 Flights", CENTER + f_sml, C.dim)
   local gov_on = gov > 0
   
-  lcd.drawFilledRectangle(X(30), Y(302), W(110), H(28), C.panel2)
-  text(85, 307, "GOV", CENTER + f_sml, C.white)
-  lcd.drawFilledRectangle(X(30), Y(330), W(110), H(42), gov_on and C.green or C.red)
-  text(85, 340, gov_on and "ON" or "OFF", CENTER + f_mid, C.white)
+  if not is_trn then drawBgRect(X(20), Y(235), W(120), H(28), C.panel2, is_transp) end
+  text(80, 240, "GOV", CENTER + f_sml, C.white)
+  lcd.drawFilledRectangle(X(20), Y(263), W(120), H(42), gov_on and C.green or C.red)
+  lcd.drawText(X(80), Y(269), gov_on and "ON" or "OFF", CENTER + f_mid + C.white)
 
-  lcd.drawFilledRectangle(X(150), Y(302), W(110), H(28), C.panel2)
-  text(205, 307, "STATUS", CENTER + f_sml, C.white)
-  lcd.drawFilledRectangle(X(150), Y(330), W(110), H(42), arm_on and C.red or C.green)
-  text(205, 340, arm_on and "ARMED" or "SAFE", CENTER + f_mid, C.white)
+  if not is_trn then drawBgRect(X(150), Y(235), W(120), H(28), C.panel2, is_transp) end
+  text(210, 240, "STATUS", CENTER + f_sml, C.white)
+  lcd.drawFilledRectangle(X(150), Y(263), W(120), H(42), arm_on and C.red or C.green)
+  lcd.drawText(X(210), Y(269), arm_on and "ARMED" or "SAFE", CENTER + f_mid + C.white)
+
+  -- Battery Percentage Bar
+  local bat_pct = sensor(5)
+  local pct_color = C.red
+  if bat_pct > 30 then pct_color = C.green
+  elseif bat_pct > 15 then pct_color = C.orange
+  end
+  
+  if not is_trn then drawBgRect(X(20), Y(320), W(250), H(50), C.panel2, is_transp) end
+  local bar_w = math.max(0, math.min(250, math.floor((bat_pct / 100) * 250)))
+  if bar_w > 0 then
+    lcd.drawFilledRectangle(X(20), Y(320), W(bar_w), H(50), pct_color)
+  end
+  lcd.drawRectangle(X(20), Y(320), W(250), H(50), is_trn and C.black or C.blue)
+  text(145, 329, string.format("%d %%", bat_pct), CENTER + f_mid, C.white)
   -- Battery summary sits below the left frame, in the bottom status area.
-  text(145, 397, string.format("BATTERY  %dS  %.1fV", cells, vbat), CENTER + f_sml, C.dim)
-  text(145, 419, string.format("%.0f mAh used", capa), CENTER + f_sml, C.dim)
-  text(145, 441, VERSION, CENTER + f_sml, C.dim)
+  text(145, 390, string.format("BATTERY  %dS  %.1fV", cells, vbat), CENTER + f_sml, C.dim)
+  text(145, 412, string.format("%.0f mAh used", capa), CENTER + f_sml, C.dim)
+  text(145, 434, VERSION, CENTER + f_sml, C.dim)
 
   -- Right: Headspeed and ESC blocks.
-  panel(X(295), Y(70), W(495), H(150))
-  text(318, 84, "HEADSPEED  RPM", f_mid, C.white)
-  text(320, 117, string.format("%.0f", hspd), f_xxl, C.white)
-  text(765, 114, string.format("max  %.0f", stat(3, "max")), RIGHT + f_sml, C.white)
-  text(765, 137, string.format("min   %.0f", stat(3, "min")), RIGHT + f_sml, C.white)
+  panel(X(295), Y(70), W(495), H(160), is_trn, is_transp)
+  text(318, 89, "HEADSPEED  RPM", f_mid, C.white)
+  text(320, 127, string.format("%.0f", hspd), f_xxl, C.white)
+  text(765, 124, string.format("max  %.0f", stat(3, "max")), RIGHT + f_sml, C.white)
+  text(765, 147, string.format("min   %.0f", stat(3, "min")), RIGHT + f_sml, C.white)
   -- Reuse the Tmcu field here so
   -- this dashboard can show useful FC data.
-  text(765, 160, string.format("MCU TEMP  %.0f °C", sensor(7)), RIGHT + f_sml, C.white)
+  text(765, 175, string.format("MCU TEMP  %.0f °C", sensor(7)), RIGHT + f_sml, C.white)
 
-  panel(X(295), Y(236), W(495), H(144))
+  panel(X(295), Y(245), W(495), H(160), is_trn, is_transp)
   local labels = { "AMPS", "Cell", "BEC", "ESC Temp" }
   local nums = { string.format("%.1f", curr), string.format("%.2f", vcel), string.format("%.1f", vbec), string.format("%.0f", tesc) }
   local units = { "A", "V", "V", "°C" }
@@ -303,8 +363,8 @@ local function refresh(w, event, touchState)
   local esc_temp_color = tesc > 60 and C.red or C.white
   for i = 1, 4 do
     local cx = 295 + (i - 1) * 124
-    if i > 1 then lcd.drawLine(X(cx), Y(236), X(cx), Y(380), SOLID, C.blue) end
-    text(cx + 62, 252, labels[i], CENTER + f_sml, C.dim)
+    if i > 1 and not is_trn then lcd.drawLine(X(cx), Y(245), X(cx), Y(405), SOLID, C.blue) end
+    text(cx + 62, 265, labels[i], CENTER + f_sml, C.dim)
     
     local val_color = C.white
     if i == 2 then val_color = cell_color
@@ -313,22 +373,22 @@ local function refresh(w, event, touchState)
     local num, unit = nums[i], units[i]
     local split_x = cx + 62 + (string.len(num) - 3) * 12 + 20
     
-    text(split_x, 284, num, RIGHT + f_dbl, val_color)
-    text(split_x + 2, 302, unit, f_0, val_color)
+    text(split_x, 301, num, RIGHT + f_dbl, val_color)
+    text(split_x + 2, 319, unit, f_0, val_color)
     
-    text(cx + 62, 341, subs[i], CENTER + f_sml, C.dim)
+    text(cx + 62, 362, subs[i], CENTER + f_sml, C.dim)
   end
 
-  panel(X(295), Y(402), W(124), H(44))
-  text(357, 415, bankText(w), CENTER + f_0, C.white)
+  panel(X(295), Y(420), W(124), H(50), is_trn, is_transp)
+  text(357, 436, bankText(w), CENTER + f_0, C.white)
 
   if not telemetry then
-    lcd.drawFilledRectangle(X(434), Y(402), W(356), H(44), C.red)
-    text(612, 412, "NO DATA", CENTER + f_mid, C.white)
+    lcd.drawFilledRectangle(X(434), Y(420), W(356), H(50), C.red)
+    lcd.drawText(X(612), Y(429), "NO DATA", CENTER + f_mid + C.white)
   else
     local user_name = w.options.UserName or ""
     if user_name ~= "" then
-      text(612, 412, user_name, CENTER + f_mid, C.white)
+      text(612, 429, user_name, CENTER + f_mid, C.white)
     end
   end
 end
