@@ -1,7 +1,14 @@
 # RBCT Helicopter Dashboard Widget
 
 **Author / 作者**: 雷恩 / Ryan Kuo
-![Preview](264936.jpg)
+### Standard UI (預設標準介面)
+![Standard UI](Standard%20UI.jpg)
+
+### Clean UI (透明背景模式)
+![Clean UI](Clean%20UI.jpg)
+
+### Transparent UI (TRN 全透無框模式)
+![Transparent UI](Transparent%20UI.jpg)
 
 (English below)
 
