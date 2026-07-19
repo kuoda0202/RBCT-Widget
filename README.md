@@ -1,6 +1,7 @@
 # RBCT Helicopter Dashboard Widget
 
 **Author / 作者**: 雷恩 / Ryan Kuo
+免責聲明：使用此資訊需自行承擔風險
 ### Standard UI (預設標準介面)
 ![Standard UI](Standard%20UI.jpg)
 
@@ -82,7 +83,7 @@
 ---
 
 ## 🇬🇧 English Description
-
+DISCLAIMER: You are using this at your own risk
 **RBCT** is a comprehensive and visually rich helicopter dashboard widget for EdgeTX. It features dynamic resolution scaling, perfectly supporting the RadioMaster TX16S MK3 (800x480), TX16S MKII (480x272), and TX15 MAX (480x320) color displays. 
 
 ### Features
