@@ -101,56 +101,88 @@
 
 ## 🇬🇧 English Description
 
-**RBCT** is a comprehensive and visually rich helicopter dashboard widget for EdgeTX. It features dynamic resolution scaling, perfectly supporting the RadioMaster TX16S MK3 (800x480), TX16S MKII (480x272), and TX15 MAX (480x320) color displays. 
+**RBCT** is a comprehensive and visually rich helicopter dashboard widget designed specifically for EdgeTX. Featuring dynamic resolution scaling, it perfectly supports RadioMaster TX16S MK3 (800x480), TX16S MKII (480x272), and TX15 MAX (480x320) color touchscreens to deliver an intuitive and complete flight telemetry monitoring interface.
 
 ### Features
 
-*   **Dynamic Resolution Scaling**: Automatically adapts layout, font sizes, and image scaling for different screens, ensuring a perfect fit across multiple radio models.
-*   **Real-Time Telemetry Display**: Monitors and displays critical flight data including Battery Voltage, Current (Amps), Capacity (mAh), BEC Voltage, Lowest Cell Voltage, and ESC/MCU Temperatures.
-*   **Headspeed Tracking**: Displays current Headspeed (RPM) along with maximum and minimum RPM statistics during the flight.
+*   **Dynamic Resolution Scaling**: Automatically adapts layout, font sizes, and image scaling for different screens (800x480 or 480-width displays), maintaining optimal visual clarity across multiple radio models.
+*   **Black Box & Chart Analyzer (Logbook & Chart Analyzer)**: Triggered instantly via a physical 3-position switch (`Logbook Sw`), offering:
+    *   **Historical Data Table**: Automatically logs flight summaries of extreme values (MAX RPM, MAX A, MIN V, MIN BEC, MAX TMP, mAh).
+    *   **Zero-Overhead Memory Chart Engine**: Pure in-memory 5-line chart (Green: RPM, Orange: Voltage, Red: Current, Blue: BEC, Yellow: Temperature) to precisely analyze voltage sags and headspeed drops during aggressive 3D maneuvers. Displays live real-time tuning data while ARMED!
+*   **Automatic Flight Counter**: Independently tracks daily flights (`Today`) and lifetime total flights (`Total`) per model, stored in plain text files on the SD card with manual edit support.
+*   **Real-Time Telemetry Display**: Monitors and displays critical flight data including Battery Voltage (Vbat), Current (A), Capacity Consumed (mAh), BEC Voltage, Lowest Cell Voltage (Cell), and ESC / MCU Temperature.
+*   **Headspeed Tracking**: Displays current Headspeed (RPM) along with maximum (max) and minimum (min) RPM statistics recorded during flight.
 *   **Governor Status**: Clear visual indicator for Governor ON/OFF state.
-*   **FBL Bank Switching**: Dynamically displays the current FBL (Flybarless) Bank number based on your switch configuration.
-*   **Customizable Themes**: Choose from 9 built-in color themes (Red, Orange, Yellow, Green, Blue, Indigo, Violet, Black, TRN Transparent) to match your preference.
-*   **Transparent Background Support**: 
-    *   Toggle on `Transp BG` to make the main background transparent while keeping panel backgrounds for readability.
-    *   Or select the `TRN` theme for a completely frameless, fully transparent experience.
-*   **Physical Gimbal LED Control**: Directly control the physical RGB gimbal rings on supported radios (like TX16S MK3) from the widget, with 9 color options or OFF.
-*   **Dynamic Model Images**: Automatically loads model pictures from `/IMAGES` or `/WIDGETS/RBCT/modelImage/`. Falls back to a default image if no specific image is found.
-*   **Timer Integration**: Displays your selected flight timer prominently on the dashboard.
+*   **FBL Bank Switching**: Dynamically displays the active FBL (Flybarless) Bank number based on your switch or channel configuration.
+*   **Customizable Color Themes**: Includes 9 high-contrast color themes (Red, Orange, Yellow, Green, Blue, Indigo, Violet, Black, TRN Transparent, Pink) for personalized aesthetics.
+*   **Transparent Background Support**:
+    *   Toggle `Transp BG`: Hides the main background color while retaining semi-transparent panel frames for readability.
+    *   Select `TRN` theme: Full transparent background with no borders/frames, letting your custom radio wallpaper take center stage!
+*   **Physical Gimbal LED Ring Control**: Directly synchronizes and controls physical RGB gimbal ring lighting on supported radios (such as TX16S MK3) with 9 selectable colors, Rainbow mode, or OFF.
+*   **Dynamic Model Images**: Automatically loads model pictures from `/IMAGES` or `/WIDGETS/RBCT/modelImage/`. Falls back to a default helicopter image if no matching image is found.
+*   **Flight Timer Integration**: Displays your selected radio flight timer prominently on the dashboard.
 
 ### Installation
-1. Copy the `RBCT` folder into the `WIDGETS` directory on your SD card (`/WIDGETS/RBCT`).
-2. On your radio, navigate to the Telemetry screen setup.
-3. Select the `RBCT` widget and assign it to a full-screen layout.
+
+1. Download and copy the entire `RBCT` folder into the `WIDGETS` directory on your radio's SD card (path: `/WIDGETS/RBCT`).
+2. On your radio, navigate to the Telemetry setup screen.
+3. Add a full-screen layout block and select the `RBCT` widget.
+
+### Widget Options
+
+Customize the following settings in the widget menu:
+*   **Timer**: Select which flight timer (Timer 1~3) to display on screen.
+*   **Bank Source**: Select the channel or switch controlling FBL Bank switching.
+*   **Arm Source**: Select the switch or channel assigned to your ARM function for synchronized status display.
+*   **Arm Invert**: Reverse the ARM / SAFE logic to match your switch habits.
+*   **Logbook Sw**: Assign a physical switch (e.g. 3-position switch) to toggle the Logbook report and chart analyzer on demand.
+*   **Reset FlyCount**: Assign a physical switch (e.g. SH momentary switch) to manually reset `Today` flights to 0 without affecting `Total` flights.
+*   **Theme**: Choose your preferred panel color theme (including Black, TRN Transparent, and Pink).
+*   **Transp BG**: Enable to make the main background transparent to reveal your wallpaper, while preserving semi-transparent panel borders for contrast.
+*   **LED Color**: Select physical gimbal RGB ring lighting colors (9 options, Pink, Peach, Rainbow, or OFF).
+*   **UserName**: Custom pilot signature to replace the "NO DATA" block in the bottom right corner when telemetry is active.
+
+### Model Image Setup
+
+To customize the helicopter picture on your dashboard:
+*   Prepare a transparent `.png` image.
+*   Place the file in `/WIDGETS/RBCT/modelImage/` named exactly matching your EdgeTX model name.
+*   Alternatively, assign a bitmap in native EdgeTX Model Setup, which RBCT will automatically detect and display.
 
 ### Changelog (v1.0.003)
-*   **New Feature (Major)**: Upgraded the static `0 Flights` text to a Dual Dynamic Flight Counter! The dashboard now simultaneously displays `Today` (today's flights) and `Total` (lifetime total flights).
-*   **New Feature (Ultimate Logbook)**: Added an **"On-Screen Flight Logbook Viewer"**! After landing, simply tap the screen (or short press the roller button) to flip the dashboard into a beautifully formatted table showing the last 10 flights for the current model. The table logs: `Time`, `Duration`, `Max RPM`, `Max Amps`, `Min Cell Voltage`, and `mAh consumed`.
-  *   *Safety Guarantee*: Built with extreme optimization, zero SD card writes and zero data arrays are processed while ARMED, ensuring absolute safety with no UI stutter or telemetry lag during flight!
-*   **New Feature**: Features SD card persistence with per-model tracking. Includes an auto-reset function where the `Today` count automatically resets to 0 on a new day, while the `Total` count continues to accumulate.
-*   **New Feature**: Added a **60-Second Debounce Timer**. A flight is only counted and added to the logs if the helicopter remains ARMED for at least 60 continuous seconds. This prevents "ghost flights" from being recorded during quick bench testing or setup.
-*   **New Feature**: Added a `Reset FlyCount` option in the widget settings. You can assign a physical switch (like a momentary SH switch) to manually reset the `Today` counter to 0 at any time (the lifetime total is safely preserved).
-*   **Customization**: Added `Pink` options to the dashboard `Theme` and the physical gimbal `LED Color` settings.
+
+*   **New Feature (Major Upgrade)**: **Dual Dynamic Flight Counter**! Displays `Today` (daily flights) and `Total` (lifetime flights) side-by-side on the main screen.
+*   **New Feature (Ultimate Logbook)**: Added **Flight Logbook Report**! After landing, toggle the assigned 3-position switch to instantly flip the screen into a 10-flight report table for the current model. Logs per-flight: `Start Time`, `Flight Duration`, `Max RPM`, `Max Current`, `Min Voltage`, `mAh Consumed`, `Max Temp`, and `Min BEC`.
+*   **Layout Redesign (Dual-Layer Chart Analyzer)**: Added a 5-line real-time chart below the log table, split physically into two layers (Top: RPM / Voltage / Amps; Bottom: Temp / BEC) allowing pilots to analyze millisecond-level correlation between heavy pitch pitch-pumps and BEC voltage sags!
+*   **Core Optimization (Aerospace Safety Protection)**: Engineered chart engine with Dynamic Downsampling and FIFO Ring Buffer technology:
+    *   *Memory Overflow Protection*: Maintains a strict max 200 data points buffer regardless of flight duration (preserving ~10 min of peak flight data).
+    *   *CPU Load Protection*: Automatically downsamples to 50 key trend points for rendering. Guarantees constant, minimal CPU load to eliminate `CPU LIMIT` crash risks even during continuous 48-hour ARMED sessions!
+*   **Logic Upgrade (Smart Anti-Ghost Debounce)**: Enhanced debounce verification. Flight count +1 is only awarded after being ARMED for over 60 seconds AND detecting `RPM > 1000 RPM` or `Current > 5A`. Prevents "ghost flights" while debugging on the bench with motors disconnected all day!
+*   **New Feature**: SD card persistence (stored independently per model) across power cycles. Features automatic daily reset (`Today` resets to 0 at midnight while `Total` continues accumulating).
+*   **New Feature**: Added `Reset FlyCount` option in widget settings. Assign a momentary switch (e.g. SH) to manually zero `Today` flight count instantly.
+*   **Customization**: Added `Pink` option to `Theme` and `LED Color` settings for expanded aesthetic customization.
 
 ### Changelog (v1.0.002)
-*   **Customization**: Added a `TRN` (Fully Transparent) theme. Selecting this theme removes all background panels and borders, and automatically applies a drop shadow to all text for perfect readability on any wallpaper.
-*   **Customization**: Added a `Transp BG` (Transparent Background) toggle. When enabled, the main background becomes transparent to show your custom radio wallpaper, while the info panels retain their semi-dark background for readability.
-*   **Customization**: Added a "Black" theme option for the dashboard `Theme`, offering a sleek and stealthy look. The default theme is now set to `Blue`.
-*   **New Feature**: Added a `Rainbow` option to `LED Color`. When selected, the physical gimbal LEDs will display a dynamic, animated flowing rainbow effect.
-*   **New Feature**: Added a dynamic Battery Bar to the left panel using `Bat%` telemetry. The bar changes color automatically (Green > 30%, Orange > 15%, Red <= 15%).
-*   **UI Tweaks**: Upgraded text legibility in Transparent (`Transp BG`) mode by universally applying a black drop-shadow to all dashboard text (including titles, values, and UserName) for perfect contrast against any wallpaper.
-*   **UI Tweaks**: Completely recalibrated the full-screen layout proportions. Extended the left main panel to fully enclose battery info, equalized the vertical gaps between the right panels to a standard 15px, and widened the GOV/STATUS blocks to perfectly align with the Battery Bar for a much cleaner and symmetrical look.
-*   **UI Tweaks**: Optimized the battery bar for `TRN` (Transparent) mode with a visible border even at 0%.
-*   **UI Fix**: Fixed vertical text alignment for "OFF", "SAFE", "NO DATA", and "UserName" to achieve perfect visual centering.
 
-### Changelog (v1.0.001)
-*   **Customization**: Added a `UserName` option to display your custom pilot name (clean white text with no frame) instead of "NO DATA" when telemetry is active.
-*   **New Feature**: Added an `Arm Invert` option in the settings to easily reverse the physical switch logic for ARMED/SAFE statuses.
-*   **UI Tweaks**: Removed the redundant `/` symbol between Tx voltage and clock for a cleaner header, and added a faint version watermark (`v 1.0.001`) below the battery capacity.
-*   **UI Fix**: Fixed a layout bug where battery information overlapped with the "NO DATA" text in the bottom left corner when a battery was connected.
-*   **Critical Fix**: Removed an incorrect >200A limit that caused high currents (common in 700/800 class helicopters) to be displayed 10x smaller.
-*   **Bug Fix**: Fixed the `Arm Source` setting so it correctly reads physical switches, preventing the ARMED status from getting stuck.
-*   **Bug Fix**: Locked the automatic battery cell count (S) to the maximum recorded voltage to prevent the cell count from randomly changing during in-flight voltage sag.
-*   **Bug Fix**: Lowered the overly sensitive single-cell voltage warning threshold from 3.8V to 3.5V to avoid false red alarms during normal flights.
-*   **Bug Fix**: Fixed a script crash when using Logical Switches (boolean values) as the Arm Source.
-*   **Bug Fix**: Fixed an issue where Min/Max telemetry values (like lowest voltage) would get stuck at 0 and fail to automatically reset when changing to a new battery.
+*   **Customization**: Added `TRN` (Fully Transparent) theme, hiding all background panels and borders while adding drop shadows to text for maximum readability on custom wallpapers.
+*   **Customization**: Added `Transp BG` (Transparent Background) toggle to hide main background color while retaining semi-transparent panel borders for clear readability.
+*   **Customization**: Added `Black` theme for a subtle, low-key look, and set default theme to `Blue`.
+*   **New Feature**: Added `Rainbow` option in `LED Color` settings to display a dynamic flowing rainbow lighting effect on physical gimbal RGB rings.
+*   **New Feature**: Added dynamic Battery Bar on the left panel driven by `Bat%` telemetry (Green > 30%, Orange 15%~30%, Red < 15%).
+*   **UI Optimization**: Universal drop-shadows applied to all dashboard text (titles, values, UserName) in transparent mode (`Transp BG`) for legibility across any wallpaper.
+*   **UI Optimization**: Full-screen layout recalibration: extended left panel to cover battery info, standardized right panel gaps to 15px, and aligned GOV/STATUS blocks flush with the Battery Bar.
+*   **UI Optimization**: Improved battery bar rendering in TRN mode with dedicated black outline even at 0%.
+*   **Layout Fix**: Adjusted vertical alignment for `f_mid` font in status blocks (OFF / SAFE / NO DATA / UserName) for perfect vertical centering.
+
+### Changelog (v1.0.001 Major Update & Bug Fixes)
+
+*   **Customization**: Added `UserName` option to replace "NO DATA" with a clean white pilot signature when telemetry is active.
+*   **New Feature**: Added `Arm Invert` option in settings to reverse ARM / SAFE logic to fit personal switch preferences.
+*   **UI Optimization**: Removed redundant `/` symbol between Tx voltage and clock; added subtle version watermark (`v 1.0.001`) in bottom left.
+*   **Layout Fix**: Fixed text overlap between battery info and "NO DATA" block in bottom left corner upon battery connection.
+*   **Logic Fix (Critical)**: Removed incorrect >200A current scaling cap that reduced heavy currents by 10x, enabling accurate display for 700/800 class helicopters!
+*   **Logic Fix**: Fixed `Arm Source` setting switch reading bug that caused ARMED status to get stuck in SAFE mode.
+*   **Logic Fix**: Cell count (S) is now locked upon battery connection to prevent erratic S-count jumps caused by voltage sags during pitch-pumps.
+*   **Logic Fix**: Lowered single-cell voltage warning threshold from 3.8V to a realistic 3.5V to avoid false red alarms during flight.
+*   **Logic Fix**: Fixed script crash when using Logical Switches as the Arm Source.
+*   **Logic Fix**: Fixed issue where Min/Max telemetry values (voltage/RPM) failed to reset when swapping batteries and remained stuck at 0.
