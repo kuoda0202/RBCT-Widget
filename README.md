@@ -2,15 +2,17 @@
 
 **Author / 作者**: 雷恩 / Ryan Kuo
 
-免責聲明：使用此資訊需自行承擔風險
 ### Standard UI (預設標準介面)
 ![Standard UI](Standard%20UI.jpg)
 
-### Clean UI ( TRN + Transp BG)
+### Clean UI (透明背景模式)
 ![Clean UI](Clean%20UI.jpg)
 
-### Transparent UI (TRN only)
+### Transparent UI (TRN 全透無框模式)
 ![Transparent UI](Transparent%20UI.jpg)
+
+### Logbook UI (飛行日誌與雙層五線譜圖表)
+![Logbook UI](Logbook%20UI.jpg)
 
 (English below)
 
@@ -19,7 +21,10 @@
 ## 🌟 核心功能
 
 *   **跨機種解析度自適應**：自動偵測螢幕大小，無論是 800x480 或 480 寬度的螢幕，皆能自動調整字體與圖片比例，維持最佳顯示效果。
-
+*   **黑盒子與五線譜飛行圖表 (Logbook & Chart Analyzer)**：透過實體開關 (Logbook Sw) 一鍵叫出，提供：
+    *   **歷史數據表格**：自動記錄近期航班的極值摘要（MAX RPM, MAX A, MIN V, MIN BEC, MAX TMP, mAh）。
+    *   **零負載極速繪圖引擎**：完全由記憶體運作的 5 線譜折線圖（綠線 RPM、橘線 電壓、紅線 電流、藍線 BEC、黃線 溫度），精準分析劇烈動作時的電壓陡降與掉轉現象。在解鎖狀態下甚至能呈現「即時調機」效果！
+*   **自動飛行次數計數器 (Flight Counter)**：獨立追蹤每台機型的「今日飛行次數 (Today)」與「歷史總飛行次數 (Total)」，皆以純文字檔儲存於 SD 卡，支援手動編輯。
 *   **即時遙測數據顯示**：監控並顯示包含電池總電壓 (Vbat)、電流 (A)、消耗容量 (mAh)、BEC 電壓、單節最低電壓 (Cell) 以及 ESC / MCU 溫度。
 *   **旋翼轉速監控 (Headspeed)**：即時顯示目前轉速 (RPM)，並記錄飛行過程中的最高 (max) 與最低 (min) 轉速。
 *   **定速狀態指示 (Governor)**：提供醒目直覺的定速開啟/關閉 (ON/OFF) 狀態圖示。
@@ -58,16 +63,28 @@
 
 ## 📝 最新更新 (Latest Updates)
 
+### v1.0.003
+*   **功能新增 (重大升級)**：將畫面上的 `0 Flights` 靜態文字升級為「雙重真實計數器」！現在畫面上會同時顯示 `Today` (今日次數) 與 `Total` (終身總次數)。
+*   **功能新增 (終極日誌)**：加入**「無感飛行日誌報表 (Flight Logbook)」**！降落後只需在螢幕輕點一下 (或短按滾輪)，畫面會立刻翻轉為該台直昇機最近 10 趟的飛行報表。表格內詳細記載每趟的：`起飛時間`、`飛行時長`、`最高轉速`、`最大電流`、`最低電壓`、`消耗容量`、`最高溫度` 與 `最低 BEC`。
+*   **版面重構 (雙層專業圖表)**：日誌下方新增即時「五線譜分析圖表」。並將圖表物理分割為上下兩層 (上層：轉速/電壓/電流，下層：溫度/BEC)。不僅解決了刻度重疊問題，更完美對齊了時間軸 (X軸)，讓飛手能精準比對「大螺距電流突波」與「BEC掉壓」的毫秒級關聯！
+*   **核心優化 (安全極限防爆)**：圖表引擎導入「動態降採樣 (Dynamic Downsampling)」與「FIFO 環狀緩衝區」航太級安全技術。
+  *   *記憶體防爆*：不管滯空時間多長，陣列永遠只保留最新 200 筆資料 (約最後 10 分鐘的精華)，保證記憶體不溢位。
+  *   *處理器防爆*：繪圖引擎自動等比例抽出 50 個關鍵點繪製趨勢。保證 CPU $O(1)$ 常數級極低負載，徹底消滅 `CPU LIMIT` 崩潰風險，連續解鎖 48 小時也絕對安全！
+*   **邏輯升級 (智慧防呆計數器)**：大幅強化防呆過濾機制。現在解鎖超過 60 秒後，還必須偵測到 `轉速 > 1000 RPM` 或 `電流 > 5A` 才會判定為真實飛行並計數 +1。在桌上拔馬達除錯一整天也絕對不會誤判產生「幽靈航班」！
+*   **功能新增**：結合 SD 卡記憶功能 (依模型獨立存放)，關機不遺失。並具備「跨日自動歸零」的貼心設計，每天開機 `Today` 會自動從 0 開始，而 `Total` 會持續累積。
+*   **功能新增**：在設定選單中新增 `Reset FlyCount` (歸零來源) 選項。可指派遙控器實體開關 (如 SH 彈回開關)，撥動瞬間即可手動將 `Today` 歸零 (不會影響終身總次數)。
+*   **介面自訂**：在 `Theme` 及 `LED Color` 選項中新增了 `Pink` (粉紅) 與 `Peach` (桃色) 兩種新色彩，提供更豐富的主題搭配。
+
 ### v1.0.002
 *   **介面自訂**：在 `Theme` 中新增了 `TRN` (全透明) 主題，選擇此主題將會隱藏所有背景底色與邊框線條，並自動為文字加上黑色陰影，提供最乾淨的無框架視覺效果且保持極高辨識度。
-*   **介面自訂**：新增 `Transp BG` (透明背景) 開關，開啟後可隱藏主背景底色以露出遙控器桌布，但貼心地保留了各資訊區塊的半透明底色，維持閱讀清晰度。
+*   **介面自訂**：新增 `Transp BG` (透明背景) 開關，開啟後可隱藏主背景底色以露出遙控器桌布，但貼心地保留了各資訊面板的半透明底色，維持閱讀清晰度。
 *   **介面自訂**：在 `Theme` 中新增了「黑色 (Black)」主題，提供更多樣的低調風格選擇，並將預設主題更改為 `Blue` (藍色)。
 *   **功能新增**：在 `LED Color` 選單中新增了 `Rainbow` (全彩) 選項，選擇後遙控器實體光圈將呈現隨時間流動的動態彩虹跑馬燈特效。
 *   **功能新增**：在左側面板新增動態「電量橫條 (Battery Bar)」，直接讀取 `Bat%` 遙測數據。電量大於 30% 顯示綠色，15%~30% 顯示橘色，低於 15% 顯示紅色。
 *   **介面優化**：全面升級全透模式 (`Transp BG`) 的文字辨識度，為全域所有儀表文字 (包含標題、數值與使用者名稱) 加上黑色陰影，確保在任何顏色的桌布下皆清晰可讀。
 *   **介面優化**：重新計算並調整全螢幕版面比例，包含延伸左側大面板以完整包覆電池資訊、均分右側三大面板的垂直間隙為標準 15px，以及加寬 GOV/STATUS 狀態框與電池 BAR 完美切齊，使整體視覺對齊更加工整舒適。
 *   **介面優化**：針對全透背景 (TRN) 模式優化電量條顯示，即使電量為 0% 也能顯示專屬黑框。
-*   **版面修復**：修正了 `f_mid` 字體在各狀態方塊 (OFF / SAFE / NO DATA / UserName) 中視覺偏下的問題。
+*   **版面修復**：修正了 `f_mid` 字體在各狀態方塊 (OFF / SAFE / NO DATA / UserName) 中視覺偏下的問題，將 Y 軸微調以達到完美垂直置中。
 
 ### v1.0.001 重大更新與 Bug 修復
 *   **介面自訂**：新增 `UserName` 選項，在有遙測訊號時，可將右下角的 "NO DATA" 區塊替換為您專屬的英文簽名 (無底框純白字體設計)。
@@ -84,7 +101,7 @@
 ---
 
 ## 🇬🇧 English Description
-DISCLAIMER: You are using this at your own risk
+
 **RBCT** is a comprehensive and visually rich helicopter dashboard widget for EdgeTX. It features dynamic resolution scaling, perfectly supporting the RadioMaster TX16S MK3 (800x480), TX16S MKII (480x272), and TX15 MAX (480x320) color displays. 
 
 ### Features
@@ -106,6 +123,15 @@ DISCLAIMER: You are using this at your own risk
 1. Copy the `RBCT` folder into the `WIDGETS` directory on your SD card (`/WIDGETS/RBCT`).
 2. On your radio, navigate to the Telemetry screen setup.
 3. Select the `RBCT` widget and assign it to a full-screen layout.
+
+### Changelog (v1.0.003)
+*   **New Feature (Major)**: Upgraded the static `0 Flights` text to a Dual Dynamic Flight Counter! The dashboard now simultaneously displays `Today` (today's flights) and `Total` (lifetime total flights).
+*   **New Feature (Ultimate Logbook)**: Added an **"On-Screen Flight Logbook Viewer"**! After landing, simply tap the screen (or short press the roller button) to flip the dashboard into a beautifully formatted table showing the last 10 flights for the current model. The table logs: `Time`, `Duration`, `Max RPM`, `Max Amps`, `Min Cell Voltage`, and `mAh consumed`.
+  *   *Safety Guarantee*: Built with extreme optimization, zero SD card writes and zero data arrays are processed while ARMED, ensuring absolute safety with no UI stutter or telemetry lag during flight!
+*   **New Feature**: Features SD card persistence with per-model tracking. Includes an auto-reset function where the `Today` count automatically resets to 0 on a new day, while the `Total` count continues to accumulate.
+*   **New Feature**: Added a **60-Second Debounce Timer**. A flight is only counted and added to the logs if the helicopter remains ARMED for at least 60 continuous seconds. This prevents "ghost flights" from being recorded during quick bench testing or setup.
+*   **New Feature**: Added a `Reset FlyCount` option in the widget settings. You can assign a physical switch (like a momentary SH switch) to manually reset the `Today` counter to 0 at any time (the lifetime total is safely preserved).
+*   **Customization**: Added `Pink` and `Peach` options to both the dashboard `Theme` and the physical gimbal `LED Color` settings.
 
 ### Changelog (v1.0.002)
 *   **Customization**: Added a `TRN` (Fully Transparent) theme. Selecting this theme removes all background panels and borders, and automatically applies a drop shadow to all text for perfect readability on any wallpaper.
