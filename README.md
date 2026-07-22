@@ -73,7 +73,7 @@
 *   **邏輯升級 (智慧防呆計數器)**：大幅強化防呆過濾機制。現在解鎖超過 60 秒後，還必須偵測到 `轉速 > 1000 RPM` 或 `電流 > 5A` 才會判定為真實飛行並計數 +1。在桌上拔馬達除錯一整天也絕對不會誤判產生「幽靈航班」！
 *   **功能新增**：結合 SD 卡記憶功能 (依模型獨立存放)，關機不遺失。並具備「跨日自動歸零」的貼心設計，每天開機 `Today` 會自動從 0 開始，而 `Total` 會持續累積。
 *   **功能新增**：在設定選單中新增 `Reset FlyCount` (歸零來源) 選項。可指派遙控器實體開關 (如 SH 彈回開關)，撥動瞬間即可手動將 `Today` 歸零 (不會影響終身總次數)。
-*   **介面自訂**：在 `Theme` 及 `LED Color` 選項中新增了 `Pink` (粉紅) 與 `Peach` (桃色) 兩種新色彩，提供更豐富的主題搭配。
+*   **介面自訂**：在 `Theme` 及 `LED Color` 選項中新增了 `Pink` (粉紅) 新色彩，提供更豐富的主題搭配。
 
 ### v1.0.002
 *   **介面自訂**：在 `Theme` 中新增了 `TRN` (全透明) 主題，選擇此主題將會隱藏所有背景底色與邊框線條，並自動為文字加上黑色陰影，提供最乾淨的無框架視覺效果且保持極高辨識度。
@@ -131,7 +131,7 @@
 *   **New Feature**: Features SD card persistence with per-model tracking. Includes an auto-reset function where the `Today` count automatically resets to 0 on a new day, while the `Total` count continues to accumulate.
 *   **New Feature**: Added a **60-Second Debounce Timer**. A flight is only counted and added to the logs if the helicopter remains ARMED for at least 60 continuous seconds. This prevents "ghost flights" from being recorded during quick bench testing or setup.
 *   **New Feature**: Added a `Reset FlyCount` option in the widget settings. You can assign a physical switch (like a momentary SH switch) to manually reset the `Today` counter to 0 at any time (the lifetime total is safely preserved).
-*   **Customization**: Added `Pink` and `Peach` options to both the dashboard `Theme` and the physical gimbal `LED Color` settings.
+*   **Customization**: Added `Pink` options to the dashboard `Theme` and the physical gimbal `LED Color` settings.
 
 ### Changelog (v1.0.002)
 *   **Customization**: Added a `TRN` (Fully Transparent) theme. Selecting this theme removes all background panels and borders, and automatically applies a drop shadow to all text for perfect readability on any wallpaper.
