@@ -14,7 +14,6 @@
 ### Logbook UI (飛行日誌與雙層曲線圖)
 ![Logbook UI](Logbook%20UI.jpg)
 
-(English below)
 
 **RBCT** 是一個專為 EdgeTX 開發的直昇機儀表板小工具 (Widget)，支援多種螢幕解析度自動適應，完美適配 RadioMaster TX16S MK3 (800x480)、TX16S MKII (480x272) 以及 TX15 MAX (480x320) 等全彩觸控螢幕。提供完整、直覺的飛行數據監控介面。
 
