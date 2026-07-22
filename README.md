@@ -98,12 +98,14 @@
 *   **邏輯修復**：修正使用邏輯開關 (Logical Switch) 觸發解鎖 (Arm) 時會導致腳本崩潰的錯誤。
 *   **邏輯修復**：修正更換電池時，最高/最低電壓與轉速不會自動重置，且最低數值永遠卡在 0 的問題。
 
-⚠️ 免責聲明 (Disclaimer)
+## ⚠️ 免責聲明 (Disclaimer)
+
 本小工具 (RBCT Widget) 係以「現狀 (AS IS)」原則免費提供，不提供任何形式之明示或默示擔保。
 
-飛行安全：遙控直昇機具備高轉速與高能量之物理危險性。飛手 (Pilot in Command) 須對每一次飛行之操作、設定及安全負完全責任。
-數據僅供參考：儀表板顯示之遙測數據、極值紀錄與歷史圖表僅供飛行調機及狀態參考，不應作為判斷飛行安全之唯一依據。
-損害免責：作者 (Author) 對於因安裝、使用或無法使用本小工具所導致之任何遙控設備故障、機體墜毀、財產損失或人員傷害，概不負任何法律與賠償責任。
+1. **飛行安全**：遙控直昇機具備高轉速與高能量之物理危險性。飛手 (Pilot in Command) 須對每一次飛行之操作、設定及安全負完全責任。
+2. **數據僅供參考**：儀表板顯示之遙測數據、極值紀錄與歷史圖表僅供飛行調機及狀態參考，不應作為判斷飛行安全之唯一依據。
+3. **損害免責**：作者 (Author) 對於因安裝、使用或無法使用本小工具所導致之任何遙控設備故障、機體墜毀、財產損失或人員傷害，概不負任何法律與賠償責任。
+
 使用本小工具即代表您已閱讀、理解並同意上述所有條款。
 ---
 
@@ -195,10 +197,12 @@ To customize the helicopter picture on your dashboard:
 *   **Logic Fix**: Fixed script crash when using Logical Switches as the Arm Source.
 *   **Logic Fix**: Fixed issue where Min/Max telemetry values (voltage/RPM) failed to reset when swapping batteries and remained stuck at 0.
   
-⚠️ Disclaimer
+### ⚠️ Disclaimer
+
 This widget (RBCT) is provided "AS IS" without warranty of any kind, express or implied.
 
-Flight Safety: Operating remote-controlled helicopters involves inherent physical risks. The pilot in command assumes full responsibility for flight safety, equipment setup, and operation.
-Data for Reference Only: All real-time telemetry values, extreme statistics, and logbook charts displayed by this widget are provided strictly for reference and tuning purposes. They should not be relied upon as the sole basis for flight safety.
-Limitation of Liability: In no event shall the author be held liable for any direct, indirect, incidental, or consequential damages, equipment loss, crashes, or personal injuries resulting from the use or misuse of this widget.
+1. **Flight Safety**: Operating remote-controlled helicopters involves inherent physical risks. The pilot in command assumes full responsibility for flight safety, equipment setup, and operation.
+2. **Data for Reference Only**: All real-time telemetry values, extreme statistics, and logbook charts displayed by this widget are provided strictly for reference and tuning purposes. They should not be relied upon as the sole basis for flight safety.
+3. **Limitation of Liability**: In no event shall the author be held liable for any direct, indirect, incidental, or consequential damages, equipment loss, crashes, or personal injuries resulting from the use or misuse of this widget.
+
 By using this widget, you acknowledge that you have read, understood, and agreed to these terms.
