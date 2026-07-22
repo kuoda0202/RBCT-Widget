@@ -11,7 +11,7 @@
 ### Transparent UI (TRN 全透無框模式)
 ![Transparent UI](Transparent%20UI.jpg)
 
-### Logbook UI (飛行日誌與雙層五線譜圖表)
+### Logbook UI (飛行日誌與雙層曲線圖)
 ![Logbook UI](Logbook%20UI.jpg)
 
 (English below)
