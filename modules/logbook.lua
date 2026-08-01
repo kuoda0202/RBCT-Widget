@@ -136,7 +136,7 @@ local function draw(w, ctx)
   lcd.drawFilledRectangle(X(590), Y(235), W(10), H(10), C.blue)
   lcd.drawText(X(610), Y(230), "BEC", f_sml + C.white)
 
-  lcd.drawFilledRectangle(X(680), Y(235), W(10), H(10), C.yellow)
+  lcd.drawFilledRectangle(X(680), Y(235), W(10), H(10), C.cyan or C.yellow)
   lcd.drawText(X(700), Y(230), "TMP", f_sml + C.white)
 
   lcd.drawLine(X(20), Y(255), X(780), Y(255), SOLID, C.panel2)
@@ -174,8 +174,8 @@ local function draw(w, ctx)
   lcd.drawText(X(cx + cw + 40), Y(base_y1 - 15), "0A", f_sml + C.red)
 
   -- Bottom Axes Labels (Auto-Scaled & Always Visible)
-  lcd.drawText(X(cx - 5), Y(cy2 - 5), string.format("%.0f°", max_t), RIGHT + f_sml + C.yellow)
-  lcd.drawText(X(cx - 5), Y(base_y2 - 15), string.format("%.0f°", min_t), RIGHT + f_sml + C.yellow)
+  lcd.drawText(X(cx - 5), Y(cy2 - 5), string.format("%.0f°", max_t), RIGHT + f_sml + (C.cyan or C.yellow))
+  lcd.drawText(X(cx - 5), Y(base_y2 - 15), string.format("%.0f°", min_t), RIGHT + f_sml + (C.cyan or C.yellow))
 
   lcd.drawText(X(cx + cw + 5), Y(cy2 - 5), string.format("%.1fV", max_b), f_sml + C.blue)
   lcd.drawText(X(cx + cw + 5), Y(base_y2 - 15), string.format("%.1fV", min_b), f_sml + C.blue)
@@ -213,7 +213,7 @@ local function draw(w, ctx)
         lcd.drawLine(px, pya, scr_x, scr_ya, SOLID, C.red)
 
         lcd.drawLine(px, pyb, scr_x, scr_yb, SOLID, C.blue)
-        lcd.drawLine(px, pyt, scr_x, scr_yt, SOLID, C.yellow)
+        lcd.drawLine(px, pyt, scr_x, scr_yt, SOLID, C.cyan or C.yellow)
       end
       px, pyr, pyv, pya, pyb, pyt = scr_x, scr_yr, scr_yv, scr_ya, scr_yb, scr_yt
     end

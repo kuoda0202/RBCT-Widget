@@ -129,7 +129,7 @@ local C = {
   panel = lcd.RGB(15, 48, 122), panel2 = lcd.RGB(22, 61, 143),
   white = lcd.RGB(242, 247, 255), dim = lcd.RGB(147, 193, 255),
   red = lcd.RGB(255, 67, 84),    green = lcd.RGB(0, 180, 0), black = lcd.RGB(0, 0, 0),
-  orange = lcd.RGB(255, 135, 0), yellow = lcd.RGB(255, 205, 0),
+  orange = lcd.RGB(255, 135, 0), yellow = lcd.RGB(255, 205, 0), cyan = lcd.RGB(0, 220, 255),
 }
 
 -- Selectable colour themes. Blue is the default.
