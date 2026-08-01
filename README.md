@@ -11,7 +11,7 @@
 ### Transparent UI (TRN 全透無框模式)
 ![Transparent UI](Transparent%20UI.jpg)
 
-### Logbook UI (飛行日誌與雙層曲線圖)
+### Logbook UI (飛行日誌與雙層五線譜圖表)
 ![Logbook UI](Logbook%20UI.jpg)
 
 
@@ -47,7 +47,7 @@
 
 在小工具設定選單中，您可以自訂以下項目：
 *   **Timer (計時器)**：選擇要在畫面上顯示哪一個計時器 (Timer 1~3)。
-*   **Bank Source (段數來源)**：選擇用來控制 FBL Bank 切換的通道 (Channel) 或開關。
+*   **BANK開關 (---為Auto)**：選擇用來控制 FBL Bank 切換的通道或開關。**預設為 `---` (Auto)**，將自動讀取飛控 RF 遙測回傳；若指定實體開關，則優先依據開關位置切換。
 *   **Arm Source (解鎖來源)**：選擇對應您遙控器上解鎖 (ARM) 功能的開關或通道，讓畫面能準確同步顯示。
 *   **Banks (段數數量)**：設定可用的 Bank 總數 (2 至 6 段)。
 *   **Theme (主題)**：選擇您喜歡的面板顏色 (包含新增的黑色與 TRN 全透明主題)。
@@ -62,6 +62,25 @@
 *   或者直接透過 EdgeTX 系統內建的模型圖片設定，小工具也會自動抓取顯示。
 
 ## 📝 最新更新 (Latest Updates)
+
+### v1.0.005
+*   **架構重構 (動態模組化架構 loadModule)**：將原本 42KB 巨型單檔重構為 `main.lua` + `modules/` (`nitro.lua`, `logbook.lua`) 惰性動態載入架構，顯著降低記憶體佔用與啟動延遲。
+*   **模型圖片 (三階段智慧搜尋優先權)**：專為 Rotorflight 共用設定檔飛友優化圖片優先順序：**`modelImage/<機型名稱>.png` (同名圖) > `/IMAGES/<m.bitmap>` (控上指定圖) > `default.png` (預設圖)**。一控多機對頻連線自動載入對應飛機高清照片！
+*   **視覺優化 (模型圖片 125% 比例高清大圖展示)**：重構左側面板模型圖片縮放比例，繪製比例由 `100%` 擴大至 `125%`（視覺面積提升 56%），並重新精算邊距置中（`X(25), Y(74)`），消除圖片週圍過度空曠感，大圖呈現更具質感！
+*   **遙測增強 (尾馬達轉速 Tspd 支援)**：新增 61 號轉速感測器 (`Tspd`) 至 RF CLI 腳本與別名映射。電機自動識別 `HEAD / TAIL RPM`；油機模式下自動智慧隱藏尾馬達顯示並恢復標準主旋翼極值。
+*   **視覺優化 (油機 XXL 字體動態中軸對齊)**：重構油機模式雙欄特大字體與單位 (`°C` / `V`) 之字元寬度演算法，修正標題為 `RX PACK`，實現 `29°C` 與 `8.3V` 於面板中軸線上 100% 精確置中。
+*   **語系與選單 (點陣字庫安全繁體化)**：優化設定選單繁體中文語意（如 `BANK開關 (---為自動)`），並嚴格比對 EdgeTX 點陣字庫相容性，確保選單選項 100% 正常顯示不缺字。
+*   **功能新增 (🔥 燃油機專屬模式 Nitro Native Mode)**：新增 `Heli Type` (Nitro / Electric) 選擇。切換至 Nitro 模式觸發 **UI 物理變形**：
+    *   *純粹無冗餘*：隱藏無用的動力電池數據 (Vbat, Amps, mAh)。
+    *   *巨型視覺黃金版面*：將右側主面板變形為兩欄超大字體 (XXL) 監控 **`ENGINE TEMP` (汽缸頭溫度)** 與 **`RX PACK` (接收機電池電壓)**，超越傳統換湯不換藥做法，提供 100% 純正的油車專業儀表板！
+    *   *超溫/低壓警告*：引擎溫度 > 120°C 或接收機電壓 < 6.6V 時自動亮顯眼紅字警示。
+*   **功能新增 (Auto-Scaling 智慧動態刻度系統)**：圖表座標軸導入「無上限動態天井與智慧比例換算演算法」。
+    *   *全機型自適應*：無論是 700 級 (12S/14S, 200A+ 大電流)、450/500 級 (6S)，或是 200 級 / 微型電直 (高轉速 3500+ ~ 10,000+ RPM, 2S/3S 電壓)，圖表刻度上限與區間皆會根據該趟飛行的實際數據自動動態推升（例如轉速自動以 500 RPM 為一階向上擴充），曲線絕對不破頂、不掉框。
+*   **介面修復 (常態刻度標籤)**：座標軸左右刻度文字標籤解鎖抽離條件式，不論記憶體內是否有實時曲線數據，進入 Logbook 介面時圖表左右兩側的刻度數值標籤永遠固定清晰顯示。
+*   **功能新增 (最後一趟曲線 SD 卡持久化)**：飛行結束切回上鎖 (DISARM) 時，自動將當前 200 個採樣點寫入 SD 卡 (`/WIDGETS/RBCT/chart_<機型>.txt`)。關機重開機或隨時點進 Logbook 都能完整還原上一趟飛行的動態遙測曲線！
+
+### v1.0.004
+*   **不存在，沒有004版，原因很簡單。
 
 ### v1.0.003
 *   **功能新增 (重大升級)**：「雙重真實計數器」！現在畫面上會同時顯示 `Today` (今日次數) 與 `Total` (終身總次數)。
@@ -100,16 +119,15 @@
 
 ## ⚠️ 免責聲明 (Disclaimer)
 
-本小工具 (RBCT Widget) 係以「現狀」原則免費提供，不提供任何形式之明示或默示擔保。
+本小工具 (RBCT Widget) 係以「現狀 (AS IS)」原則免費提供，不提供任何形式之明示或默示擔保。
 
-1. **飛行安全**：遙控直昇機具備高轉速與高能量之物理危險性。使用者須對每一次飛行之操作、設定及安全負完全責任。
+1. **飛行安全**：遙控直昇機具備高轉速與高能量之物理危險性。飛手 (Pilot in Command) 須對每一次飛行之操作、設定及安全負完全責任。
 2. **數據僅供參考**：儀表板顯示之遙測數據、極值紀錄與歷史圖表僅供飛行調機及狀態參考，不應作為判斷飛行安全之唯一依據。
 3. **損害免責**：作者 (Author) 對於因安裝、使用或無法使用本小工具所導致之任何遙控設備故障、機體墜毀、財產損失或人員傷害，概不負任何法律與賠償責任。
 
 使用本小工具即代表您已閱讀、理解並同意上述所有條款。
+
 ---
-
-
 
 ## 🇬🇧 English Description
 
@@ -161,6 +179,25 @@ To customize the helicopter picture on your dashboard:
 *   Place the file in `/WIDGETS/RBCT/modelImage/` named exactly matching your EdgeTX model name.
 *   Alternatively, assign a bitmap in native EdgeTX Model Setup, which RBCT will automatically detect and display.
 
+### Changelog (v1.0.005)
+
+*   **Architecture Refactoring (Dynamic Module Loading via `loadModule`)**: Refactored core script into modular architecture (`main.lua` + `modules/nitro.lua` & `modules/logbook.lua`) for lower RAM footprint and zero startup lag.
+*   **Model Image Priority (3-Tier Intelligent Fallback)**: Optimized image loading priority specifically for Rotorflight single-profile multi-heli pilots: **`modelImage/<CraftName>.png` > `/IMAGES/<m.bitmap>` > `default.png`**. Binding to different crafts automatically displays craft-specific HD images!
+*   **Telemetry Enhancement (Tail Motor RPM `Tspd` Support)**: Added sensor 61 (`Tspd`) to RF CLI script and sensor alias map. Dynamically displays `HEAD / TAIL RPM` on dual-motor electric helis, while automatically hiding tail RPM when in Nitro mode.
+*   **UI Optimization (Nitro Mode XXL Visual Centering)**: Recalibrated character pitch math for XXL numbers and units (`°C` / `V`), updated title to `RX PACK`, achieving perfect visual centering for values like `29°C` and `8.3V`.
+*   **Localization (Font-Safe Traditional Chinese Menu)**: Refined widget option strings (e.g. `BANK開關 (---為自動)`), strictly validated against EdgeTX bitmap font boundaries to guarantee error-free rendering.
+*   **New Feature (🔥 Nitro Native Mode)**: Added `Heli Type` (Nitro / Electric) selection. Nitro mode triggers **UI layout transformation**:
+    *   *Zero Redundancy*: Hides flight pack telemetry (Vbat, Amps, mAh).
+    *   *XXL Golden Layout*: Transforms right-hand panel into two XXL metric blocks monitoring **`ENGINE TEMP`** and **`RX PACK`** battery voltage.
+    *   *Warning Alerts*: Highlights `ENGINE TEMP` > 120°C or `RX PACK` < 6.6V in bold red alerts.
+*   **New Feature (Auto-Scaling Chart System)**: Introduced dynamic ceiling and scale algorithms for chart Y-axes across all heli sizes (700-class 12S/14S 200A+ down to micro 2S/3S 10,000+ RPM).
+*   **UI Fix (Static Scale Labels)**: Chart Y-axis numerical labels remain visible at all times regardless of live telemetry state.
+*   **New Feature (Chart SD Card Persistence)**: Automatically writes 200 telemetry sample points to SD card (`/WIDGETS/RBCT/chart_<Model>.txt`) upon disarming.
+
+### Changelog (v1.0.004)
+
+*   *Does not exist (Version 1.0.004 was skipped)*
+
 ### Changelog (v1.0.003)
 
 *   **New Feature (Major Upgrade)**: **Dual Dynamic Flight Counter**! Displays `Today` (daily flights) and `Total` (lifetime flights) side-by-side on the main screen.
@@ -198,7 +235,7 @@ To customize the helicopter picture on your dashboard:
 *   **Logic Fix**: Lowered single-cell voltage warning threshold from 3.8V to a realistic 3.5V to avoid false red alarms during flight.
 *   **Logic Fix**: Fixed script crash when using Logical Switches as the Arm Source.
 *   **Logic Fix**: Fixed issue where Min/Max telemetry values (voltage/RPM) failed to reset when swapping batteries and remained stuck at 0.
-  
+
 ### ⚠️ Disclaimer
 
 This widget (RBCT) is provided "AS IS" without warranty of any kind, express or implied.
