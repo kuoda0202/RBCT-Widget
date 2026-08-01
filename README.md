@@ -3,22 +3,22 @@
 **Author / 作者**: 雷恩 / Ryan Kuo
 
 ### Standard UI (預設標準介面)
-![Standard UI](Standard%20UI.jpg)
+![Standard UI](Standard%20UI.jpg?v=1.0.005)
 
 ### Clean UI (透明背景模式)
-![Clean UI](Clean%20UI.jpg)
+![Clean UI](Clean%20UI.jpg?v=1.0.005)
 
 ### Transparent UI (TRN 全透無框模式)
-![Transparent UI](Transparent%20UI.jpg)
+![Transparent UI](Transparent%20UI.jpg?v=1.0.005)
 
 ### Logbook UI (飛行日誌與雙層五線譜圖表)
-![Logbook UI](Logbook%20UI.jpg)
+![Logbook UI](Logbook%20UI.jpg?v=1.0.005)
 
 ### Nitro UI (🔥 燃油機專屬視覺黃金模式)
-![Nitro UI](Nitro%20UI.jpg)
+![Nitro UI](Nitro%20UI.jpg?v=1.0.005)
 
 ### Menu UI (繁體中文點陣字庫選單)
-![Menu UI](Menu%20UI.jpg)
+![Menu UI](Menu%20UI.jpg?v=1.0.005)
 
 
 
