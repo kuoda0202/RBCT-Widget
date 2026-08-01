@@ -14,10 +14,10 @@
 ### Logbook UI (飛行日誌與雙層五線譜圖表)
 ![Logbook UI](Logbook%20UI.jpg?v=1.0.005)
 
-### Nitro UI (🔥 燃油機專屬視覺黃金模式)
+### Nitro UI (🔥 燃油機模式)
 ![Nitro UI](Nitro%20UI.jpg?v=1.0.005)
 
-### Menu UI (繁體中文點陣字庫選單)
+### Menu UI (繁體中文選單)
 ![Menu UI](Menu%20UI.jpg?v=1.0.005)
 
 
