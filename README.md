@@ -189,6 +189,11 @@ To customize the helicopter picture on your dashboard:
 *   Place the file in `/WIDGETS/RBCT/modelImage/` named exactly matching your EdgeTX model name.
 *   Alternatively, assign a bitmap in native EdgeTX Model Setup, which RBCT will automatically detect and display.
 
+### Changelog (v1.0.501)
+
+*   **Telemetry Fix (Bank PID Profile Priority)**: Fixed Bank detection logic in Auto mode by prioritizing Rotorflight active PID Profile sensors (`PID#` / `PID` / `Pid#` / `Bank`) over Flight Mode (`FM`), resolving the issue where Bank status was stuck on `BANK 1`.
+*   **UI Optimization (Nitro RX PACK Visual Centering)**: Fine-tuned horizontal X-offset calculation for XXL numbers and unit (`8.3V`) in Nitro mode right block, achieving visually balanced centering.
+
 ### Changelog (v1.0.005)
 
 *   **Architecture Refactoring (Dynamic Module Loading via `loadModule`)**: Refactored core script into modular architecture (`main.lua` + `modules/nitro.lua` & `modules/logbook.lua`) for lower RAM footprint and zero startup lag.
