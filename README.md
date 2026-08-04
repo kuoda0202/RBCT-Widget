@@ -69,6 +69,10 @@
 
 ## 📝 最新更新 (Latest Updates)
 
+### v1.0.501
+*   **遙測判斷修復 (Bank 優先讀取 PID#)**：修復 Auto 模式下 Bank 顯示邏輯，優先讀取 Rotorflight active PID Profile 感測器 (`PID#` / `PID` / `Pid#` / `Bank`) 而非 Flight Mode (`FM`)，解決切換 Bank 時畫面卡在 `BANK 1` 的問題。
+*   **視覺優化 (油機 RX PACK 電壓置中微調)**：微調油機模式右側 `RX PACK` 特大電壓數字與單位 (如 `8.3V`) 之橫向繪製 X 軸偏移量，使其於面板框內視覺呈現更加精確置中。
+
 ### v1.0.005
 *   **架構重構 (動態模組化架構 loadModule)**：將原本 42KB 巨型單檔重構為 `main.lua` + `modules/` (`nitro.lua`, `logbook.lua`) 惰性動態載入架構，顯著降低記憶體佔用與啟動延遲。
 *   **模型圖片 (三階段智慧搜尋優先權)**：專為 Rotorflight 共用設定檔飛友優化圖片優先順序：**`modelImage/<機型名稱>.png` (同名圖) > `/IMAGES/<m.bitmap>` (控上指定圖) > `default.png` (預設圖)**。一控多機對頻連線自動載入對應飛機高清照片！

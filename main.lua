@@ -3,7 +3,7 @@
 -- Model picture order: Model Setup bitmap (/IMAGES), RBCT/modelImage/<model>.png,
 -- RBCT/modelImage/<model without its first character>.png, then default.png.
 local NAME = "RBCT"
-local VERSION = "v 1.0.005"
+local VERSION = "v1.0.501"
 
 -- Keep this list byte-for-byte compatible with standard telemetry. The order is
 -- deliberately arranged to ensure standard telemetry setup works here.
@@ -246,6 +246,7 @@ local sensor_aliases = {
   ["Tmcu"] = { "Tmcu", "McuT", "Tmp2", "MCU" },
   ["Vbec"] = { "Vbec", "BecV", "RxBt", "BEC" },
   ["Vcel"] = { "Vcel", "CelV", "Cels" },
+  ["FM"]   = { "FM", "PID#", "PID", "Pid#", "Bank" },
 }
 
 local function resolveSensors()
@@ -508,10 +509,23 @@ local function bankText(w)
     end
   end
 
-  local fm = getValue("FM")
-  if type(fm) ~= "number" then
-    fm = getValue("Bank")
+  -- Auto telemetry bank detection:
+  -- Prioritize Rotorflight PID Profile sensor ("PID#", "PID", "Pid#", "Bank") over "FM" (Flight Mode)
+  local bank_sensors = { "PID#", "PID", "Pid#", "Bank", "FM" }
+  local fm = nil
+  for i = 1, #bank_sensors do
+    local name = bank_sensors[i]
+    if getFieldInfo then
+      local info = getFieldInfo(name)
+      if info then
+        fm = getValue(info.id)
+        if type(fm) == "number" and fm > 0 then break end
+      end
+    end
+    fm = getValue(name)
+    if type(fm) == "number" and fm > 0 then break end
   end
+
   if type(fm) == "number" and fm > 0 then
     local b = math.floor(fm)
     if b == 0 then b = 1 end

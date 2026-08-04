@@ -36,7 +36,7 @@ local function draw(w, ctx)
   local rx_color = (rx_v > 0 and rx_v < 6.6) and C.red or C.white
   local rx_str = string.format("%.1f", rx_v)
   local len2 = string.len(rx_str)
-  local split_x2 = cx2 + (len2 <= 2 and 162 or (len2 == 3 and 175 or 192))
+  local split_x2 = cx2 + (len2 <= 2 and 171 or (len2 == 3 and 184 or 201))
   text(split_x2, 280, rx_str, RIGHT + f_xxl, rx_color)
   text(split_x2 + 3, 308, "V", f_0, rx_color)
   text(cx2 + 123, 362, string.format("min %.1fV", min_rx_v), CENTER + f_sml, C.dim)
