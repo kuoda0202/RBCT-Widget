@@ -21,7 +21,7 @@
 ![Menu UI](Menu%20UI.jpg?v=1.0.005)
 
 ### Battery Fleet Manager UI (電池機隊管理介面)
-![Battery Fleet Manager UI](BATTERY%20UI.jpg?v=1.0.005)
+![Battery Fleet Manager UI](BATTERY%20UI.jpg?v=1.0.6)
 
 
 
