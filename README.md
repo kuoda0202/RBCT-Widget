@@ -20,6 +20,9 @@
 ### Menu UI (繁體中文選單)
 ![Menu UI](Menu%20UI.jpg?v=1.0.005)
 
+### Battery Fleet Manager UI (電池機隊管理介面)
+![Battery Fleet Manager UI](BATTERY%20UI.jpg?v=1.0.005)
+
 
 
 **RBCT** 是一個專為 EdgeTX 開發的直昇機儀表板小工具 (Widget)，支援多種螢幕解析度自動適應，完美適配 RadioMaster TX16S MK3 (800x480)、TX16S MKII (480x272) 以及 TX15 MAX (480x320) 等全彩觸控螢幕。提供完整、直覺的飛行數據監控介面。
@@ -59,6 +62,8 @@
 *   **Theme (主題)**：選擇您喜歡的面板顏色 (包含新增的黑色與 TRN 全透明主題)。
 *   **Transp BG (透明背景)**：開啟後主背景會變成透明，露出底層桌布，但保留各個資訊面板的半透明底色以維持辨識度。
 *   **LED Color (光圈顏色)**：設定遙控器實體方向桿光圈的顏色 (9色可選或 OFF)。
+*   **電池追蹤 (Bat Track)**：選擇用於識別 6 包電池槽 (BAT 1 ~ BAT 6) 的開關或通道。支援自動感測 `6P1..6P6` / `SW1..SW6` 或指定頻道，獨立紀錄每包電池的循環次數、最低電壓與歷史數據。
+*   **重置電池 (Reset Bat Log)**：指派實體開關（如 SH 彈回開關）。撥動即可一鍵清空當前選定電池 (BAT 1 ~ BAT 6) 的歷史架次、最低電壓、最高溫度與 5 線譜曲線圖，方便換新電池時重新開始紀錄。在電池管理總表 (Tab 2) 頁面下觸發重置開關亦會清空該包電池紀錄。
 
 ## 🚁 模型圖片設定
 
@@ -68,6 +73,15 @@
 *   或者直接透過 EdgeTX 系統內建的模型圖片設定，小工具也會自動抓取顯示。
 
 ## 📝 最新更新 (Latest Updates)
+
+### v1.0.6
+*   **功能新增 (電池 Fleet 管理與多電池獨立追蹤 Battery Fleet Manager)**：將 `RBCT_Beta V1.0.008DEV` 的電池管理功能正式納入 v1.0.6 發行版！
+    *   *多電池槽獨立日誌*：自動感測實體開關或邏輯開關 (`6P1..6P6`, `6POS1..6POS6`, `SW1..SW6`, `L1..L6`) 或 `Bat Track` 設定，支援自動切換 BAT 1 ~ BAT 6。每包電池皆有獨立的起降次數、最低電壓、最高溫度、平均飛行時間與曲線紀錄 (`log_<機型>_BAT<1..6>.txt`, `logbook_<機型>_BAT<1..6>.txt`, `chart_<機型>_BAT<1..6>.txt`)。
+    *   *3段式日誌與電池 Fleet 表格*：透過 `Logbook Sw` 三段開關控制：
+        *   **切至中段 (MID)**：顯示 Tab 1 飛行日誌與 5 線譜即時折線圖。
+        *   **切至下段 (DOWN)**：顯示 Tab 2 **BATTERY FLEET MANAGER** 機隊電池管理總表（列出 BAT 1 ~ BAT 6 的循環次數 `CYCLES`、歷史最低電壓 `MIN VOLT`、最高溫度 `MAX TMP` 與平均航程 `AVG DUR`），當前選取的電池以高亮綠框醒目標示。
+    *   **左下角電池槽狀態顯示**：左下角版本水印自動擴充顯示當前選定的電池編號（如 `v1.0.6 | BAT 1`）。
+*   **錯誤修復 (純英文系統介面顯示異常)**：修復在純英文語系設定下，若 SD 卡內殘留中文語音包資料夾，會導致 Widget 設定選單文字因字型不支援中文字元而顯示空白的問題。現在將嚴格優先依據系統語言進行判斷。
 
 ### v1.0.501
 *   **遙測判斷修復 (Bank 優先讀取 PID#)**：修復 Auto 模式下 Bank 顯示邏輯，優先讀取 Rotorflight active PID Profile 感測器 (`PID#` / `PID` / `Pid#` / `Bank`) 而非 Flight Mode (`FM`)，解決切換 Bank 時畫面卡在 `BANK 1` 的問題。
@@ -180,6 +194,8 @@ Customize the following settings in the widget menu:
 *   **Theme**: Choose your preferred panel color theme (including Black, TRN Transparent, and Pink).
 *   **Transp BG**: Enable to make the main background transparent to reveal your wallpaper, while preserving semi-transparent panel borders for contrast.
 *   **LED Color**: Select physical gimbal RGB ring lighting colors (9 options, Pink, Peach, Rainbow, or OFF).
+*   **Bat Track**: Select a switch, channel, or 6POS source to track up to 6 individual battery packs (BAT 1 ~ BAT 6). Supports auto-sensing hardware/logical switches or designated channels to maintain per-pack cycle count, minimum voltage, and flight logs.
+*   **Reset Bat Log**: Assign a physical switch (e.g. SH momentary switch) to completely reset/wipe the historic flight count, minimum voltage, max temperature, and flight chart for the currently active battery slot (BAT 1 ~ BAT 6).
 *   **UserName**: Custom pilot signature to replace the "NO DATA" block in the bottom right corner when telemetry is active.
 
 ### Model Image Setup
@@ -188,6 +204,16 @@ To customize the helicopter picture on your dashboard:
 *   Prepare a transparent `.png` image.
 *   Place the file in `/WIDGETS/RBCT/modelImage/` named exactly matching your EdgeTX model name.
 *   Alternatively, assign a bitmap in native EdgeTX Model Setup, which RBCT will automatically detect and display.
+
+### Changelog (v1.0.6)
+
+*   **New Feature (Battery Fleet Manager & Multi-Pack Tracking)**: Ported full battery management capabilities from `RBCT_Beta V1.0.008DEV` into `v1.0.6` stable release!
+    *   *Per-Pack Independent Logs*: Automatically detects hardware/logical switches (`6P1..6P6`, `6POS1..6POS6`, `SW1..SW6`, `L1..L6`) or `Bat Track` setting to switch between battery slots BAT 1 ~ BAT 6. Maintains independent cycle counts, minimum voltages, max temperatures, average durations, and flight charts per battery (`log_<Model>_BAT<1..6>.txt`, `logbook_<Model>_BAT<1..6>.txt`, `chart_<Model>_BAT<1..6>.txt`).
+    *   *3-Position Logbook Switch & Fleet Manager Table*: Logbook switch (`Logbook Sw`) controls dashboard overlays:
+        *   **MID Position**: Displays Tab 1 Flight Logbook and real-time 5-line telemetry chart.
+        *   **DOWN Position**: Displays Tab 2 **BATTERY FLEET MANAGER** table (listing BAT 1 ~ BAT 6 cycles, historic minimum voltage, max temperature, and average flight duration), with the active battery slot highlighted in bold green.
+    *   *Bottom-Left Battery Watermark*: Status watermark automatically updates to show active battery ID (e.g. `v1.0.6 | BAT 1`).
+*   **Bug Fix (Missing Menu Text in English UI)**: Fixed an issue where the widget menu displayed blank text on radios set to English UI if a Chinese voice pack folder was present on the SD card. Language detection now strictly prioritizes system language settings.
 
 ### Changelog (v1.0.501)
 

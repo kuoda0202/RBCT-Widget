@@ -3,7 +3,7 @@
 -- Model picture order: Model Setup bitmap (/IMAGES), RBCT/modelImage/<model>.png,
 -- RBCT/modelImage/<model without its first character>.png, then default.png.
 local NAME = "RBCT"
-local VERSION = "v1.0.501"
+local VERSION = "v1.0.6"
 
 -- Keep this list byte-for-byte compatible with standard telemetry. The order is
 -- deliberately arranged to ensure standard telemetry setup works here.
@@ -28,6 +28,9 @@ local function detectLanguage()
   if string.find(lang_str, "zh") or string.find(lang_str, "tw") or string.find(lang_str, "cn") or string.find(lang_str, "hk") then
     return true
   end
+  if string.find(lang_str, "en") or string.find(lang_str, "us") or string.find(lang_str, "gb") then
+    return false
+  end
   if fstat and (fstat("/SOUNDS/tw") or fstat("/SOUNDS/zh") or fstat("/SOUNDS/cn")) then
     return true
   end
@@ -47,7 +50,9 @@ local options = is_zh and {
   { "反向解鎖", BOOL, 0 },
   { "BANK開關 (---為自動)", SOURCE, 0 },
   { "日誌開關", SOURCE, 0 },
+  { "電池追蹤", SOURCE, 0 },
   { "重置計數", SOURCE, 0 },
+  { "重置電池", SOURCE, 0 },
   { "機型選擇", CHOICE, 2, { "燃油機 (Nitro)", "電機 (Electric)" } },
 } or {
   { "Theme", CHOICE, 5, { "Red", "Orange", "Yellow", "Green", "Blue", "Cyan", "Violet", "Black", "TRN", "Pink" } },
@@ -60,7 +65,9 @@ local options = is_zh and {
   { "Arm Invert", BOOL, 0 },
   { "Bank Src (---=Auto)", SOURCE, 0 },
   { "Logbook Sw", SOURCE, 0 },
+  { "Bat Track", SOURCE, 0 },
   { "Reset FlyCount", SOURCE, 0 },
+  { "Reset Bat Log", SOURCE, 0 },
   { "Heli Type", CHOICE, 2, { "Nitro", "Electric" } },
 }
 
@@ -75,7 +82,9 @@ local option_aliases = {
   ["Arm Invert"] = { "Arm Invert", "反向解鎖", "ArmInvert" },
   ["BankSwitch"] = { "BankSwitch", "Bank Src", "BANK開關", "BANK 開關", "BANK開關 (---為Auto)", "BANK開關 (---為自動)", "Bank Src (---=Auto)" },
   ["Logbook Sw"] = { "Logbook Sw", "日誌開關", "LogbookSw" },
+  ["Bat Track"] = { "Bat Track", "電池號碼", "電池紀錄", "電池追蹤" },
   ["Reset FlyCount"] = { "Reset FlyCount", "重置計數", "次數重置", "架次重置", "次數歸零", "次數清零" },
+  ["Reset Bat Log"] = { "Reset Bat Log", "重置電池", "電池歸零", "電池重置", "清空電池" },
   ["Heli Type"] = { "Heli Type", "機型選擇", "動力模式", "動力選項", "油電選擇", "HeliType" },
 }
 
@@ -310,14 +319,72 @@ local function loadModelImage()
   end
 end
 
-local function getLogFilePath()
+local function getActiveBatIndex(w)
+  local bat_mod = loadModule("battery")
+  if bat_mod then
+    local bat_src = getOption(w, "Bat Track")
+    local val = bat_src and (bat_src ~= 0) and getValue(bat_src) or nil
+    return bat_mod.getBatIndex(val)
+  end
+  return 0
+end
+
+local function resetActiveBatLog(w)
+  local batIdx = getActiveBatIndex(w)
   local modelName = (model.getInfo() or {}).name or "UNKNOWN"
   local cleanName = string.gsub(modelName, "[^%w]", "_")
-  return "/WIDGETS/RBCT/flights_" .. cleanName .. ".txt"
+  local dt = getDateTime()
+  local today = string.format("%04d-%02d-%02d", dt.year or 2000, dt.mon or 1, dt.day or 1)
+
+  local logPath, lbPath, chPath
+  if batIdx > 0 then
+    logPath = basePath .. "/log_" .. cleanName .. "_BAT" .. batIdx .. ".txt"
+    lbPath = basePath .. "/logbook_" .. cleanName .. "_BAT" .. batIdx .. ".txt"
+    chPath = basePath .. "/chart_" .. cleanName .. "_BAT" .. batIdx .. ".txt"
+  else
+    logPath = basePath .. "/log_" .. cleanName .. ".txt"
+    lbPath = basePath .. "/logbook_" .. cleanName .. ".txt"
+    chPath = basePath .. "/chart_" .. cleanName .. ".txt"
+  end
+
+  local f1 = io.open(logPath, "w")
+  if f1 then
+    io.write(f1, today .. ",0,0")
+    io.close(f1)
+  end
+
+  local f2 = io.open(lbPath, "w")
+  if f2 then
+    io.write(f2, "")
+    io.close(f2)
+  end
+
+  local f3 = io.open(chPath, "w")
+  if f3 then
+    io.write(f3, "")
+    io.close(f3)
+  end
+
+  w.flight_count = 0
+  w.lifetime_count = 0
+  w.log_entries = {}
+  w.chart_data = {}
+  w.fleet_data = nil
+  w.log_loaded = false
+end
+
+local function getLogFilePath(w)
+  local modelName = (model.getInfo() or {}).name or "UNKNOWN"
+  local cleanName = string.gsub(modelName, "[^%w]", "_")
+  local batIdx = getActiveBatIndex(w)
+  if batIdx > 0 then
+    return basePath .. "/log_" .. cleanName .. "_BAT" .. batIdx .. ".txt"
+  end
+  return basePath .. "/log_" .. cleanName .. ".txt"
 end
 
 local function loadFlightLog(w)
-  local path = getLogFilePath()
+  local path = getLogFilePath(w)
   local f = io.open(path, "r")
   local dt = getDateTime()
   local today = string.format("%04d-%02d-%02d", dt.year or 2000, dt.mon or 1, dt.day or 1)
@@ -350,7 +417,7 @@ local function loadFlightLog(w)
 end
 
 local function saveFlightLog(w)
-  local path = getLogFilePath()
+  local path = getLogFilePath(w)
   local f = io.open(path, "w")
   if f then
     io.write(f, w.last_date .. "," .. tostring(w.flight_count or 0) .. "," .. tostring(w.lifetime_count or 0))
@@ -358,21 +425,29 @@ local function saveFlightLog(w)
   end
 end
 
-local function getLogbookPath()
+local function getLogbookPath(w)
   local modelName = (model.getInfo() or {}).name or "UNKNOWN"
   local cleanName = string.gsub(modelName, "[^%w]", "_")
-  return "/WIDGETS/RBCT/logbook_" .. cleanName .. ".txt"
+  local batIdx = getActiveBatIndex(w)
+  if batIdx > 0 then
+    return basePath .. "/logbook_" .. cleanName .. "_BAT" .. batIdx .. ".txt"
+  end
+  return basePath .. "/logbook_" .. cleanName .. ".txt"
 end
 
-local function getChartPath()
+local function getChartPath(w)
   local modelName = (model.getInfo() or {}).name or "UNKNOWN"
   local cleanName = string.gsub(modelName, "[^%w]", "_")
-  return "/WIDGETS/RBCT/chart_" .. cleanName .. ".txt"
+  local batIdx = getActiveBatIndex(w)
+  if batIdx > 0 then
+    return basePath .. "/chart_" .. cleanName .. "_BAT" .. batIdx .. ".txt"
+  end
+  return basePath .. "/chart_" .. cleanName .. ".txt"
 end
 
 local function loadChartData(w)
   w.chart_data = {}
-  local path = getChartPath()
+  local path = getChartPath(w)
   local f = io.open(path, "r")
   if f then
     local content = io.read(f, 6144) or ""
@@ -393,7 +468,7 @@ end
 
 local function saveChartData(w)
   if not w.chart_data or #w.chart_data < 2 then return end
-  local path = getChartPath()
+  local path = getChartPath(w)
   local f = io.open(path, "w")
   if f then
     for i = 1, #w.chart_data do
@@ -408,7 +483,7 @@ end
 
 local function loadLogbook(w)
   w.log_entries = {}
-  local path = getLogbookPath()
+  local path = getLogbookPath(w)
   local f = io.open(path, "r")
   if f then
     local content = io.read(f, 2048) or ""
@@ -428,7 +503,7 @@ local function loadLogbook(w)
 end
 
 local function saveLogbook(w)
-  local path = getLogbookPath()
+  local path = getLogbookPath(w)
   local f = io.open(path, "w")
   if f then
     for i=1, #w.log_entries do
@@ -618,22 +693,19 @@ local function refresh(w, event, touchState)
   local log_sw = getOption(w, "Logbook Sw")
   if log_sw and log_sw ~= 0 then
     local l_val = getValue(log_sw)
-    if w.last_logbook_sw_val ~= l_val then
-      w.last_logbook_sw_val = l_val
-      if type(l_val) == "boolean" then
-        w.show_logbook = l_val
+    if type(l_val) == "boolean" then
+      w.show_logbook = l_val
+      w.logbook_tab = 1
+    elseif type(l_val) == "number" then
+      -- 3-position switch: DOWN (>= 50) -> Tab 2 (Battery Manager), MID (-50 < v < 50) -> Tab 1 (Logbook), UP (<= -50) -> Close (Main Dashboard)
+      if l_val >= 50 or l_val == 2 then
+        w.show_logbook = true
+        w.logbook_tab = 2
+      elseif (l_val > -50 and l_val < 50) or l_val == 1 then
+        w.show_logbook = true
         w.logbook_tab = 1
-      elseif type(l_val) == "number" then
-        -- 3-position switch: DOWN (>= 50) -> Tab 2, MID (-50 < v < 50) -> Tab 1, UP (<= -50) -> Close
-        if l_val >= 50 or l_val == 2 then
-          w.show_logbook = true
-          w.logbook_tab = 2
-        elseif (l_val > -50 and l_val < 50) or l_val == 1 then
-          w.show_logbook = true
-          w.logbook_tab = 1
-        else
-          w.show_logbook = false
-        end
+      else
+        w.show_logbook = false
       end
     end
   end
@@ -660,6 +732,14 @@ local function refresh(w, event, touchState)
     loadLogbook(w)
     loadChartData(w)
     w.log_loaded = true
+  end
+
+  -- Detect Battery Track switch change
+  local currentBatIdx = getActiveBatIndex(w)
+  if w.last_bat_idx ~= currentBatIdx then
+    w.last_bat_idx = currentBatIdx
+    w.log_loaded = false -- Force reload next frame
+    w.fleet_data = nil -- Force reload battery fleet data
   end
 
   local dt = getDateTime()
@@ -754,12 +834,30 @@ local function refresh(w, event, touchState)
     end
   end
 
+  local bat_reset_on = false
+  local bat_reset_src = getOption(w, "Reset Bat Log")
+  if bat_reset_src and bat_reset_src ~= 0 then
+    local br_val = getValue(bat_reset_src)
+    if type(br_val) == "boolean" then
+      bat_reset_on = br_val
+    elseif type(br_val) == "number" then
+      bat_reset_on = br_val > 0
+    end
+  end
+
   if w.log_loaded then
-    if reset_on and not w.last_reset_state then
-      w.flight_count = 0
-      saveFlightLog(w)
+    if bat_reset_on and not w.last_bat_reset_state then
+      resetActiveBatLog(w)
+    elseif reset_on and not w.last_reset_state then
+      if w.show_logbook and w.logbook_tab == 2 then
+        resetActiveBatLog(w)
+      else
+        w.flight_count = 0
+        saveFlightLog(w)
+      end
     end
     w.last_reset_state = reset_on
+    w.last_bat_reset_state = bat_reset_on
   end
 
   if LED_STRIP_LENGTH and LED_STRIP_LENGTH > 0 and setRGBLedColor and applyRGBLedColors then
@@ -880,7 +978,8 @@ local function refresh(w, event, touchState)
     text(145, 390, string.format("BATTERY  %dS  %.1fV", cells, vbat), CENTER + f_sml, C.dim)
     text(145, 412, string.format("%.0f mAh used", capa), CENTER + f_sml, C.dim)
   end
-  text(145, 434, VERSION, CENTER + f_sml, C.dim)
+  local bat_info_str = (w.last_bat_idx and w.last_bat_idx > 0) and (VERSION .. " | BAT " .. w.last_bat_idx) or VERSION
+  text(145, 434, bat_info_str, CENTER + f_sml, C.dim)
 
   -- Right: Headspeed and ESC blocks.
   panel(X(295), Y(70), W(495), H(160), is_trn, is_transp)

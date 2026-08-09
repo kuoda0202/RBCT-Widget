@@ -1,0 +1,1378 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RBCT v1.0.6 Official Help System / 官方 Help 系統</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Noto+Sans+TC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0b0f19;
+      --bg-card: #131b2e;
+      --bg-sidebar: #0f172a;
+      --border-color: #1e293b;
+      --accent-blue: #38bdf8;
+      --accent-purple: #818cf8;
+      --accent-green: #4ade80;
+      --accent-orange: #fb923c;
+      --accent-red: #f87171;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --shadow-glow: 0 0 25px rgba(56, 189, 248, 0.15);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Noto Sans TC', 'Outfit', sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      line-height: 1.7;
+    }
+
+    /* Language Switch Visibility */
+    .lang-en { display: none !important; }
+    body.lang-en-mode .lang-zh { display: none !important; }
+    body.lang-en-mode .lang-en { display: block !important; }
+    body.lang-en-mode span.lang-en, 
+    body.lang-en-mode div.lang-en, 
+    body.lang-en-mode a.lang-en, 
+    body.lang-en-mode td.lang-en, 
+    body.lang-en-mode th.lang-en { display: inline-block !important; }
+
+    header {
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-color);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .brand-logo {
+      width: 42px;
+      height: 42px;
+      background: linear-gradient(135deg, #0284c7, #6366f1);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1.2rem;
+      color: white;
+      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.4);
+    }
+
+    .brand-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      background: linear-gradient(90deg, #38bdf8, #818cf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .version-badge {
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--accent-blue);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      padding: 0.2rem 0.6rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .lang-btn {
+      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid var(--accent-blue);
+      color: var(--accent-blue);
+      padding: 0.55rem 1.2rem;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .lang-btn:hover {
+      background: var(--accent-blue);
+      color: #0b0f19;
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+    }
+
+    .search-box {
+      position: relative;
+      width: 300px;
+    }
+
+    .search-box input {
+      width: 100%;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 0.55rem 1rem 0.55rem 2.4rem;
+      color: var(--text-main);
+      font-size: 0.9rem;
+      outline: none;
+      transition: all 0.3s;
+    }
+
+    .search-box input:focus {
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.25);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 0.8rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-dim);
+      font-size: 0.9rem;
+    }
+
+    .app-container {
+      display: flex;
+      flex: 1;
+    }
+
+    aside {
+      width: 300px;
+      background: var(--bg-sidebar);
+      border-right: 1px solid var(--border-color);
+      padding: 1.5rem 1rem;
+      position: sticky;
+      top: 73px;
+      height: calc(100vh - 73px);
+      overflow-y: auto;
+    }
+
+    .nav-group-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-dim);
+      margin: 1.2rem 0 0.5rem 0.8rem;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.65rem 0.8rem;
+      border-radius: 8px;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 500;
+      transition: all 0.2s;
+      cursor: pointer;
+      margin-bottom: 0.25rem;
+    }
+
+    .nav-item:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-main);
+    }
+
+    .nav-item.active {
+      background: linear-gradient(90deg, rgba(56, 189, 248, 0.15), rgba(99, 102, 241, 0.05));
+      border-left: 3px solid var(--accent-blue);
+      color: var(--accent-blue);
+      font-weight: 600;
+    }
+
+    main {
+      flex: 1;
+      padding: 2.5rem 3.5rem;
+      max-width: 1150px;
+    }
+
+    .quick-finder {
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95));
+      border: 1px solid var(--accent-blue);
+      border-radius: 14px;
+      padding: 1.5rem;
+      margin-bottom: 3rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .quick-finder-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--accent-blue);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .quick-buttons {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 0.8rem;
+    }
+
+    .quick-btn {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      color: var(--text-main);
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .quick-btn:hover {
+      border-color: var(--accent-blue);
+      background: rgba(56, 189, 248, 0.1);
+      color: var(--accent-blue);
+      transform: translateY(-1px);
+    }
+
+    .section {
+      margin-bottom: 4rem;
+      scroll-margin-top: 90px;
+    }
+
+    .section-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      color: var(--accent-blue);
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 0.75rem;
+    }
+
+    .topic-sub-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin: 1.8rem 0 0.8rem 0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    p {
+      color: var(--text-muted);
+      margin-bottom: 1.2rem;
+      font-size: 0.98rem;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.5rem;
+      margin: 1.5rem 0;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.5rem;
+      transition: all 0.3s;
+    }
+
+    .card:hover {
+      border-color: rgba(56, 189, 248, 0.4);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-glow);
+    }
+
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text-main);
+      margin-bottom: 0.6rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .card-desc {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .alert {
+      border-radius: 10px;
+      padding: 1rem 1.25rem;
+      margin: 1.5rem 0;
+      border-left: 4px solid;
+      font-size: 0.92rem;
+    }
+
+    .alert-tip {
+      background: rgba(74, 222, 128, 0.08);
+      border-color: var(--accent-green);
+      color: #86efac;
+    }
+
+    .alert-important {
+      background: rgba(56, 189, 248, 0.08);
+      border-color: var(--accent-blue);
+      color: #93c5fd;
+    }
+
+    .alert-warning {
+      background: rgba(251, 146, 60, 0.08);
+      border-color: var(--accent-orange);
+      color: #fdba74;
+    }
+
+    .alert-caution {
+      background: rgba(248, 113, 113, 0.08);
+      border-color: var(--accent-red);
+      color: #fca5a5;
+    }
+
+    .alert-title {
+      font-weight: 700;
+      margin-bottom: 0.3rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      background: var(--bg-card);
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+    }
+
+    th, td {
+      padding: 0.9rem 1.2rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 0.9rem;
+    }
+
+    th {
+      background: rgba(15, 23, 42, 0.6);
+      color: var(--accent-blue);
+      font-weight: 600;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    code {
+      font-family: 'JetBrains Mono', monospace;
+      background: rgba(15, 23, 42, 0.8);
+      color: var(--accent-blue);
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      border: 1px solid rgba(56, 189, 248, 0.2);
+    }
+
+    .switch-visual {
+      display: flex;
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+
+    .switch-card {
+      flex: 1;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 1.2rem;
+      text-align: center;
+    }
+
+    .switch-card.active {
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
+    }
+
+    .switch-pos-badge {
+      display: inline-block;
+      padding: 0.2rem 0.6rem;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      margin-bottom: 0.6rem;
+    }
+
+    .pos-up { background: rgba(148, 163, 184, 0.2); color: #cbd5e1; }
+    .pos-mid { background: rgba(56, 189, 248, 0.2); color: var(--accent-blue); }
+    .pos-down { background: rgba(74, 222, 128, 0.2); color: var(--accent-green); }
+
+    footer {
+      background: var(--bg-sidebar);
+      border-top: 1px solid var(--border-color);
+      padding: 1.5rem;
+      text-align: center;
+      color: var(--text-dim);
+      font-size: 0.85rem;
+      margin-top: auto;
+    }
+
+    @media (max-width: 868px) {
+      aside { display: none; }
+      main { padding: 1.5rem; }
+      .switch-visual { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="brand">
+      <div class="brand-logo">R</div>
+      <div>
+        <div class="brand-title">RBCT Helicopter Dashboard Widget</div>
+        <div class="lang-zh" style="font-size: 0.8rem; color: var(--text-dim);">EdgeTX / Rotorflight 官方完整 Help 說明系統</div>
+        <div class="lang-en" style="font-size: 0.8rem; color: var(--text-dim);">EdgeTX / Rotorflight Official Help System</div>
+      </div>
+      <span class="version-badge">v1.0.6 Official Help</span>
+    </div>
+    
+    <div class="header-actions">
+      <button class="lang-btn" onclick="toggleLanguage()">
+        🌐 <span class="lang-zh">Switch to English</span><span class="lang-en">切換為 繁體中文</span>
+      </button>
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchInput" placeholder="搜尋主題與問答 / Search Help..." onkeyup="filterContent()">
+      </div>
+    </div>
+  </header>
+
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <aside>
+      <div class="nav-group-title lang-zh">主題目錄 (HELP TOPICS)</div>
+      <div class="nav-group-title lang-en">HELP TOPICS</div>
+      
+      <a class="nav-item active" onclick="scrollToSection('topic-sysreq')">
+        <span class="lang-zh">📖 1. 系統需求與生態系</span>
+        <span class="lang-en">📖 1. System Requirements</span>
+      </a>
+      <a class="nav-item" onclick="scrollToSection('topic-install')">
+        <span class="lang-zh">🚀 2. 安裝與全螢幕設定指南</span>
+        <span class="lang-en">🚀 2. Setup & Installation</span>
+      </a>
+      <a class="nav-item" onclick="scrollToSection('topic-image')">
+        <span class="lang-zh">🖼️ 3. 模型圖片顯示與 DIY 實做</span>
+        <span class="lang-en">🖼️ 3. Craft Image DIY Guide</span>
+      </a>
+      <a class="nav-item" onclick="scrollToSection('topic-bank')">
+        <span class="lang-zh">🎛️ 4. BANK 檔位系統</span>
+        <span class="lang-en">🎛️ 4. BANK / Flight Profile</span>
+      </a>
+      <a class="nav-item" onclick="scrollToSection('topic-dashboard')">
+        <span class="lang-zh">🔥 5. 主儀表板與油電雙模式 (Nitro/Electric)</span>
+        <span class="lang-en">🔥 5. Main Dashboard & Nitro/Electric Modes</span>
+      </a>
+      <a class="nav-item" onclick="scrollToSection('topic-battery')">
+        <span class="lang-zh">🔋 6. 電池 Fleet 機隊管理</span>
+        <span class="lang-en">🔋 6. Battery Fleet Manager</span>
+      </a>
+      <a class="nav-item" onclick="scrollToSection('topic-logbook')">
+        <span class="lang-zh">📈 7. 飛行日誌與 5 線譜圖表</span>
+        <span class="lang-en">📈 7. Logbook & 5-Line Chart</span>
+      </a>
+      <a class="nav-item" onclick="scrollToSection('topic-reset')">
+        <span class="lang-zh">🔄 8. 重置歸零與資料夾維護</span>
+        <span class="lang-en">🔄 8. Reset & File Maintenance</span>
+      </a>
+      <a class="nav-item" onclick="scrollToSection('topic-options')">
+        <span class="lang-zh">⚙️ 9. 設定選單、搖桿光圈與透明背景</span>
+        <span class="lang-en">⚙️ 9. Options, Gimbal LED & Transp BG</span>
+      </a>
+      <a class="nav-item" onclick="scrollToSection('topic-fmea')">
+        <span class="lang-zh">⚠️ 10. 邊界異常與防爆規則</span>
+        <span class="lang-en">⚠️ 10. FMEA & Protection Rules</span>
+      </a>
+      <a class="nav-item" onclick="scrollToSection('topic-faq')">
+        <span class="lang-zh">❓ 11. 飛手實戰與常問問題 FAQ 索引</span>
+        <span class="lang-en">❓ 11. Complete Pilot FAQ Index</span>
+      </a>
+    </aside>
+
+    <!-- Main Help Content Area -->
+    <main>
+
+      <!-- Beginner Quick Finder Banner -->
+      <div class="quick-finder">
+        <div class="quick-finder-title">
+          <span class="lang-zh">🔰 新手一秒速查按鈕面板 (點擊跳轉專業解答)</span>
+          <span class="lang-en">🔰 Beginner One-Click Question Finder (Click to jump)</span>
+        </div>
+        <div class="quick-buttons">
+          <button class="quick-btn" onclick="scrollToSection('topic-dashboard')">
+            <span class="lang-zh">🔥 油機/燃油機模式 (Nitro Mode) 怎麼切換？</span>
+            <span class="lang-en">🔥 How to enable Nitro Mode?</span>
+          </button>
+          <button class="quick-btn" onclick="scrollToSection('topic-options')">
+            <span class="lang-zh">💡 如何同步控制遙控器搖桿 RGB 光圈？</span>
+            <span class="lang-en">💡 How to control Gimbal RGB LED?</span>
+          </button>
+          <button class="quick-btn" onclick="scrollToSection('topic-options')">
+            <span class="lang-zh">✍️ 如何在右下角顯示飛手英文簽名？</span>
+            <span class="lang-en">✍️ How to set pilot signature?</span>
+          </button>
+          <button class="quick-btn" onclick="scrollToSection('topic-logbook')">
+            <span class="lang-zh">🛠️ 如何用 5 線譜圖表『調機與排錯』？</span>
+            <span class="lang-en">🛠️ How to use 5-line chart for flight tuning?</span>
+          </button>
+          <button class="quick-btn" onclick="scrollToSection('topic-dashboard')">
+            <span class="lang-zh">⚙️ 為什麼畫面上沒有尾馬達轉速？</span>
+            <span class="lang-en">⚙️ Why is Tail RPM missing?</span>
+          </button>
+          <button class="quick-btn" onclick="scrollToSection('topic-options')">
+            <span class="lang-zh">✨ 如何設定全透明主題背景？</span>
+            <span class="lang-en">✨ How to set Transparent BG?</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Topic 1: System Requirements & Ecosystem -->
+      <section id="topic-sysreq" class="section">
+        <h2 class="section-title">
+          <span class="lang-zh">📖 1. 系統需求與生態系</span>
+          <span class="lang-en">📖 1. System Requirements & Ecosystem</span>
+        </h2>
+
+        <div class="topic-sub-title">
+          <span class="lang-zh">🎯 研發動機與為甚麼要開發本工具</span>
+          <span class="lang-en">🎯 Design Motivation & Safety Principles</span>
+        </div>
+        <p class="lang-zh"><strong>RBCT (Helicopter Dashboard Widget)</strong> 是專為 RadioMaster TX16S (MK1/MK2/MK3)、TX15 MAX 等全彩螢幕遙控器設計的高階直昇機主儀表板。傳統遙控器畫面只能顯示單純數字，飛手在 3D 特技飛行中無法一眼掌握動力電池總電壓、即時大電流、ESC 溫度與飛控 PID 檔位。RBCT 整合全彩玻璃視覺與自動感測，為飛手提供毫秒級飛行安全保障。</p>
+        <p class="lang-en"><strong>RBCT (Helicopter Dashboard Widget)</strong> is a premium telemetry dashboard designed for color-screen EdgeTX radios such as RadioMaster TX16S (MK1/MK2/MK3) and TX15 MAX. It bridges raw telemetry values into a high-visibility flight console for 3D pilots.</p>
+
+        <div class="topic-sub-title">
+          <span class="lang-zh">🛸 17 大原生遙測感測器對照表 (Sensors Reference)</span>
+          <span class="lang-en">🛸 17 Telemetry Sensors Reference Table</span>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th class="lang-zh">感測器代碼</th><th class="lang-en">Sensor Name</th>
+              <th class="lang-zh">中文名稱</th><th class="lang-en">Description</th>
+              <th class="lang-zh">數據來源與來源協議</th><th class="lang-en">Data Source</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>Vbat</code></td>
+              <td class="lang-zh">動力電池總電壓</td><td class="lang-en">Main Battery Voltage</td>
+              <td class="lang-zh">電調 / 接收機回傳總電壓 (V)</td><td class="lang-en">ESC / Receiver telemetry (V)</td>
+            </tr>
+            <tr>
+              <td><code>Curr</code> / <code>Amps</code></td>
+              <td class="lang-zh">即時放電電流</td><td class="lang-en">Real-time Current</td>
+              <td class="lang-zh">電調電流感測器 (A)</td><td class="lang-en">ESC current sensor (A)</td>
+            </tr>
+            <tr>
+              <td><code>Hspd</code></td>
+              <td class="lang-zh">主旋翼轉速 (HeadSpeed)</td><td class="lang-en">Main Rotor RPM</td>
+              <td class="lang-zh">電調 / 飛控 RPM 轉速感測器</td><td class="lang-en">ESC / FC Main RPM sensor</td>
+            </tr>
+            <tr>
+              <td><code>Tspd</code></td>
+              <td class="lang-zh">尾馬達轉速 (Tail Motor Speed)</td><td class="lang-en">Tail Motor RPM</td>
+              <td class="lang-zh">直驅尾馬達電調轉速感測器 (無尾馬達時自動隱藏)</td><td class="lang-en">Direct-drive Tail ESC RPM sensor (Auto-hidden if none)</td>
+            </tr>
+            <tr>
+              <td><code>Capa</code></td>
+              <td class="lang-zh">已消耗容量 (mAh)</td><td class="lang-en">Consumed Capacity</td>
+              <td class="lang-zh">電調累計容量計數 (mAh)</td><td class="lang-en">ESC accumulated capacity (mAh)</td>
+            </tr>
+            <tr>
+              <td><code>Bat%</code></td>
+              <td class="lang-zh">動力電池剩餘電量百分比</td><td class="lang-en">Battery Percentage</td>
+              <td class="lang-zh">依據單芯電壓動態計算 (0%~100%)</td><td class="lang-en">Calculated based on per-cell voltage</td>
+            </tr>
+            <tr>
+              <td><code>Tesc</code></td>
+              <td class="lang-zh">主電調溫度 / 汽缸頭溫度</td><td class="lang-en">ESC / Cylinder Head Temp</td>
+              <td class="lang-zh">電調 NTC 溫感 / 油機汽缸頭感應器 (°C)</td><td class="lang-en">ESC NTC sensor / Gas engine head temp (°C)</td>
+            </tr>
+            <tr>
+              <td><code>Tmcu</code></td>
+              <td class="lang-zh">飛控 MCU 核心溫度</td><td class="lang-en">Flight Controller MCU Temp</td>
+              <td class="lang-zh">Rotorflight 飛控晶片內部溫感 (°C)</td><td class="lang-en">Rotorflight MCU internal temp (°C)</td>
+            </tr>
+            <tr>
+              <td><code>Vbec</code></td>
+              <td class="lang-zh">BEC 接收機 / 伺服器電壓</td><td class="lang-en">BEC / Rx Voltage</td>
+              <td class="lang-zh">接收機供電電壓 (V)</td><td class="lang-en">Receiver power supply voltage (V)</td>
+            </tr>
+            <tr>
+              <td><code>Vcel</code></td>
+              <td class="lang-zh">單芯平均電壓</td><td class="lang-en">Average Cell Voltage</td>
+              <td class="lang-zh">總電壓除以自動判斷之 S 數 (V/Cell)</td><td class="lang-en">Pack Vbat divided by auto-detected S-count</td>
+            </tr>
+            <tr>
+              <td><code>PID#</code> / <code>Bank</code></td>
+              <td class="lang-zh">飛控當前 PID Profile 檔位</td><td class="lang-en">Active PID Profile (Bank)</td>
+              <td class="lang-zh">Rotorflight MSP 協議即時回傳 (Bank 1~3)</td><td class="lang-en">Rotorflight MSP protocol feedback (Bank 1~3)</td>
+            </tr>
+            <tr>
+              <td><code>Gov</code></td>
+              <td class="lang-zh">定速器 GOV 狀態</td><td class="lang-en">Governor GOV Status</td>
+              <td class="lang-zh">OFF / INITIAL / SPOOLUP / ACTIVE / AUTOROTATION</td><td class="lang-en">OFF / INITIAL / SPOOLUP / ACTIVE / AUTOROTATION</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="alert alert-caution">
+          <div class="alert-title">
+            <span class="lang-zh">⚠️ 必要限制：必須安裝 Rotorflight 設定腳本 (`rf.lua`)！</span>
+            <span class="lang-en">⚠️ Requirement: Rotorflight Setup Script (`rf.lua`) Required!</span>
+          </div>
+          <span class="lang-zh">如果您的記憶卡未安裝 <code>rf.lua</code> (Rotorflight 設定腳本)，小工具將無法自動讀取飛控回傳的 PID Profile (Bank 檔位)、Rate Profile 與 GOV 定速狀態！</span>
+          <span class="lang-en">Without <code>rf.lua</code> installed on your SD card, automated Bank (PID Profile) and GOV status telemetry will NOT function!</span>
+        </div>
+      </section>
+
+      <!-- Topic 2: Setup & Installation -->
+      <section id="topic-install" class="section">
+        <h2 class="section-title">
+          <span class="lang-zh">🚀 2. 安裝與全螢幕設定指南</span>
+          <span class="lang-en">🚀 2. Setup & Installation Guide</span>
+        </h2>
+
+        <div class="topic-sub-title">
+          <span class="lang-zh">📥 手把手安裝三步驟</span>
+          <span class="lang-en">📥 Step-by-Step Installation</span>
+        </div>
+
+        <ol style="margin-left: 1.5rem; color: var(--text-muted); margin-bottom: 1.5rem;">
+          <li style="margin-bottom: 0.8rem;">
+            <strong class="lang-zh">步驟一：複製檔案至記憶卡 (SD Card)</strong><strong class="lang-en">Step 1: Copy Files to SD Card</strong><br>
+            <span class="lang-zh">使用 Type-C 線連接遙控器與電腦（選擇 USB 儲存裝置），把解壓後的 <code>RBCT</code> 資料夾複製到記憶卡中。</span>
+            <span class="lang-en">Connect radio to PC via USB, and copy the unzipped <code>RBCT</code> folder into the SD Card.</span><br>
+            <code>SD Card / WIDGETS / RBCT / main.lua</code>
+          </li>
+          <li style="margin-bottom: 0.8rem;">
+            <strong class="lang-zh">步驟二：遙控器畫面新增 Widget</strong><strong class="lang-en">Step 2: Add Widget in EdgeTX Screen</strong><br>
+            <span class="lang-zh">長按遙控器左側 <code>TELEMETRY</code> (或 <code>SYS</code>) 鍵 ➔ 新增頁面設定 Layout 為 **全螢幕 (Full Screen)** ➔ 點擊 `Select widget` 選擇 **RBCT**。</span>
+            <span class="lang-en">Long press <code>TELEMETRY</code> key ➔ Create new screen layout as **Full Screen** ➔ Tap `Select widget` and choose **RBCT**.</span>
+          </li>
+          <li style="margin-bottom: 0.8rem;">
+            <strong class="lang-zh">步驟三：關鍵的「搜尋感測器」(沒按數字全為 0)</strong><strong class="lang-en">Step 3: Discover New Telemetry Sensors</strong><br>
+            <span class="lang-zh">直昇機通電，遙控器進入 <code>MODEL SETUP</code> ➔ <code>Telemetry (遙測)</code> ➔ 點擊 **`Discover new sensors` (搜尋感測器)**。螢幕刷出 `RPM` 與 `Vbat` 即宣告成功！</span>
+            <span class="lang-en">Power up helicopter, enter <code>MODEL SETUP</code> ➔ <code>Telemetry</code> ➔ Tap **`Discover new sensors`**. Once `RPM` and `Vbat` appear, setup is complete!</span>
+          </li>
+        </ol>
+
+        <div class="alert alert-tip">
+          <div class="alert-title">
+            <span class="lang-zh">💡 新手初次使用「懶人設定法」</span>
+            <span class="lang-en">💡 Quick Start Recommended Settings for Beginners</span>
+          </div>
+          <span class="lang-zh">
+            1. <code>解鎖開關 (Arm Source)</code> ➔ 指派為您的油門鎖定/解鎖開關 (如 SF 開關)。<br>
+            2. <code>日誌開關 (Logbook Sw)</code> ➔ 指派為您的三段開關 (如 SC 開關)。<br>
+            3. 其餘設定（包括 BANK、電池等）**保持預設不動** 即可直接安全開飛！
+          </span>
+          <span class="lang-en">
+            1. <code>Arm Source</code> ➔ Assign to your throttle arm switch (e.g. SF switch).<br>
+            2. <code>Logbook Sw</code> ➔ Assign to a 3-position switch (e.g. SC switch).<br>
+            3. Leave all other options **at default values** for immediate safe flying!
+          </span>
+        </div>
+      </section>
+
+      <!-- Topic 3: Model Image DIY Guide -->
+      <section id="topic-image" class="section">
+        <h2 class="section-title">
+          <span class="lang-zh">🖼️ 3. 模型圖片顯示與 DIY 實做</span>
+          <span class="lang-en">🖼️ 3. Craft Image Display & DIY Guide</span>
+        </h2>
+
+        <div class="topic-sub-title">
+          <span class="lang-zh">🧠 圖片 3 階搜尋原則</span>
+          <span class="lang-en">🧠 3-Tier Image Priority Search Algorithm</span>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th class="lang-zh">優先級</th><th class="lang-en">Tier</th>
+              <th class="lang-zh">搜尋目錄與檔名格式</th><th class="lang-en">Search Target</th>
+              <th class="lang-zh">說明與備註</th><th class="lang-en">Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Tier 1</strong></td>
+              <td><code>/WIDGETS/RBCT/modelImage/&lt;機型名稱&gt;.png</code></td>
+              <td class="lang-zh">專屬去背 PNG 圖檔（如未找到，自動去除名稱首字再次搜尋）</td>
+              <td class="lang-en">Transparent PNG photo (automatch model name)</td>
+            </tr>
+            <tr>
+              <td><strong>Tier 2</strong></td>
+              <td><code>/IMAGES/&lt;bitmap&gt;</code></td>
+              <td class="lang-zh">遙控器 EdgeTX Model Setup 中指派之原生圖檔</td>
+              <td class="lang-en">Native EdgeTX Model Setup bitmap image</td>
+            </tr>
+            <tr>
+              <td><strong>Tier 3</strong></td>
+              <td><code>/WIDGETS/RBCT/default.png</code></td>
+              <td class="lang-zh">當前兩者皆未找到時，自動載入安全預設直昇機剪影</td>
+              <td class="lang-en">Default helicopter silhouette fallback</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="topic-sub-title">
+          <span class="lang-zh">✂️ 自製愛機去背圖手把手 4 步驟</span>
+          <span class="lang-en">✂️ 4 Steps to Make Custom Craft Image</span>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">
+              <span class="lang-zh">📷 步驟 1：拍攝照片</span>
+              <span class="lang-en">📷 Step 1: Take Photo</span>
+            </div>
+            <div class="card-desc">
+              <span class="lang-zh">用手機幫愛機拍一張側面全身照片（建議背景乾淨）。</span>
+              <span class="lang-en">Take a side-view photo of your helicopter with your phone.</span>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">
+              <span class="lang-zh">✂️ 步驟 2：去背為透明 PNG</span>
+              <span class="lang-en">✂️ Step 2: Remove Background</span>
+            </div>
+            <div class="card-desc">
+              <span class="lang-zh">使用 iOS 相簿長按去背或 <code>remove.bg</code> 網站一鍵去背，存為透明 PNG。</span>
+              <span class="lang-en">Use iOS photos cutout or <code>remove.bg</code> site to remove background and save as transparent PNG.</span>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">
+              <span class="lang-zh">🏷️ 步驟 3：精準命名 (極重要)</span>
+              <span class="lang-en">🏷️ Step 3: Exact Naming</span>
+            </div>
+            <div class="card-desc">
+              <span class="lang-zh"><strong>檔名必須跟 EdgeTX 模型名稱 100% 相同！</strong> 例如 EdgeTX 叫 <code>RAW580</code>，檔名就改為 <code>RAW580.png</code>。</span>
+              <span class="lang-en"><strong>Filename MUST exactly match EdgeTX Model Name!</strong> E.g. If model name is <code>RAW580</code>, name the file <code>RAW580.png</code>.</span>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">
+              <span class="lang-zh">📂 步驟 4：存入指定資料夾</span>
+              <span class="lang-en">📂 Step 4: Copy to SD Card</span>
+            </div>
+            <div class="card-desc">
+              <span class="lang-zh">將做好的 PNG 複製到：<code>SD卡/WIDGETS/RBCT/modelImage/RAW580.png</code>。</span>
+              <span class="lang-en">Copy to SD Card folder: <code>SD Card/WIDGETS/RBCT/modelImage/RAW580.png</code>.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="alert alert-important">
+          <div class="alert-title">
+            <span class="lang-zh">📏 照片解析度規格與限制</span>
+            <span class="lang-en">📏 Optimal Image Specifications</span>
+          </div>
+          <span class="lang-zh">
+            • <strong>建議解析度</strong>：<code>300 x 200</code> 像素至 <code>400 x 280</code> 像素。<br>
+            • <strong>長寬比例</strong>：約 <code>4:3</code> 或 <code>16:9</code> 橫式照片。<br>
+            • <strong>檔案大小</strong>：建議控制在 <strong>100 KB ~ 300 KB</strong> 以內，繪製效能最佳。<br>
+            • <strong>畫面算式</strong>：小工具會自動以 <code>125%</code> (繪製比例 <code>sx * 125</code>) 擴大置中渲染，視覺飽滿無空隙。
+          </span>
+          <span class="lang-en">
+            • <strong>Optimal Resolution</strong>: <code>300 x 200</code> to <code>400 x 280</code> pixels.<br>
+            • <strong>Aspect Ratio</strong>: ~ <code>4:3</code> or 16:9 horizontal PNG.<br>
+            • <strong>File Size</strong>: Keep under <strong>300 KB</strong> for smooth UI rendering.<br>
+            • <strong>Scale Engine</strong>: Auto-scaled at <code>125%</code> for crisp rendering on color radios.
+          </span>
+        </div>
+      </section>
+
+      <!-- Topic 4: BANK Flight Mode System -->
+      <section id="topic-bank" class="section">
+        <h2 class="section-title">
+          <span class="lang-zh">🎛️ 4. BANK 檔位系統</span>
+          <span class="lang-en">🎛️ 4. BANK / Flight Profile System</span>
+        </h2>
+
+        <div class="topic-sub-title">
+          <span class="lang-zh">💡 什麼是 BANK？(新手白話解說)</span>
+          <span class="lang-en">💡 What is BANK? (Beginner Explanation)</span>
+        </div>
+        <p class="lang-zh">在直昇機飛控中，<strong>BANK 就像是汽車的「自排檔位」或「飛行模式」！</strong></p>
+        <p class="lang-en">In helicopter flight controllers, <strong>BANK acts like an automatic transmission gear or flight mode!</strong></p>
+        <ul style="margin-left: 1.5rem; color: var(--text-muted); margin-bottom: 1.5rem;">
+          <li><strong class="lang-zh">Bank 1 (一檔/航線檔)</strong><strong class="lang-en">Bank 1 (Gear 1 / Cruise)</strong><span class="lang-zh">：轉速較低、靈敏度較溫和，適合新手練習起降與平穩航線飛行。</span><span class="lang-en">: Lower RPM and gentle agility for beginners and smooth cruising.</span></li>
+          <li><strong class="lang-zh">Bank 2 (二檔/特技檔)</strong><strong class="lang-en">Bank 2 (Gear 2 / Sport 3D)</strong><span class="lang-zh">：轉速拉高、反應靈敏，適合倒飛與基礎 3D 特技動作。</span><span class="lang-en">: Higher RPM and crisp response for inverted flight and basic 3D tricks.</span></li>
+          <li><strong class="lang-zh">Bank 3 (三檔/暴力 3D 檔)</strong><strong class="lang-en">Bank 3 (Gear 3 / Hard 3D)</strong><span class="lang-zh">：極高轉速、反應極快，適合暴力 3D 擺動。</span><span class="lang-en">: Maximum RPM and fast response for hard 3D maneuvers.</span></li>
+        </ul>
+
+        <div class="topic-sub-title">
+          <span class="lang-zh">⚙️ BANK 開關 (`Bank Src`) 設定與連動影響</span>
+          <span class="lang-en">⚙️ Bank Option Assignment & Impact</span>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th class="lang-zh">設定狀態</th><th class="lang-en">Setting State</th>
+              <th class="lang-zh">RBCT 小工具運作原理</th><th class="lang-en">Widget Principle</th>
+              <th class="lang-zh">儀表板畫面呈現與連動影響</th><th class="lang-en">UI Impact</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong class="lang-zh">情況 A：設定為 `---`<br>(預設推薦)</strong><strong class="lang-en">Case A: Set to `---`<br>(Recommended)</strong></td>
+              <td class="lang-zh"><strong>自動讀取飛控 PID 遙測！</strong><br>自動感測飛控 (Rotorflight, Brain2, Spirit) 回傳的 `PID#` 信號。</td>
+              <td class="lang-en"><strong>Auto-reads FBL PID telemetry!</strong><br>Auto-senses `PID#` telemetry from FC (Rotorflight, Brain2, Spirit).</td>
+              <td class="lang-zh">畫面右上角<strong>真實同步顯示飛控當前真正的檔位</strong> (如 `Bank 1`)。飛控切到哪檔，螢幕就顯示哪檔！</td>
+              <td class="lang-en">Displays <strong>real-time active FBL Bank profile</strong> on upper-right header. Syncs automatically with FC!</td>
+            </tr>
+            <tr>
+              <td><strong class="lang-zh">情況 B：手動指派開關<br>(例如 SE 開關)</strong><strong class="lang-en">Case B: Manual Switch<br>(e.g. SE switch)</strong></td>
+              <td class="lang-zh"><strong>強行讀取遙控器實體開關！</strong><br>忽略飛控遙測，依據 SE 開關位置（上/中/下）強制切換。</td>
+              <td class="lang-en"><strong>Reads physical radio switch directly!</strong><br>Overrides FC telemetry and switches based on SE switch position.</td>
+              <td class="lang-zh">適合用於「舊款無遙測飛控」。撥動 SE 開關時，畫面上的 Bank 標籤會隨開關連動切換。</td>
+              <td class="lang-en">Useful for older non-telemetry FBLs. Toggling SE switch updates Bank label on screen.</td>
+            </tr>
+            <tr>
+              <td><strong class="lang-zh">情況 C：未指派且無遙測</strong><strong class="lang-en">Case C: Unassigned & No Telemetry</strong></td>
+              <td class="lang-zh"><strong>安全降級預設！</strong><br>系統安全保持在預設狀態，不上鎖也不報錯。</td>
+              <td class="lang-en"><strong>Safe Fallback Mode!</strong><br>System remains safe without errors or locking.</td>
+              <td class="lang-zh">畫面安全顯示 `Bank 1` 或 `---`。<strong>完全不影響</strong> 電壓、轉速、電流與飛行計數功能。</td>
+              <td class="lang-en">Safely shows `Bank 1` or `---`. Does NOT affect voltage, RPM, current, or flight counting.</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- Topic 5: Main Dashboard & Nitro/Electric Modes -->
+      <section id="topic-dashboard" class="section">
+        <h2 class="section-title">
+          <span class="lang-zh">🔥 5. 主儀表板與油電雙模式 (Nitro/Electric)</span>
+          <span class="lang-en">🔥 5. Main Dashboard & Nitro / Electric Native Modes</span>
+        </h2>
+
+        <div class="topic-sub-title">
+          <span class="lang-zh">🎯 開發動機：為何要獨立設計「🔥 燃油機專屬模式 (Nitro Native Mode)」？</span>
+          <span class="lang-en">🎯 Motivation: Why Native Nitro Mode Matters</span>
+        </div>
+        <p class="lang-zh">傳統彩幕小工具只為電動直昇機設計，畫面上堆滿了動力電池總電壓 (Vbat)、放電電流 (Amps) 與消耗容量 (mAh)。然而對於 **油壓/燃油直昇機 (Nitro / Gas Heli)** 而言，根本沒有大動力鋰電池！油機飛手空中真正關心的是 **「汽缸頭引擎溫度 (ENGINE TEMP)」** 與 **「接收機/伺服器電池電壓 (RX PACK)」**。如果汽缸頭過熱 (>120°C) 會直接暴震縮缸拉缸死機；如果接收機電池過低 (<6.6V) 會瞬間失控墜機！</p>
+        <p class="lang-en">Electric widgets clog screens with Vbat and Current. For Nitro/Gas helicopters, there is no main motor battery. Pilots strictly need to monitor **Engine Cylinder Head Temp (`ENGINE TEMP`)** and **Receiver Battery Voltage (`RX PACK`)** to prevent piston seizures and receiver brownouts.</p>
+
+        <div class="topic-sub-title">
+          <span class="lang-zh">🕹️ 設定步驟：如何切換為 Nitro 油機模式？</span>
+          <span class="lang-en">🕹️ Step-by-Step Nitro Mode Activation</span>
+        </div>
+        <ol style="margin-left: 1.5rem; color: var(--text-muted); margin-bottom: 1.5rem;">
+          <li>長按滾輪進入 RBCT 設定選單。</li>
+          <li>找到 <code>Heli Type</code> (機種類型) 選項。</li>
+          <li>將預設的 <code>Electric</code> (電機模式) 切換為 <strong><code>Nitro</code> (油機模式)</strong>！</li>
+        </ol>
+
+        <div class="topic-sub-title">
+          <span class="lang-zh">🔬 Nitro 模式下的 UI 物理變形與視覺演算法</span>
+          <span class="lang-en">🔬 UI Layout Transformation & Centering Math</span>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">
+              <span class="lang-zh">✨ 1. 物理版面變形 (Zero Redundancy)</span>
+              <span class="lang-en">✨ 1. Layout Transformation</span>
+            </div>
+            <div class="card-desc">
+              <span class="lang-zh">自動隱藏電機無用的 Vbat, Amps, mAh 與 Bat% 電量 Bar。將右側面板瞬間拉伸變形為 **XXL 雙欄特大視覺黃金版面**。</span>
+              <span class="lang-en">Hides electric battery meters and transforms right panel into two XXL high-visibility metric blocks.</span>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">
+              <span class="lang-zh">☀️ 2. 戶外陽光下 0.1 秒極速辨識</span>
+              <span class="lang-en">☀️ 2. 0.1s Outdoor High-Visibility View</span>
+            </div>
+            <div class="card-desc">
+              <span class="lang-zh">採用 XXL 高對比黃金大字體版面，飛手在戶外強烈陽光下進行 3D 特技飛行時，只需餘光 0.1 秒極速掃視，即可瞬間掌握引擎溫度與接收機電壓，眼睛無需離開機體！</span>
+              <span class="lang-en">Designed with XXL high-contrast layout, enabling pilots to read engine temp and Rx voltage in a 0.1s quick glance under bright outdoor sunlight.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="alert alert-caution">
+          <div class="alert-title">
+            <span class="lang-zh">⚠️ Nitro 油機模式專屬警示門檻</span>
+            <span class="lang-en">⚠️ Nitro Mode Alert Thresholds</span>
+          </div>
+          <span class="lang-zh">
+            • <strong>`ENGINE TEMP` 引擎過熱警示</strong>：當汽缸頭溫度超越 <strong>120°C</strong> 時，數字自動亮顯眼大紅字警示！<br>
+            • <strong>`RX PACK` 接收機低壓警示</strong>：當 2S LiFe/LiPo 接收機電池電壓低於 <strong>6.6V</strong> 時，自動亮紅字警告提醒充電！
+          </span>
+          <span class="lang-en">
+            • <strong>`ENGINE TEMP` High Warning</strong>: Highlights in bold red when engine head temp exceeds <strong>120°C</strong>.<br>
+            • <strong>`RX PACK` Low Voltage Warning</strong>: Highlights in bold red when Rx pack drops below <strong>6.6V</strong>.
+          </span>
+        </div>
+
+        <div class="topic-sub-title">
+          <span class="lang-zh">⚡ 關鍵技術原理：尾馬達轉速 (`TAIL RPM`) 顯示與隱藏機制</span>
+          <span class="lang-en">⚡ Core Principle: Tail Motor Speed (`TAIL RPM`) Display & Auto-Hide Logic</span>
+        </div>
+
+        <div class="alert alert-important">
+          <span class="lang-zh">
+            • <strong>直驅尾馬達 (Motorized Tail)</strong>：若 RF 設定檔中配置了獨立尾電調且遙測到 `Tspd` 信號，儀表板會 **自動啟用並顯示 `TAIL RPM` 尾馬達轉速**！<br>
+            • <strong>傳統機械尾傳 (Shaft/Belt Drive) 與油機</strong>：如果是傳統軸傳/皮帶尾翼或 Nitro 油機，小工具會 **自動隱藏 `TAIL RPM`**，避免畫面出現無效數據。
+          </span>
+          <span class="lang-en">
+            • <strong>Direct Drive Tail</strong>: Auto-detects `Tspd` telemetry and displays `TAIL RPM`.<br>
+            • <strong>Belt/Shaft Tails & Nitro</strong>: Auto-hides `TAIL RPM` for mechanical tails or Nitro mode.
+          </span>
+        </div>
+      </section>
+
+      <!-- Topic 6: Battery Fleet Manager -->
+      <section id="topic-battery" class="section">
+        <h2 class="section-title">
+          <span class="lang-zh">🔋 6. 電池 Fleet 機隊管理與鎖定 S 數演算法</span>
+          <span class="lang-en">🔋 6. Battery Fleet Management & S-Count Lock Engine</span>
+        </h2>
+
+        <div class="topic-sub-title">
+          <span class="lang-zh">🔋 1. 電池紀錄的核心功能與檔案獨立結構</span>
+          <span class="lang-en">🔋 1. Core Battery Tracking & Independent File Architecture</span>
+        </div>
+        <p class="lang-zh">RBCT 支援針對每一台直昇機獨立追蹤最多 **6 包電池 (BAT 1 ~ BAT 6)** 的健康數據與飛行歷史：</p>
+        <ul style="margin-left: 1.5rem; color: var(--text-muted); margin-bottom: 1.5rem;">
+          <li><strong class="lang-zh">獨立飛行數據</strong><strong class="lang-en">Independent Flight Metrics</strong><span class="lang-zh">：每一包電池都有自己獨立的「起降次數 (Cycles)」、「歷史最低電壓 (Min Volt)」、「最高溫度 (Max Temp)」、「平均飛行時間 (Avg Dur)」。</span><span class="lang-en">: Each pack tracks its own flight cycles, min voltage, max temp, and avg flight time.</span></li>
+          <li><strong class="lang-zh">獨立歷史日誌與圖表檔案</strong><strong class="lang-en">Dedicated History Logs & Chart Files</strong><span class="lang-zh">：每包電池皆在 SD 卡維持專屬的最近 10 趟飛行報表 (<code>logbook_&lt;機型&gt;_BAT1~6.txt</code>) 與上一趟 5 線譜動態折線圖 (<code>chart_&lt;機型&gt;_BAT1~6.txt</code>)。</span><span class="lang-en">: Maintains separate files for each pack: <code>logbook_&lt;Model&gt;_BAT1~6.txt</code> and <code>chart_&lt;Model&gt;_BAT1~6.txt</code>.</span></li>
+        </ul>
+
+        <div class="topic-sub-title">
+          <span class="lang-zh">🔬 防降壓亂跳的「電池 S 數記憶體鎖定演算法 (S-Count Locking)」</span>
+          <span class="lang-en">🔬 S-Count Memory Lock Algorithm</span>
+        </div>
+
+        <div class="card" style="margin-bottom: 1.5rem;">
+          <div class="card-title">
+            <span class="lang-zh">🛡️ 為何需要「通電鎖定 S 數」？</span>
+            <span class="lang-en">🛡️ Why Locked S-Count Prevents Glitches</span>
+          </div>
+          <div class="card-desc">
+            <span class="lang-zh">在大螺距暴力 3D 抽電時，鋰電池總電壓會瞬間劇烈下沉壓降。傳統儀表板如果隨時重新計算 S 數，會導致畫面上的 S 數亂跳（例如 6S 電池在壓降時被誤判為 5S 電池）。RBCT 在電池剛接上通電時，即 **自動計算並將 S 數永久鎖定於記憶體中**，整趟飛行過程中絕不誤判亂跳！</span>
+            <span class="lang-en">Heavy pitch-pumps cause temporary voltage sags. RBCT locks the S-count into memory upon battery connection, preventing erratic S-count jumps (e.g. 6S miscalculated as 5S) during voltage dips.</span>
+          </div>
+        </div>
+
+        <div class="topic-sub-title">
+          <span class="lang-zh">🎛️ 2. 如何切換當前使用的電池 (BAT 1 ~ BAT 6)</span>
+          <span class="lang-en">🎛️ 2. How to Switch Active Battery (BAT 1 ~ BAT 6)</span>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">
+              <span class="lang-zh">方式 A：全自動開關感測 (最推薦)</span>
+              <span class="lang-en">Method A: Full Auto Switch Sense (Recommended)</span>
+            </div>
+            <div class="card-desc">
+              <span class="lang-zh">自動掃描實體/邏輯開關：<code>6P1..6P6</code>、<code>SW1..SW6</code>、<code>L1..L6</code>。按下 6P1 或 SW1 瞬間自動切換為 <strong>BAT 1</strong>。</span>
+              <span class="lang-en">Auto-scans physical buttons: <code>6P1..6P6</code>, <code>SW1..SW6</code>, <code>L1..L6</code>. Pressing button 6P1 or SW1 switches active profile to BAT 1.</span>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">
+              <span class="lang-zh">方式 B：選單指派開關 (Bat Track)</span>
+              <span class="lang-en">Method B: Menu Switch Assignment (Bat Track)</span>
+            </div>
+            <div class="card-desc">
+              <span class="lang-zh">長按滾輪進入選單，在 <code>Bat Track</code> 指派對應的通道或 6POS 旋鈕來切換電池檔位。</span>
+              <span class="lang-en">Assign <code>Bat Track</code> option in settings menu to a specific channel or knob to control battery selection.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-sub-title">
+          <span class="lang-zh">📊 3. 查看機隊電池管理總表 (SC↓ 下撥) 與浮水印</span>
+          <span class="lang-en">📊 3. Battery Fleet Manager Table & Watermark</span>
+        </div>
+
+        <p class="lang-zh">將 <code>Logbook Sw</code> 指派開關下撥 (SC↓)，即可叫出總表。當前選定之電池整列以 **綠色高亮框** 強調；左下角水印同步回饋 <code>v1.0.6 | BAT 1</code>。</p>
+        <p class="lang-en">Set <code>Logbook Sw</code> to DOWN (SC↓) to view the fleet table. Active battery row is highlighted in green with watermark <code>v1.0.6 | BAT 1</code>.</p>
+      </section>
+
+      <!-- Topic 7: Logbook & 5-Line Chart -->
+      <section id="topic-logbook" class="section">
+        <h2 class="section-title">
+          <span class="lang-zh">📈 7. 飛行日誌與 5 線譜圖表</span>
+          <span class="lang-en">📈 7. Logbook & 5-Line Telemetry Chart</span>
+        </h2>
+
+        <div class="topic-sub-title">
+          <span class="lang-zh">🎯 開發動機：降落後 1 秒分析動力系統健康度</span>
+          <span class="lang-en">🎯 Motivation: Immediate Telemetry Inspection</span>
+        </div>
+        <p class="lang-zh">以往飛手降落後需要拔下 SD 卡連電腦開 Log 檔才能看電壓與轉速變化。RBCT 直接在遙控器全彩彩幕上原繪 **5 線譜動態折線圖**，讓飛手在降落後撥動開關，即可 1 秒內檢視剛才飛行的轉速是否平穩、電壓壓降 (Voltage Sag) 與電流峰值。</p>
+        <p class="lang-en">Eliminates the hassle of pulling SD cards to inspect flight logs on a PC. RBCT renders a 5-channel line chart directly on EdgeTX color screens for instant post-flight analysis.</p>
+
+        <div class="topic-sub-title">
+          <span class="lang-zh">🛠️ 5 線譜折線圖在『飛手調機 (Flight Tuning)』上的四大實戰診斷應用</span>
+          <span class="lang-en">🛠️ 4 Practical Flight Tuning & Diagnostic Applications</span>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">
+              <span class="lang-zh">1. 定速器 (GOV) PID 補償調校</span>
+              <span class="lang-en">1. Governor (GOV) PID Tuning</span>
+            </div>
+            <div class="card-desc">
+              <span class="lang-zh">全螺距急升 (Collective Punch) 時觀察綠色 **RPM 曲線**。若 RPM 劇烈下凹 (>200 RPM)，代表定速前饋 (Feedforward) 或 P 增益不夠；若轉速高頻上下波浪震盪，代表 GOV P/I 增益過高！</span>
+              <span class="lang-en">Observe green RPM line during collective punch-outs. Severe drop (>200 RPM) means insufficient Gov feedforward; oscillation means Gov gain is too high.</span>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">
+              <span class="lang-zh">2. 動力電池 C 數老化與壓降診斷</span>
+              <span class="lang-en">2. Battery Sag & C-Rate Health Check</span>
+            </div>
+            <div class="card-desc">
+              <span class="lang-zh">對比橘色 **VOLT 曲線** 與紅色 **AMPS 曲線**。當暴大電流 (>120A) 灌入時，若總電壓暴跌低於 3.4V/Cell，代表電池內阻升高老化、放電 C 數嚴重不足！</span>
+              <span class="lang-en">Compare orange VOLT and red AMPS lines under heavy load (>120A). Rapid drop below 3.4V/cell indicates high internal resistance (IR) and battery degradation.</span>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">
+              <span class="lang-zh">3. BEC 供電與舵機集體抽電安全檢查</span>
+              <span class="lang-en">3. BEC Power Supply & Servo Load Safety</span>
+            </div>
+            <div class="card-desc">
+              <span class="lang-zh">觀察藍色 **BEC 曲線**。在暴力 3D 劇烈擺動（4 顆伺服器全速集體抽電）時，若 BEC 電壓壓降超過 0.8V 或低於 6.0V，代表 BEC 供電安培數不足或虛接，警示有斷電掉機風險！</span>
+              <span class="lang-en">Observe blue BEC line during fast 3D maneuvers. A dip > 0.8V warns of insufficient BEC current capacity, risking receiver brownout and total crash.</span>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">
+              <span class="lang-zh">4. 電調散熱與溫升過熱預警</span>
+              <span class="lang-en">4. ESC Thermal Performance & Overheating</span>
+            </div>
+            <div class="card-desc">
+              <span class="lang-zh">觀察青色 **TMP 曲線** 的溫升斜率 (°C/min)。若 3 分鐘飛行中電調溫度迅速飆升超越 85°C，代表齒比搭配不當或風道散熱不良，需在電調觸發過熱保護停機前修正！</span>
+              <span class="lang-en">Track cyan TMP line slope (°C/min). Temp rising above 85°C in 3 minutes indicates wrong gear ratio or poor airflow before thermal shutdown occurs.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="topic-sub-title">
+          <span class="lang-zh">🔬 5 線譜折線圖數據採樣原理與演算法</span>
+          <span class="lang-en">🔬 5-Line Telemetry Chart Engine & Sampling Algorithm</span>
+        </div>
+
+        <div class="card" style="margin-bottom: 1.5rem;">
+          <div class="card-title">
+            <span class="lang-zh">📈 1. 無上限 Auto-Scaling 智慧動態天井刻度演算法</span>
+            <span class="lang-en">📈 1. Auto-Scaling Dynamic Ceiling Algorithm</span>
+          </div>
+          <div class="card-desc">
+            <span class="lang-zh">座標軸導入無上限動態天井演算法。無論是 700/800 級 (12S/14S, 200A+ 大電流)、450 級 (6S)，或是微型電直 (高轉速 10,000+ RPM)，刻度上限皆會隨實際遙測自動動態推升 (如 RPM 以 500 RPM 為一階向下擴充)，曲線 **絕對不破頂、不截斷**！</span>
+            <span class="lang-en">Y-axes automatically calculate dynamic ceilings based on telemetry max values (e.g., RPM scales in 500 RPM steps, current scales up to 200A+), preventing clipped curves.</span>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom: 1.5rem;">
+          <div class="card-title">
+            <span class="lang-zh">⚙️ 2. 採樣間隔與 200 點 FIFO 環形佇列 (3.0s Sampling)</span>
+            <span class="lang-en">⚙️ 2. 3.0s Sampling Interval & 200-Point FIFO Buffer</span>
+          </div>
+          <div class="card-desc">
+            <span class="lang-zh">解鎖起轉後，每隔 **精準 3.0 秒 (`300 ticks`) 採樣一次數據**。RAM 記憶體維持 200 點 FIFO 環形佇列，可完整記錄 **最長 10 分鐘** 數據精華。</span>
+            <span class="lang-en">Samples every 3.0s, keeping max 200 telemetry points in a RAM FIFO buffer for up to 10 minutes of flight logs.</span>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom: 1.5rem;">
+          <div class="card-title">
+            <span class="lang-zh">🛡️ 3. ARMED 飛行中 0 次 SD 卡寫入 (Zero SD Writes)</span>
+            <span class="lang-en">🛡️ 3. Zero SD Writes During Flight</span>
+          </div>
+          <div class="card-desc">
+            <span class="lang-zh">飛行狀態下 (`ARMED = true`) 數據寫在 RAM 記憶體。只有當降落上鎖 (`DISARM`) 時，才會寫入 SD 卡 <code>chart_&lt;Model&gt;_BAT&lt;Idx&gt;.txt</code>，100% 避免 SD 卡 I/O 阻塞遙控器！</span>
+            <span class="lang-en">Data points are buffered strictly in RAM while ARMED. Writes to SD card only upon DISARMING, guaranteeing 0 SD latency in mid-air.</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Topic 8: Reset & File Maintenance -->
+      <section id="topic-reset" class="section">
+        <h2 class="section-title">
+          <span class="lang-zh">🔄 8. 重置歸零與資料夾維護</span>
+          <span class="lang-en">🔄 8. Reset Operations & Files Maintenance</span>
+        </h2>
+
+        <div class="topic-sub-title">
+          <span class="lang-zh">⚖️ 兩種歸零機制比較表</span>
+          <span class="lang-en">⚖️ Daily Reset vs Battery Wipe Comparison</span>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th class="lang-zh">歸零功能</th><th class="lang-en">Reset Action</th>
+              <th class="lang-zh">觸發方式</th><th class="lang-en">Trigger</th>
+              <th class="lang-zh">影響範圍</th><th class="lang-en">Scope</th>
+              <th class="lang-zh">連動結果與說明</th><th class="lang-en">Impact</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong class="lang-zh">當日架次重置<br>(`Reset FlyCount`)</strong><strong class="lang-en">Daily Flight Reset<br>(`Reset FlyCount`)</strong></td>
+              <td class="lang-zh">撥動指派之重置開關 (如 SH 彈回開關)</td>
+              <td class="lang-en">Toggle assigned reset switch (e.g. SH momentary switch)</td>
+              <td class="lang-zh">僅重置當前模式下的 <code>Today</code> 架次</td>
+              <td class="lang-en">Resets <code>Today</code> flight counter only</td>
+              <td class="lang-zh">主頁面 <code>Today</code> 變為 0。<strong>完全不影響</strong> 終身總架次 (Total) 與電池歷史。</td>
+              <td class="lang-en">Resets Today to 0. Does NOT wipe Total lifetime flights or battery logs.</td>
+            </tr>
+            <tr>
+              <td><strong class="lang-zh">電池數據重置<br>(`Reset Bat Log`)</strong><strong class="lang-en">Battery Profile Wipe<br>(`Reset Bat Log`)</strong></td>
+              <td class="lang-zh">1. 撥動 `Reset Bat Log` 開關<br>2. 於 Tab 2 總表頁面撥動 `Reset FlyCount`</td>
+              <td class="lang-en">1. Toggle `Reset Bat Log` switch<br>2. Toggle `Reset FlyCount` while viewing Tab 2</td>
+              <td class="lang-zh">針對<strong>當前選定之電池 (如 BAT 1)</strong> 徹底一鍵清空</td>
+              <td class="lang-en">Wipes active battery profile (e.g. BAT 1)</td>
+              <td class="lang-zh">該包電池的 <code>Today</code>, <code>Total</code>, <code>CYCLES</code>, <code>MIN VOLT</code>, <code>MAX TMP</code> 與 10 趟圖表全部歸零。適合買新電池時使用！</td>
+              <td class="lang-en">Wipes CYCLES, MIN VOLT, MAX TMP, and 10-flight charts for active battery. Perfect for new packs!</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- Topic 9: Options & Transparent Background Setup -->
+      <section id="topic-options" class="section">
+        <h2 class="section-title">
+          <span class="lang-zh">⚙️ 9. 設定選單、搖桿光圈與透明背景</span>
+          <span class="lang-en">⚙️ 9. Options Reference, Gimbal RGB LED & Transparent BG</span>
+        </h2>
+
+        <div class="topic-sub-title">
+          <span class="lang-zh">💡 1. 遙控器實體方向桿 RGB 光圈連動控制 (`LED Color`)</span>
+          <span class="lang-en">💡 1. Physical Gimbal RGB LED Ring Control</span>
+        </div>
+        <p class="lang-zh">針對支援方向桿 RGB 光圈的遙控器 (如 RadioMaster TX16S MK3)，小工具提供可以直接在 Lua 設定中同步控制實體光圈顏色的功能！在選單 <code>LED Color</code> 可選擇：<code>Red</code>、<code>Orange</code>、<code>Yellow</code>、<code>Green</code>、<code>Blue</code>、<code>Indigo</code>、<code>Violet</code>、<code>Pink</code>、<code>Peach</code>、<strong>`Rainbow` (動態跑馬燈彩虹)</strong> 或 <code>OFF</code>。</p>
+
+        <div class="topic-sub-title">
+          <span class="lang-zh">✍️ 2. 飛手專屬英文數位簽名 (`UserName`)</span>
+          <span class="lang-en">✍️ 2. Pilot Custom Signature (UserName)</span>
+        </div>
+        <p class="lang-zh">於小工具設定選單中輸入您的英文簽名檔 (如 <code>Ryan Kuo</code>)。在遙測訊號正常時，系統會將右下角預設的 "NO DATA" 區塊替換為您個人專屬的無底框純白簽名文字！</p>
+
+        <div class="alert alert-tip">
+          <div class="alert-title">
+            <span class="lang-zh">✨ 3. 如何將 RBCT 設定為「全透明背景」？</span>
+            <span class="lang-en">✨ 3. How to Set Full Transparent Background (TRN)</span>
+          </div>
+          <span class="lang-zh">
+            • <strong>方法 A (最推薦)</strong>：於選單中將 <strong>`Theme` (主題)</strong> 切換為 <strong>`TRN` (全透主題)</strong>！<br>
+            • <strong>方法 B (背景開關)</strong>：將 <strong>`Transp BG` (透明背景)</strong> 設定為 <strong>`1 (ON / 開啟)`</strong>！<br><br>
+            主畫面的底色框會完全消失，呈現極具現代感的全透明玻璃懸浮儀表板風格！
+          </span>
+          <span class="lang-en">
+            • <strong>Method A</strong>: Set <strong>`Theme`</strong> option to <strong>`TRN` (Transparent Theme)</strong>.<br>
+            • <strong>Method B</strong>: Set <strong>`Transp BG`</strong> to <strong>`1 (ON)`</strong>.<br><br>
+            Panel backgrounds vanish into a sleek glassmorphism dashboard!
+          </span>
+        </div>
+      </section>
+
+      <!-- Topic 10: FMEA & Protection Rules -->
+      <section id="topic-fmea" class="section">
+        <h2 class="section-title">
+          <span class="lang-zh">⚠️ 10. 邊界異常與防爆規則</span>
+          <span class="lang-en">⚠️ 10. FMEA & Protection Rules</span>
+        </h2>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">
+              <span class="lang-zh">規則 1：解鎖 60 秒防呆限制</span>
+              <span class="lang-en">Rule 1: 60-Second Flight Count Debounce</span>
+            </div>
+            <div class="card-desc">
+              <span class="lang-zh">解鎖持續超過 60 秒且轉速 > 1000 RPM 才算一趟飛行，桌上拔馬達除錯絕不誤算產生幽靈航班。</span>
+              <span class="lang-en">ARMED &gt; 60s AND RPM &gt; 1000 required to log a flight. Bench testing won't generate ghost flight counts.</span>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">
+              <span class="lang-zh">規則 2：飛行中 0 次 SD 卡寫入</span>
+              <span class="lang-en">Rule 2: Zero SD Writes During Flight</span>
+            </div>
+            <div class="card-desc">
+              <span class="lang-zh">飛行中 (ARMED) 數據僅寫在記憶體，降落上鎖 (DISARM) 時才一次性寫卡。中途誤觸開關 100% 不死機卡死。</span>
+              <span class="lang-en">All telemetry is buffered in RAM while ARMED. Writes to SD card ONLY when DISARMED, preventing radio freeze.</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Topic 11: Complete Pilot FAQ Index -->
+      <section id="topic-faq" class="section">
+        <h2 class="section-title">
+          <span class="lang-zh">❓ 11. 飛手實戰與常問問題 FAQ 索引</span>
+          <span class="lang-en">❓ 11. Complete Pilot FAQ Index</span>
+        </h2>
+
+        <div class="card" style="margin-bottom: 1rem;">
+          <div class="card-title">
+            <span class="lang-zh">Q1: 第一次使用，要怎麼安裝這個小工具？</span>
+            <span class="lang-en">Q1: How do I install this widget for the first time?</span>
+          </div>
+          <div class="card-desc">
+            <span class="lang-zh">A: 請參考 <strong><a onclick="scrollToSection('topic-install')" style="color: var(--accent-blue); cursor: pointer;">🚀 2. 安裝與全螢幕設定指南</a></strong>。三步驟：檔案放 <code>/WIDGETS/RBCT</code> ➔ 遙控器新增全螢幕小工具 ➔ 按下 <code>Discover new sensors</code>。</span>
+            <span class="lang-en">A: See <strong><a onclick="scrollToSection('topic-install')" style="color: var(--accent-blue); cursor: pointer;">🚀 2. Setup & Installation Guide</a></strong>. 3 steps: Copy folder to <code>/WIDGETS/RBCT</code> ➔ Add full screen widget ➔ Run <code>Discover new sensors</code>.</span>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom: 1rem;">
+          <div class="card-title">
+            <span class="lang-zh">Q2: 我是燃油直昇機 (Nitro)，如何開啟油機模式？</span>
+            <span class="lang-en">Q2: How do I enable Nitro Mode for gas helicopters?</span>
+          </div>
+          <div class="card-desc">
+            <span class="lang-zh">A: 請參考 <strong><a onclick="scrollToSection('topic-dashboard')" style="color: var(--accent-blue); cursor: pointer;">🔥 5. 主儀表板與油電雙模式</a></strong>。進入設定選單將 <code>Heli Type</code> 設為 <code>Nitro</code>。畫面會自動隱藏電調電流等冗餘數據，變形為兩欄特大 XXL 監控 <code>ENGINE TEMP</code> (汽缸頭溫度 >120°C 紅字警示) 與 <code>RX PACK</code> (接收機電壓 &lt;6.6V 紅字警示)。</span>
+            <span class="lang-en">A: See <strong><a onclick="scrollToSection('topic-dashboard')" style="color: var(--accent-blue); cursor: pointer;">🔥 5. Main Dashboard</a></strong>. Change <code>Heli Type</code> to <code>Nitro</code>. Hides electric battery UI and transforms screen to monitor Engine Temp (>120°C alert) and Rx Pack voltage (&lt;6.6V alert).</span>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom: 1rem;">
+          <div class="card-title">
+            <span class="lang-zh">Q3: 我要怎麼設定全透明的主題背景？</span>
+            <span class="lang-en">Q3: How do I set a full transparent background?</span>
+          </div>
+          <div class="card-desc">
+            <span class="lang-zh">A: 請參考 <strong><a onclick="scrollToSection('topic-options')" style="color: var(--accent-blue); cursor: pointer;">⚙️ 9. 設定選單說明</a></strong>。選單中將 <code>Theme</code> 設為 <code>TRN</code>，或將 <code>Transp BG</code> 設為 <code>1</code> 即可。</span>
+            <span class="lang-en">A: See <strong><a onclick="scrollToSection('topic-options')" style="color: var(--accent-blue); cursor: pointer;">⚙️ 9. Options Reference</a></strong>. Set <code>Theme</code> to <code>TRN</code> or set <code>Transp BG</code> to <code>1</code>.</span>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom: 1rem;">
+          <div class="card-title">
+            <span class="lang-zh">Q4: 5 線譜折線圖數據採樣頻率是多少？上記錄多久？能用來調機嗎？</span>
+            <span class="lang-en">Q4: What is chart sampling rate & can it be used for flight tuning?</span>
+          </div>
+          <div class="card-desc">
+            <span class="lang-zh">A: 請參考 <strong><a onclick="scrollToSection('topic-logbook')" style="color: var(--accent-blue); cursor: pointer;">📈 7. 飛行日誌與 5 線譜圖表</a></strong>。每 3.0 秒採樣一次，佇列最多記錄 200 個採樣點 (10 分鐘)。可用於：1. GOV 定速 PID 前饋調校、2. 電池 C 數壓降診斷、3. BEC 供電與舵機抽電安全檢查、4. 電調溫升過熱預警！</span>
+            <span class="lang-en">A: See <strong><a onclick="scrollToSection('topic-logbook')" style="color: var(--accent-blue); cursor: pointer;">📈 7. Logbook & 5-Line Chart</a></strong>. Samples every 3.0s (up to 10 mins). Used for: 1. Gov PID tuning, 2. Battery sag check, 3. BEC load safety, 4. ESC thermal warnings!</span>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom: 1rem;">
+          <div class="card-title">
+            <span class="lang-zh">Q5: 如何讓遙控器實體搖桿光圈與小工具顏色連動？</span>
+            <span class="lang-en">Q5: How to sync physical Gimbal RGB LED ring colors?</span>
+          </div>
+          <div class="card-desc">
+            <span class="lang-zh">A: 請參考 <strong><a onclick="scrollToSection('topic-options')" style="color: var(--accent-blue); cursor: pointer;">⚙️ 9. 設定選單說明</a></strong>。於選單 <code>LED Color</code> 選擇顏色或 <code>Rainbow</code> (動態彩虹跑馬燈)。適用於 TX16S MK3 等具備 RGB 光圈之遙控器。</span>
+            <span class="lang-en">A: See <strong><a onclick="scrollToSection('topic-options')" style="color: var(--accent-blue); cursor: pointer;">⚙️ 9. Options Reference</a></strong>. Set <code>LED Color</code> to desired color or <code>Rainbow</code> in widget settings menu.</span>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <footer>
+    RBCT Helicopter Dashboard Widget v1.0.6 | Author: 雷恩 / Ryan Kuo | Standard Application Help System
+  </footer>
+
+  <script>
+    let currentLang = 'zh';
+
+    function toggleLanguage() {
+      const body = document.body;
+      if (currentLang === 'zh') {
+        currentLang = 'en';
+        body.classList.add('lang-en-mode');
+      } else {
+        currentLang = 'zh';
+        body.classList.remove('lang-en-mode');
+      }
+    }
+
+    function scrollToSection(id) {
+      const el = document.getElementById(id);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+        const navItems = document.querySelectorAll('.nav-item');
+        navItems.forEach(item => {
+          if (item.getAttribute('onclick') && item.getAttribute('onclick').includes(id)) {
+            item.classList.add('active');
+          }
+        });
+      }
+    }
+
+    function filterContent() {
+      const query = document.getElementById('searchInput').value.toLowerCase();
+      const cards = document.querySelectorAll('.card, tr, .alert');
+      cards.forEach(card => {
+        const text = card.innerText.toLowerCase();
+        if (text.includes(query)) {
+          card.style.display = '';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+  </script>
+</body>
+</html>
