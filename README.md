@@ -75,7 +75,7 @@
 ## 📝 最新更新 (Latest Updates)
 
 ### v1.0.6
-*   **功能新增 (電池 Fleet 管理與多電池獨立追蹤 Battery Fleet Manager)**：將 `RBCT_Beta V1.0.008DEV` 的電池管理功能正式納入 v1.0.6 發行版！
+*   **功能新增 (電池 Fleet 管理與多電池獨立追蹤 Battery Fleet Manager)**：
     *   *多電池槽獨立日誌*：自動感測實體開關或邏輯開關 (`6P1..6P6`, `6POS1..6POS6`, `SW1..SW6`, `L1..L6`) 或 `Bat Track` 設定，支援自動切換 BAT 1 ~ BAT 6。每包電池皆有獨立的起降次數、最低電壓、最高溫度、平均飛行時間與曲線紀錄 (`log_<機型>_BAT<1..6>.txt`, `logbook_<機型>_BAT<1..6>.txt`, `chart_<機型>_BAT<1..6>.txt`)。
     *   *3段式日誌與電池 Fleet 表格*：透過 `Logbook Sw` 三段開關控制：
         *   **切至中段 (MID)**：顯示 Tab 1 飛行日誌與 5 線譜即時折線圖。
