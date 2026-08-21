@@ -1,8 +1,8 @@
-local basePath = "/WIDGETS/RBCT"
+local basePath = "/WIDGETS/RBCT_Beta"
 
 local function loadFleetData(w, ctx)
   w.fleet_data = {}
-  local modelName = ctx.modelName or ((model.getInfo() or {}).name or "UNKNOWN")
+  local modelName = ctx.modelName or "UNKNOWN"
   local cleanName = string.gsub(modelName, "[^%w]", "_")
   for i = 1, 6 do
     local data = { id = i, cycles = 0, min_v = "-", max_t = "-", avg_dur = "-" }
@@ -67,11 +67,11 @@ local function calculateChartScales(data)
     for i = 1, #data do
       local p = data[i]
       if type(p) == "table" then
-        local r = tonumber(p[1] or p.r) or 0
-        local v = tonumber(p[2] or p.v) or 0
-        local a = tonumber(p[3] or p.a) or 0
-        local b = tonumber(p[4] or p.b) or 0
-        local t = tonumber(p[5] or p.t) or 0
+        local r = p.r or (p[1] or 0)
+        local v = p.v or (p[2] or 0)
+        local a = p.a or (p[3] or 0)
+        local b = p.b or (p[4] or 0)
+        local t = p.t or (p[5] or 0)
         if r > peak_rpm then peak_rpm = r end
         if v > peak_v then peak_v = v end
         if v > 0 and v < lowest_v then lowest_v = v end
@@ -115,15 +115,12 @@ end
 local function drawLogbook(w, ctx)
   local lcd, C, f_mid, f_sml, is_trn, is_transp = ctx.lcd, ctx.C, ctx.f_mid, ctx.f_sml, ctx.is_trn, ctx.is_transp
   local x, y, sw, sh, sx, sy = ctx.x, ctx.y, ctx.sw, ctx.sh, ctx.sx, ctx.sy
-  local X = ctx.X or function(v) return x + math.floor(v * sx) end
-  local Y = ctx.Y or function(v) return y + math.floor(v * sy) end
-  local W = ctx.W or function(v) return math.floor(v * sx) end
-  local H = ctx.H or function(v) return math.floor(v * sy) end
+  local X, Y, W, H = ctx.X, ctx.Y, ctx.W, ctx.H
 
   -- Logbook & Battery Manager require solid background for high contrast readability
   lcd.drawFilledRectangle(x, y, sw, sh, C.bg)
   lcd.drawRectangle(x, y, sw, sh, C.blue)
-
+  
   if w.logbook_tab == 2 then
     if not w.fleet_data then loadFleetData(w, ctx) end
     lcd.drawText(X(400), Y(20), "BATTERY FLEET MANAGER", CENTER + f_mid + C.white)
@@ -162,7 +159,7 @@ local function drawLogbook(w, ctx)
     end
   else
     lcd.drawText(X(400), Y(20), "FLIGHT LOGBOOK", CENTER + f_mid + C.white)
-
+  
     if w.is_demo_data then
       lcd.drawFilledRectangle(X(670), Y(12), W(100), H(35), C.red)
       lcd.drawText(X(720), Y(19), "DEMO", CENTER + f_sml + C.white)
@@ -235,12 +232,26 @@ local function drawLogbook(w, ctx)
     lcd.drawLine(X(cx), Y(cy1 + ch1/2), X(cx + cw), Y(cy1 + ch1/2), DOTTED, C.panel2)
     lcd.drawRectangle(X(cx), Y(cy2), W(cw), H(ch2), C.panel2)
 
-    if not w.chart_data then
+    if not w.chart_data or #w.chart_data < 2 then
+      w.is_demo_data = true
       w.chart_data = {}
+      for i = 1, 40 do
+        local rpm = 0
+        if i > 3 and i < 37 then rpm = 2000 + math.sin(i)*100 end
+        if i > 10 and i < 30 then rpm = 2200 + math.sin(i*2)*150 end
+        local volt = 50 - (i/40)*6 + math.cos(i)*0.5
+        if i < 3 or i > 37 then volt = 50 end
+        local amp = 0
+        if i > 3 and i < 37 then amp = 30 + math.abs(math.sin(i*3)*40) end
+        local bec = 8.4
+        if i > 3 and i < 37 then bec = 8.4 - math.abs(math.sin(i*3)*0.5) end
+        local tmp = 40 + (i/40)*45
+        table.insert(w.chart_data, { v = volt, a = amp, r = rpm, b = bec, t = tmp })
+      end
     end
 
     local data = w.chart_data
-    local len = #data
+    local len = data and #data or 0
     local max_rpm, max_v, min_v, max_a, max_b, min_b, max_t, min_t = calculateChartScales(data)
 
     local base_y1 = cy1 + ch1
@@ -273,11 +284,11 @@ local function drawLogbook(w, ctx)
         local p = data[data_idx] or {}
         local scr_x = X(cx + (i-1) * step)
         
-        local r_val = tonumber(p[1] or p.r) or 0
-        local v_val = tonumber(p[2] or p.v) or 0
-        local a_val = tonumber(p[3] or p.a) or 0
-        local b_val = tonumber(p[4] or p.b) or 0
-        local t_val = tonumber(p[5] or p.t) or 0
+        local r_val = p.r or (p[1] or 0)
+        local v_val = p.v or (p[2] or 0)
+        local a_val = p.a or (p[3] or 0)
+        local b_val = p.b or (p[4] or 0)
+        local t_val = p.t or (p[5] or 0)
 
         local scr_yr = Y(base_y1 - (math.max(0, math.min(max_rpm, r_val)) / max_rpm) * ch1)
         local scr_yv = Y(base_y1 - (math.max(0, math.min(max_v - min_v, v_val - min_v)) / (max_v - min_v)) * ch1)
@@ -299,4 +310,4 @@ local function drawLogbook(w, ctx)
   end
 end
 
-return { draw = drawLogbook, drawLogbook = drawLogbook, calculateChartScales = calculateChartScales }
+return { drawLogbook = drawLogbook }

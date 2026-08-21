@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RBCT v1.0.6 Official Help System / 官方 Help 系統</title>
+  <title>RBCT v1.0.8 Official Help System / 官方 Help 系統</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Noto+Sans+TC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -475,7 +475,7 @@
         <div class="lang-zh" style="font-size: 0.8rem; color: var(--text-dim);">EdgeTX / Rotorflight 官方完整 Help 說明系統</div>
         <div class="lang-en" style="font-size: 0.8rem; color: var(--text-dim);">EdgeTX / Rotorflight Official Help System</div>
       </div>
-      <span class="version-badge">v1.0.6 Official Help</span>
+      <span class="version-badge">v1.0.8 Official Help</span>
     </div>
     
     <div class="header-actions">
@@ -1230,6 +1230,138 @@
             Panel backgrounds vanish into a sleek glassmorphism dashboard!
           </span>
         </div>
+
+        <div class="topic-sub-title">
+          <span class="lang-zh">📢 4. 智能語音副駕駛與自訂警示門檻 (Voice Assistant & Custom Thresholds)</span>
+          <span class="lang-en">📢 4. Voice Assistant & Custom Alert Thresholds</span>
+        </div>
+        <p class="lang-zh">在小工具設定選單（Widget Options Menu）中開啟 <code>語音警示</code> (Voice Alarm) 後，系統會自動監控遙測極端數據。飛手可依據機型與電池規格，直接從小工具選單設定各項危險與電量語音門檻：</p>
+        <p class="lang-en">Enabling <code>Voice Alarm</code> in widget settings activates real-time voice & haptic telemetry alerts. All safety thresholds can be customized directly from the widget menu:</p>
+
+        <table>
+          <thead>
+            <tr>
+              <th class="lang-zh">選單設定項目</th><th class="lang-en">Option Name</th>
+              <th class="lang-zh">設定範圍與預設值</th><th class="lang-en">Configurable Range & Default</th>
+              <th class="lang-zh">功能說明與觸發條件</th><th class="lang-en">Description & Trigger</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>BEC 門檻</code><br>(BEC Warn V)</td>
+              <td class="lang-zh">5.0V / 5.5V / 6.0V / 6.4V / <strong>6.6V (預設)</strong> / 7.0V / 7.4V / 8.0V</td>
+              <td class="lang-en">5.0V, 5.5V, 6.0V, 6.4V, <strong>6.6V (default)</strong>, 7.0V, 7.4V, 8.0V</td>
+              <td class="lang-zh">BEC/接收機電壓低於此門檻時，發出 2000Hz 蜂鳴音、震動並播報 <code>rxbatlow.wav</code>。</td>
+              <td class="lang-en">Triggers 2000Hz beep, haptic, and voice when BEC voltage drops below threshold.</td>
+            </tr>
+            <tr>
+              <td><code>電變高溫門檻</code><br>(ESC Temp Warn)</td>
+              <td class="lang-zh">40°C ~ 110°C 可調（<strong>預設 60°C</strong>）</td>
+              <td class="lang-en">40°C ~ 110°C configurable (<strong>default 60°C</strong>)</td>
+              <td class="lang-zh">電機模式下，電變實時溫度超越此門檻發出高溫警報與 <code>telemwarn.wav</code>。</td>
+              <td class="lang-en">Triggers high temp alarm and <code>telemwarn.wav</code> in Electric mode when ESC exceeds threshold.</td>
+            </tr>
+            <tr>
+              <td><code>油機高溫門檻</code><br>(Nitro Temp Warn)</td>
+              <td class="lang-zh">80°C ~ 160°C 可調（<strong>預設 120°C</strong>）</td>
+              <td class="lang-en">80°C ~ 160°C configurable (<strong>default 120°C</strong>)</td>
+              <td class="lang-zh">油機模式下，引擎汽缸頭溫度超越此門檻發出過熱警報與 <code>telemwarn.wav</code>。</td>
+              <td class="lang-en">Triggers engine overheat alarm in Nitro mode when cylinder head temp exceeds threshold.</td>
+            </tr>
+            <tr>
+              <td><code>電量語音報警</code><br>(Bat% Voice)</td>
+              <td class="lang-zh">ON / OFF (<strong>預設 OFF</strong>)</td>
+              <td class="lang-en">ON / OFF (<strong>default OFF</strong>)</td>
+              <td class="lang-zh">開啟/關閉動力電池電量階梯語音副駕駛播報功能。</td>
+              <td class="lang-en">Enable/disable battery percentage voice announcements.</td>
+            </tr>
+            <tr>
+              <td><code>低電量門檻</code><br>(Bat Low %)</td>
+              <td class="lang-zh">15% ~ 50% 可調（<strong>預設 30%</strong>）</td>
+              <td class="lang-en">15% ~ 50% configurable (<strong>default 30%</strong>)</td>
+              <td class="lang-zh">當動力電量降至此設定值及更低階梯 (20%, 15%, 10%...) 時，觸發階梯語音播報。</td>
+              <td class="lang-en">Triggers battery level voice warnings when Bat% drops below this threshold and lower steps.</td>
+            </tr>
+            <tr>
+              <td><code>沒電門檻</code><br>(Bat Crit %)</td>
+              <td class="lang-zh">0% ~ 20% 可調（<strong>預設 10%</strong>）</td>
+              <td class="lang-en">0% ~ 20% configurable (<strong>default 10%</strong>)</td>
+              <td class="lang-zh">低於臨界沒電門檻時，持續觸發強烈震動與 2500Hz 重複警示音與 <code>dead.wav</code>。</td>
+              <td class="lang-en">Triggers urgent repeating alarm tone (2500Hz), vibration, and <code>dead.wav</code> when below critical limit.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">
+              <span class="lang-zh">🔊 1. 階梯式電量語音報警 (Step Voice Alert)</span>
+              <span class="lang-en">🔊 1. Step Battery Voice Alert</span>
+            </div>
+            <div class="card-desc">
+              <span class="lang-zh">電量低於設定門檻（如 30%、20%、15%...）跨階時，系統會自動播放對應語音檔或語音朗讀電量數值，讓飛手隨時掌握剩餘能量。</span>
+              <span class="lang-en">Announces remaining battery percentage when crossing thresholds (e.g. 30%, 20%, 15%...) automatically.</span>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">
+              <span class="lang-zh">📳 2. 臨界沒電重複告警與震動 (Critical Dead Alarm)</span>
+              <span class="lang-en">📳 2. Critical Battery Alarm & Haptic</span>
+            </div>
+            <div class="card-desc">
+              <span class="lang-zh">當電量降至沒電臨界門檻（如 10% 或 0%）時，觸發連動強烈震動與急促警報音，提醒飛手立即降落。</span>
+              <span class="lang-en">Triggers intense haptic vibration and urgent alarm sounds when battery drops below critical threshold.</span>
+            </div>
+          </div>
+          <div class="card" style="grid-column: 1 / -1;">
+            <div class="card-title">
+              <span class="lang-zh">🔄 3. 換新電池自動重置階梯 (Fresh Battery Auto-Reset)</span>
+              <span class="lang-en">🔄 3. Fresh Battery Pack Auto-Reset</span>
+            </div>
+            <div class="card-desc">
+              <span class="lang-zh">降落更換新電池起飛時，一旦感測到電量恢復至 <strong>Bat% > 90%</strong>，系統會自動重置階梯播報紀錄，下一趟飛行無須任何手動操作。</span>
+              <span class="lang-en">Connecting a new pack (Bat% > 90%) automatically resets voice step logs for the next flight.</span>
+            </div>
+          </div>
+        <div class="topic-sub-title">
+          <span class="lang-zh">☀️ 5. 復古液晶高反差主題與光感自動切換 (LCD Theme & Auto Light Sensor)</span>
+          <span class="lang-en">☀️ 5. LCD High-Contrast Theme & Auto Light Sensor Switching</span>
+        </div>
+        <p class="lang-zh">RBCT 導入獨家的 <code>LCD</code> (經典液晶) 高反差主題。採用微綠灰液晶低飽和底色與深墨綠高反差文字，在戶外大太陽強光直射下，閱讀清晰度遠高於一般深色主題。</p>
+        <p class="lang-en">RBCT introduces the <code>LCD</code> high-contrast theme featuring a pale green-gray LCD background with dark graphite text for extreme direct sunlight legibility.</p>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">
+              <span class="lang-zh">📟 液晶高反差主題 (LCD Theme)</span>
+              <span class="lang-en">📟 LCD High-Contrast Theme</span>
+            </div>
+            <div class="card-desc">
+              <span class="lang-zh">可於 <code>Theme</code> (UI 主題) 選單中手動選擇 <code>LCD</code> 常駐套用，提供無與倫比的強光清晰度與復古液晶美學。</span>
+              <span class="lang-en">Select <code>LCD</code> in the Theme option for permanent high-contrast viewing under outdoor sunlight.</span>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">
+              <span class="lang-zh">💡 光感切換 (Auto LCD Theme)</span>
+              <span class="lang-en">💡 Light Sensor Auto-Switching</span>
+            </div>
+            <div class="card-desc">
+              <span class="lang-zh">選單指定 <code>光感開關</code> (Light Sens)。當感應到戶外強光（或開關觸發）持續 1.5 秒自動切換至 LCD 主題；光線恢復時自動還原原主題。</span>
+              <span class="lang-en">Assigns light sensor/switch source. Automatically switches to LCD theme after 1.5s in bright outdoor light.</span>
+            </div>
+          </div>
+          <div class="card" style="grid-column: 1 / -1;">
+            <div class="card-title">
+              <span class="lang-zh">🛡️ 飛安保護：解鎖飛行中鎖定 (ARMED Safety Lockout)</span>
+              <span class="lang-en">🛡️ ARMED Mid-Flight Safety Lockout</span>
+            </div>
+            <div class="card-desc">
+              <span class="lang-zh">當起飛解鎖 (`ARMED = true`) 時，系統會自動鎖定飛行前的生效主題。在整個飛行過程中絕不因手影或雲影改變顏色，100% 杜絕空中視覺驚嚇與注意力干擾！降落上鎖後自動恢復光感監控。</span>
+              <span class="lang-en">Locks active theme while ARMED, preventing mid-air color flashes. Resumes light sensing only after DISARMING.</span>
+            </div>
+          </div>
+        </div>
       </section>
 
       <!-- Topic 10: FMEA & Protection Rules -->
@@ -1330,7 +1462,7 @@
   </div>
 
   <footer>
-    RBCT Helicopter Dashboard Widget v1.0.6 | Author: 雷恩 / Ryan Kuo | Standard Application Help System
+    RBCT Helicopter Dashboard Widget v1.0.8 | Author: 雷恩 / Ryan Kuo | Standard Application Help System
   </footer>
 
   <script>

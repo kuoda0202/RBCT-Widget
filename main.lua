@@ -3,7 +3,7 @@
 -- Model picture order: Model Setup bitmap (/IMAGES), RBCT/modelImage/<model>.png,
 -- RBCT/modelImage/<model without its first character>.png, then default.png.
 local NAME = "RBCT"
-local VERSION = "v1.0.6"
+local VERSION = "v1.0.7"
 
 -- Keep this list byte-for-byte compatible with standard telemetry. The order is
 -- deliberately arranged to ensure standard telemetry setup works here.
@@ -39,36 +39,28 @@ end
 
 local is_zh = detectLanguage()
 
-local options = is_zh and {
-  { "UI 主題", CHOICE, 5, { "紅色", "Orange", "黃色", "綠色", "藍色", "水藍", "Violet", "Black", "TRN", "粉紅" } },
-  { "背景 (BG)", BOOL, 0 },
-  { "搖桿燈開關", BOOL, 0 },
-  { "搖桿燈顏色", CHOICE, 5, { "紅色", "Orange", "黃色", "綠色", "藍色", "水藍", "Violet", "粉紅", "Rainbow" } },
-  { "使用者名稱", STRING, "Pilot" },
-  { "計時器選擇", VALUE, 1, 1, 3 },
-  { "解鎖開關", SOURCE, 0 },
-  { "反向解鎖", BOOL, 0 },
-  { "BANK開關 (---為自動)", SOURCE, 0 },
-  { "日誌開關", SOURCE, 0 },
-  { "電池追蹤", SOURCE, 0 },
-  { "重置計數", SOURCE, 0 },
-  { "重置電池", SOURCE, 0 },
-  { "機型選擇", CHOICE, 2, { "燃油機 (Nitro)", "電機 (Electric)" } },
-} or {
-  { "Theme", CHOICE, 5, { "Red", "Orange", "Yellow", "Green", "Blue", "Cyan", "Violet", "Black", "TRN", "Pink" } },
+local options = {
+  { "Theme", CHOICE, 5, { "Red", "Orange", "Yellow", "Green", "Blue", "Cyan", "Violet", "Black", "TRN", "Pink", "LCD" } },
   { "Transp BG", BOOL, 0 },
   { "DispLED", BOOL, 0 },
   { "LED Color", CHOICE, 5, { "Red", "Orange", "Yellow", "Green", "Blue", "Cyan", "Violet", "Pink", "Rainbow" } },
-  { "UserName", STRING, "Pilot" },
-  { "Timer", VALUE, 1, 1, 3 },
+  { "Heli Type", CHOICE, 2, { "Nitro", "Electric" } },
   { "Arm Source", SOURCE, 0 },
   { "Arm Invert", BOOL, 0 },
-  { "Bank Src (---=Auto)", SOURCE, 0 },
   { "Logbook Sw", SOURCE, 0 },
+  { "Bank Src", SOURCE, 0 },
+  { "Light Sens", SOURCE, 0 },
+  { "Voice Alm", BOOL, 0 },
+  { "BEC Warn V", CHOICE, 5, { "5.0V", "5.5V", "6.0V", "6.4V", "6.6V", "7.0V", "7.4V", "8.0V" } },
+  { "ESC T Warn", VALUE, 60, 40, 110 },
+  { "Nit T Warn", VALUE, 120, 80, 160 },
+  { "Bat% Voice", BOOL, 0 },
+  { "Bat Low %", VALUE, 30, 15, 50 },
+  { "UserName", STRING, "Pilot" },
+  { "Timer", VALUE, 1, 1, 3 },
+  { "Rst FlyCnt", SOURCE, 0 },
   { "Bat Track", SOURCE, 0 },
-  { "Reset FlyCount", SOURCE, 0 },
-  { "Reset Bat Log", SOURCE, 0 },
-  { "Heli Type", CHOICE, 2, { "Nitro", "Electric" } },
+  { "Rst BatLog", SOURCE, 0 },
 }
 
 local option_aliases = {
@@ -81,11 +73,20 @@ local option_aliases = {
   ["Arm Source"] = { "Arm Source", "解鎖開關", "ArmSource" },
   ["Arm Invert"] = { "Arm Invert", "反向解鎖", "ArmInvert" },
   ["BankSwitch"] = { "BankSwitch", "Bank Src", "BANK開關", "BANK 開關", "BANK開關 (---為Auto)", "BANK開關 (---為自動)", "Bank Src (---=Auto)" },
+  ["Bank Src"] = { "Bank Src", "BankSwitch", "BANK開關", "BANK 開關", "BANK開關 (---為Auto)", "BANK開關 (---為自動)", "Bank Src (---=Auto)" },
   ["Logbook Sw"] = { "Logbook Sw", "日誌開關", "LogbookSw" },
-  ["Bat Track"] = { "Bat Track", "電池號碼", "電池紀錄", "電池追蹤" },
   ["Reset FlyCount"] = { "Reset FlyCount", "重置計數", "次數重置", "架次重置", "次數歸零", "次數清零" },
-  ["Reset Bat Log"] = { "Reset Bat Log", "重置電池", "電池歸零", "電池重置", "清空電池" },
   ["Heli Type"] = { "Heli Type", "機型選擇", "動力模式", "動力選項", "油電選擇", "HeliType" },
+  ["Bat Track"] = { "Bat Track", "電池日誌", "電池號碼", "電池紀錄", "電池追蹤" },
+  ["Reset Bat Log"] = { "Reset Bat Log", "重置電池", "電池歸零", "電池重置", "清空電池" },
+  ["Light Sens"] = { "Light Sens", "光感應LCD主題", "光感開關", "光感切換", "Auto LCD", "LightSens" },
+  ["Voice Alarm"] = { "Voice Alarm", "語音警示", "語音警告", "VoiceAlarm", "語音" },
+  ["BEC Warn V"] = { "BEC Warn V", "BEC 警示", "BEC 門檻", "BEC 警示門檻", "BEC低壓門檻", "BEC Voltage Warn" },
+  ["ESC Temp Warn"] = { "ESC Temp Warn", "電變高溫警示", "電變高溫門檻", "電變高溫", "ESC TempWarn" },
+  ["Nitro Temp Warn"] = { "Nitro Temp Warn", "油機高溫警示", "油機高溫門檻", "油機高溫", "Nitro TempWarn" },
+  ["Bat% Voice"] = { "Bat% Voice", "電量語音報警", "電量語音", "Bat Voice" },
+  ["Bat Low %"] = { "Bat Low %", "低電量警示", "低電量門檻", "低電門檻", "Bat Low" },
+  ["Bat Crit %"] = { "Bat Crit %", "沒電警示", "沒電門檻", "臨界沒電門檻", "Bat Crit" },
 }
 
 local function getOption(w, key)
@@ -102,17 +103,19 @@ local function getOption(w, key)
   return nil
 end
 
-local basePath = "/WIDGETS/RBCT"
+local basePath = "/WIDGETS/RBCT_Beta"
 
 local w_last_mod_err = ""
+
+-- Module cache for lazy loading
 local modules = {}
 local function loadModule(name)
   if not modules[name] then
     local paths = {
       basePath .. "/modules/" .. name .. ".lua",
       basePath .. "/modules/" .. name,
-      "/WIDGETS/RBCT/modules/" .. name .. ".lua",
-      "WIDGETS/RBCT/modules/" .. name .. ".lua"
+      "/WIDGETS/RBCT_Beta/modules/" .. name .. ".lua",
+      "WIDGETS/RBCT_Beta/modules/" .. name .. ".lua"
     }
     local f, err = nil, ""
     for i = 1, #paths do
@@ -158,11 +161,7 @@ local themes = {
 local function parseThemeIndex(val)
   if type(val) == "number" then
     local n = math.floor(val)
-    if n >= 1 and n <= 10 then
-      return n
-    elseif n == 0 then
-      return 1
-    end
+    if n >= 1 and n <= 11 then return n end
     return 5
   elseif type(val) == "string" then
     local s = string.lower(val)
@@ -174,8 +173,9 @@ local function parseThemeIndex(val)
     elseif string.find(s, "blue") or string.find(s, "藍") then return 5
     elseif string.find(s, "violet") or string.find(s, "紫") then return 7
     elseif string.find(s, "black") or string.find(s, "黑") then return 8
-    elseif string.find(s, "trn") or string.find(s, "透") or string.find(s, "明") then return 9
+    elseif string.find(s, "trn") or string.find(s, "透") then return 9
     elseif string.find(s, "pink") or string.find(s, "粉") or string.find(s, "桃") then return 10
+    elseif string.find(s, "lcd") or string.find(s, "晶") or string.find(s, "高反差") then return 11
     end
     local n = tonumber(val)
     if n then return parseThemeIndex(n) end
@@ -210,7 +210,7 @@ local function parseLedColorIndex(val)
     elseif string.find(s, "blue") or string.find(s, "藍") then return 5
     elseif string.find(s, "violet") or string.find(s, "紫") then return 7
     elseif string.find(s, "pink") or string.find(s, "粉") or string.find(s, "桃") then return 8
-    elseif string.find(s, "rainbow") or string.find(s, "彩虹") or string.find(s, "七彩") or string.find(s, "彩") then return 9
+    elseif string.find(s, "rainbow") or string.find(s, "彩虹") or string.find(s, "七彩") then return 9
     end
     local n = tonumber(val)
     if n then return parseLedColorIndex(n) end
@@ -235,13 +235,75 @@ end
 
 local function setTheme(n)
   local idx = parseThemeIndex(n)
-  local t = themes[math.max(1, math.min(#themes, idx))]
-  local r, g, b = t[1], t[2], t[3]
-  C.blue = lcd.RGB(r, g, b)
-  C.bg = lcd.RGB(math.max(5, math.floor(r * .10)), math.max(5, math.floor(g * .10)), math.max(5, math.floor(b * .10)))
-  C.panel = lcd.RGB(math.max(8, math.floor(r * .28)), math.max(8, math.floor(g * .28)), math.max(8, math.floor(b * .28)))
-  C.panel2 = lcd.RGB(math.max(10, math.floor(r * .40)), math.max(10, math.floor(g * .40)), math.max(10, math.floor(b * .40)))
-  C.dim = lcd.RGB(math.min(255, 95 + math.floor(r * .45)), math.min(255, 95 + math.floor(g * .45)), math.min(255, 95 + math.floor(b * .45)))
+  if idx == 11 then
+    -- Special High-Contrast LCD Aesthetic Theme
+    C.blue = lcd.RGB(15, 25, 20)       -- Graphite text / lines
+    C.bg = lcd.RGB(212, 224, 206)      -- Pale green-gray LCD background
+    C.panel = lcd.RGB(194, 208, 186)   -- LCD panel tile
+    C.panel2 = lcd.RGB(180, 196, 172)  -- Secondary LCD tile
+    C.dim = lcd.RGB(75, 90, 75)        -- Dim label
+    C.white = lcd.RGB(15, 25, 20)      -- Dark text
+    C.black = lcd.RGB(212, 224, 206)   -- Inverse background
+  else
+    local t = themes[math.max(1, math.min(#themes, idx))]
+    local r, g, b = t[1], t[2], t[3]
+    C.blue = lcd.RGB(r, g, b)
+    C.bg = lcd.RGB(math.max(5, math.floor(r * .10)), math.max(5, math.floor(g * .10)), math.max(5, math.floor(b * .10)))
+    C.panel = lcd.RGB(math.max(8, math.floor(r * .28)), math.max(8, math.floor(g * .28)), math.max(8, math.floor(b * .28)))
+    C.panel2 = lcd.RGB(math.max(10, math.floor(r * .40)), math.max(10, math.floor(g * .40)), math.max(10, math.floor(b * .40)))
+    C.dim = lcd.RGB(math.min(255, 95 + math.floor(r * .45)), math.min(255, 95 + math.floor(g * .45)), math.min(255, 95 + math.floor(b * .45)))
+    C.white = lcd.RGB(242, 247, 255)
+    C.black = lcd.RGB(0, 0, 0)
+  end
+  C.theme = themes[idx] or themes[5]
+end
+
+local function applyDynamicTheme(w, arm_on)
+  local base_theme = getOption(w, "Theme")
+  local light_src = getOption(w, "Light Sens")
+  local light_val = 0
+
+  local is_light_active = false
+  if light_src and light_src ~= 0 then
+    local v = getValue(light_src)
+    if type(v) == "table" then v = v.value end
+    
+    if type(v) == "boolean" then
+      is_light_active = v
+    elseif type(v) == "number" then
+      is_light_active = (v > 0)
+    end
+  end
+  local now = getTime()
+
+  -- Initialize current theme if nil
+  if not w.current_dynamic_theme then
+    w.current_dynamic_theme = base_theme
+  end
+
+  if is_light_active then
+    w.light_inactive_since = nil
+    if not w.light_active_since then
+      w.light_active_since = now
+    elseif (now - w.light_active_since) >= 20 then -- 0.2s hysteresis
+      w.current_dynamic_theme = 13 -- LCD theme
+    end
+  else
+    w.light_active_since = nil
+    if not w.light_inactive_since then
+      w.light_inactive_since = now
+    elseif (now - w.light_inactive_since) >= 20 then -- 0.2s hysteresis
+      w.current_dynamic_theme = base_theme
+    end
+  end
+  
+  -- If light sensor is not active and no hysteresis is running, always ensure we track base_theme
+  -- This allows dynamic menu updates to work instantly when light sensor is off
+  if not is_light_active and not w.light_inactive_since then
+      w.current_dynamic_theme = base_theme
+  end
+
+  setTheme(w.current_dynamic_theme)
 end
 
 local function resetMinMax()
@@ -292,10 +354,10 @@ end
 local function modelImagePath(m)
   local name = m.name or ""
   if name ~= "" then
-    local p = "/WIDGETS/RBCT/modelImage/" .. name .. ".png"
+    local p = basePath .. "/modelImage/" .. name .. ".png"
     if fstat(p) then return p end
     -- Handle cases with a leading model-type marker (for example >RS5).
-    p = "/WIDGETS/RBCT/modelImage/" .. string.sub(name, 2) .. ".png"
+    p = basePath .. "/modelImage/" .. string.sub(name, 2) .. ".png"
     if fstat(p) then return p end
   end
   if m.bitmap and m.bitmap ~= "" then
@@ -305,7 +367,7 @@ local function modelImagePath(m)
     end
     if fstat(p) then return p end
   end
-  return "/WIDGETS/RBCT/default.png"
+  return basePath .. "/default.png"
 end
 
 local function loadModelImage()
@@ -416,6 +478,7 @@ local function loadFlightLog(w)
   w.log_loaded = true
 end
 
+
 local function saveFlightLog(w)
   local path = getLogFilePath(w)
   local f = io.open(path, "w")
@@ -459,7 +522,7 @@ local function loadChartData(w)
           table.insert(parts, tonumber(p) or 0)
         end
         if #parts >= 5 then
-          table.insert(w.chart_data, parts)
+          table.insert(w.chart_data, { r = parts[1], v = parts[2], a = parts[3], b = parts[4], t = parts[5] })
         end
       end
     end
@@ -473,8 +536,13 @@ local function saveChartData(w)
   if f then
     for i = 1, #w.chart_data do
       local p = w.chart_data[i]
-      if type(p) == "table" and #p >= 5 then
-        io.write(f, string.format("%.0f,%.2f,%.1f,%.2f,%.0f\n", p[1] or 0, p[2] or 0, p[3] or 0, p[4] or 0, p[5] or 0))
+      if type(p) == "table" then
+        local r = p.r or (p[1] or 0)
+        local v = p.v or (p[2] or 0)
+        local a = p.a or (p[3] or 0)
+        local b = p.b or (p[4] or 0)
+        local t = p.t or (p[5] or 0)
+        io.write(f, string.format("%.0f,%.2f,%.1f,%.2f,%.0f\n", r, v, a, b, t))
       end
     end
     io.close(f)
@@ -553,12 +621,16 @@ local function background(w)
 end
 
 local function volts(v)
+  -- EdgeTX returns these telemetry values in volts already.
+  -- Only protect against the uncommon centivolt representation; never turn
+  -- a normal 11.1 V flight pack into 1.1 V.
   if v > 100 then return v / 100 end
   return v
 end
 
 local function amps(v)
-  if v > 2000 then return v / 100 end
+  -- 移除 v > 200 的限制，避免 700 級直昇機大電流時顯示錯誤縮水 10 倍
+      if v > 2000 then return v / 100 end
   return v
 end
 
@@ -573,10 +645,11 @@ local function timerText(w)
 end
 
 local function bankText(w)
-  local source = getOption(w, "BankSwitch") or getOption(w, "Bank Src")
+  local source = getOption(w, "Bank Src") or getOption(w, "BankSwitch")
   if source and source ~= 0 then
     local value = getValue(source)
     if type(value) == "number" then
+      -- Same three-position thresholds used by DBK_MK3Min.
       local bank = 2
       if value < -300 then bank = 1
       elseif value > 300 then bank = 3 end
@@ -584,7 +657,7 @@ local function bankText(w)
     end
   end
 
-  -- Auto telemetry bank detection:
+  -- Fallback logic when NO physical switch source is designated (Auto mode):
   -- Prioritize Rotorflight PID Profile sensor ("PID#", "PID", "Pid#", "Bank") over "FM" (Flight Mode)
   local bank_sensors = { "PID#", "PID", "Pid#", "Bank", "FM" }
   local fm = nil
@@ -607,6 +680,7 @@ local function bankText(w)
     return string.format("BANK %d", math.max(1, math.min(6, b)))
   end
 
+  -- Unpowered / No telemetry signal & no physical switch designated
   return "BANK --"
 end
 
@@ -627,7 +701,24 @@ local function panel(x, y, w, h, is_trn, is_transp)
 end
 
 local function refresh(w, event, touchState)
-  setTheme(getOption(w, "Theme"))
+  local arm_on = false
+  local arm_src = getOption(w, "Arm Source")
+  if arm_src and arm_src ~= 0 then
+    local arm_val = getValue(arm_src)
+    if type(arm_val) == "boolean" then 
+      arm_on = arm_val
+    elseif type(arm_val) == "number" then 
+      arm_on = arm_val > 0 
+    end
+    local arm_inv = getOption(w, "Arm Invert")
+    if arm_inv == 1 or arm_inv == true then
+      arm_on = not arm_on
+    end
+  else
+    arm_on = sensor(13) > 0 -- Fallback to telemetry sensor
+  end
+
+  applyDynamicTheme(w, arm_on)
   background(w); loadModelImage()
   local z = w.zone
   local x, y, sw, sh = math.floor(z.x), math.floor(z.y), math.floor(z.w), math.floor(z.h)
@@ -658,9 +749,15 @@ local function refresh(w, event, touchState)
   if type(touchState) == "table" and type(touchState.x) == "number" and type(touchState.y) == "number" then
     tx, ty = touchState.x, touchState.y
     local t_type = touchState.type
-    -- Hardcode EdgeTX touch types (1=FIRST, 2=BREAK, 3=TAP) to bypass missing global constants
-    if t_type == 1 or t_type == 2 or t_type == 3 then
-      is_tap = true
+    if t_type == 1 then
+      w.is_touching = true
+    elseif t_type == 2 or t_type == 3 then
+      if w.is_touching then
+        is_tap = true
+        w.is_touching = false
+      end
+    else
+      w.is_touching = false
     end
   end
 
@@ -690,37 +787,37 @@ local function refresh(w, event, touchState)
     end
   end
 
-  local log_sw = getOption(w, "Logbook Sw")
-  if log_sw and log_sw ~= 0 then
-    local l_val = getValue(log_sw)
+  local logSw = getOption(w, "Logbook Sw")
+  if logSw and logSw ~= 0 then
+    local l_val = getValue(logSw)
     if type(l_val) == "boolean" then
       w.show_logbook = l_val
       w.logbook_tab = 1
     elseif type(l_val) == "number" then
-      -- 3-position switch: DOWN (>= 50) -> Tab 2 (Battery Manager), MID (-50 < v < 50) -> Tab 1 (Logbook), UP (<= -50) -> Close (Main Dashboard)
+      -- 3-position switch: DOWN (>= 50) -> Tab 2, MID (-50 < v < 50) -> Tab 1, UP (<= -50) -> Close
       if l_val >= 50 or l_val == 2 then
         w.show_logbook = true
-        w.logbook_tab = 2
+        w.logbook_tab = 2 -- Tab 2: Battery Fleet Manager
       elseif (l_val > -50 and l_val < 50) or l_val == 1 then
         w.show_logbook = true
-        w.logbook_tab = 1
+        w.logbook_tab = 1 -- Tab 1: Logbook Line Chart
       else
-        w.show_logbook = false
+        w.show_logbook = false -- UP (SC-up / Off)
       end
     end
   end
 
   local arm_on = false
-  local arm_src = getOption(w, "Arm Source")
-  if arm_src and arm_src ~= 0 then
-    local arm_val = getValue(arm_src)
+  local armSrc = getOption(w, "Arm Source")
+  if armSrc and armSrc ~= 0 then
+    local arm_val = getValue(armSrc)
     if type(arm_val) == "boolean" then 
       arm_on = arm_val
     elseif type(arm_val) == "number" then 
       arm_on = arm_val > 0 
     end
-    local arm_inv = getOption(w, "Arm Invert")
-    if arm_inv == 1 or arm_inv == true then
+    local armInv = getOption(w, "Arm Invert")
+    if armInv == 1 or armInv == true then
       arm_on = not arm_on
     end
   else
@@ -739,7 +836,24 @@ local function refresh(w, event, touchState)
   if w.last_bat_idx ~= currentBatIdx then
     w.last_bat_idx = currentBatIdx
     w.log_loaded = false -- Force reload next frame
-    w.fleet_data = nil -- Force reload battery fleet data
+  end
+
+  -- Handle dynamic themes（暫時完全禁用，避免衝突）
+  -- local theme_mod = loadModule("theme")
+  -- if theme_mod then
+  --   local ctx = { C=C, lcd=lcd }
+  --   theme_mod.update(w, ctx)
+  --   if w.force_solid_bg then
+  --     is_transp = false
+  --     is_trn = false
+  --   end
+  -- end
+  
+  -- 如果是 HiVis 或 F-35 主題，強制設置 solid bg
+  local curTheme = getOption(w, "Theme")
+  if curTheme == 11 or curTheme == 12 then
+    is_transp = false
+    is_trn = false
   end
 
   local dt = getDateTime()
@@ -775,6 +889,7 @@ local function refresh(w, event, touchState)
       local cur_curr = amps(sensor(2)) or 0
       if (cur_rpm > 500 or cur_curr > 1.5) and not w.chart_reset_this_arm then
         w.chart_data = {} -- Clear old chart once motor actually spools up
+        w.is_demo_data = false
         w.chart_reset_this_arm = true
       end
       
@@ -790,7 +905,24 @@ local function refresh(w, event, touchState)
           local bec = volts(sensor(12)) or 0
           local tmp = stat(6, "cur") or 0
           
-          table.insert(w.chart_data, {rpm, vbat, curr, bec, tmp})
+          -- Voice Assistant integration
+          local voice_opt = getOption(w, "Voice Alarm")
+          if voice_opt == 1 or voice_opt == true then
+            local voice_mod = loadModule("voice")
+            if voice_mod then
+              local ctx = {
+                sensor = sensor,
+                stat = stat,
+                volts = volts,
+                amps = amps,
+                is_nitro = (getOption(w, "Heli Type") == 1),
+                getOption = function(k) return getOption(w, k) end
+              }
+              voice_mod.update(w, ctx)
+            end
+          end
+          
+          table.insert(w.chart_data, { v = vbat, a = curr, r = rpm, b = bec, t = tmp })
           -- Ring Buffer (FIFO): keep only the last 200 points (approx 10 mins)
           if #w.chart_data > 200 then
              table.remove(w.chart_data, 1)
@@ -824,9 +956,9 @@ local function refresh(w, event, touchState)
   end
 
   local reset_on = false
-  local reset_src = getOption(w, "Reset FlyCount")
-  if reset_src and reset_src ~= 0 then
-    local r_val = getValue(reset_src)
+  local r_opt = getOption(w, "Reset FlyCount")
+  if r_opt and r_opt ~= 0 then
+    local r_val = getValue(r_opt)
     if type(r_val) == "boolean" then
       reset_on = r_val
     elseif type(r_val) == "number" then
@@ -907,13 +1039,27 @@ local function refresh(w, event, touchState)
   for i = 1, #sensors do if id[i] and stat(i, "cur") ~= 0 then telemetry = true break end end
 
   if w.show_logbook then
-    local logbook_mod = loadModule("logbook")
-    if logbook_mod and logbook_mod.draw then
-      local ctx = { x=x, y=y, sw=sw, sh=sh, sx=sx, sy=sy, is_trn=is_trn, is_transp=is_transp, f_mid=f_mid, f_sml=f_sml, lcd=lcd, C=C }
-      logbook_mod.draw(w, ctx)
+    local lctx = {
+      x=x, y=y, sw=sw, sh=sh, sx=sx, sy=sy,
+      X=X, Y=Y, W=W, H=H,
+      is_trn=is_trn, is_transp=is_transp,
+      f_mid=f_mid, f_sml=f_sml,
+      lcd=lcd, C=C,
+      modelName=(model.getInfo() or {}).name or "UNKNOWN"
+    }
+    local log_mod = loadModule("logbook")
+    if log_mod and log_mod.drawLogbook then
+      local ok, err = pcall(log_mod.drawLogbook, w, lctx)
+      if not ok then
+        lcd.drawFilledRectangle(x, y, sw, sh, C.red)
+        lcd.drawText(x + 10, y + 10, "LOGBOOK CRASH:", 0)
+        lcd.drawText(x + 10, y + 40, tostring(err), 0)
+      end
     else
       lcd.drawFilledRectangle(x, y, sw, sh, C.red)
-      lcd.drawText(x + 10, y + 10, "LOGBOOK MODULE MISSING", 0)
+      lcd.drawText(x + 10, y + 10, "LOGBOOK MODULE LOAD FAILED", 0)
+      lcd.drawText(x + 10, y + 40, tostring(w_last_mod_err), 0)
+      lcd.drawText(x + 10, y + 70, "Base: " .. tostring(basePath), 0)
     end
     return
   end
@@ -968,10 +1114,14 @@ local function refresh(w, event, touchState)
   lcd.drawRectangle(X(20), Y(320), W(250), H(50), is_trn and C.black or C.blue)
   text(145, 329, string.format("%d %%", bat_pct), CENTER + f_mid, C.white)
   -- Battery summary sits below the left frame, in the bottom status area.
-  local ht_opt = getOption(w, "Heli Type")
-  local is_nitro_mode = (ht_opt == 1 or ht_opt == 0 or ht_opt == "Nitro" or ht_opt == "燃油機 (Nitro)" or (type(ht_opt) == "string" and string.find(string.lower(ht_opt), "nitro") ~= nil))
+  local heli_type = getOption(w, "Heli Type")
+  local is_nitro_mode = (heli_type == 1 or heli_type == 0 or heli_type == "Nitro" or heli_type == "燃油機 (Nitro)" or (type(heli_type) == "string" and string.find(string.lower(heli_type), "nitro") ~= nil))
+  local is_turbine_mode = (heli_type == 3 or heli_type == "Turbine" or (type(heli_type) == "string" and string.find(string.lower(heli_type), "turbine") ~= nil))
 
-  if is_nitro_mode then
+  if is_turbine_mode then
+    text(145, 390, "TURBINE JET", CENTER + f_sml, C.dim)
+    text(145, 412, string.format("ECU BAT  %.1fV", vbec), CENTER + f_sml, C.dim)
+  elseif is_nitro_mode then
     text(145, 390, "NITRO ENGINE", CENTER + f_sml, C.dim)
     text(145, 412, string.format("RX PACK  %.1fV", vbec), CENTER + f_sml, C.dim)
   else
@@ -985,7 +1135,7 @@ local function refresh(w, event, touchState)
   panel(X(295), Y(70), W(495), H(160), is_trn, is_transp)
   local tspd = sensor(17)
   local max_tspd = stat(17, "max")
-  if not is_nitro_mode and (id[17] or tspd > 0 or max_tspd > 0) then
+  if not is_nitro_mode and not is_turbine_mode and (id[17] or tspd > 0 or max_tspd > 0) then
     text(318, 89, "HEAD / TAIL RPM", f_mid, C.white)
     text(320, 127, string.format("%.0f", hspd), f_xxl, C.white)
     text(765, 124, string.format("max  %.0f", stat(3, "max")), RIGHT + f_sml, C.white)
@@ -1000,19 +1150,32 @@ local function refresh(w, event, touchState)
   -- this dashboard can show useful FC data.
   text(765, 175, string.format("MCU TEMP  %.0f °C", sensor(7)), RIGHT + f_sml, C.white)
 
-  panel(X(295), Y(245), W(495), H(160), is_trn, is_transp)
-
-  if is_nitro_mode then
+  -- Bottom Right Panel: Electric vs Nitro vs Turbine Mode
+  if is_turbine_mode then
+    -- Turbine Mode (Dynamic Module Loading)
+    local turbine = loadModule("turbine")
+    if turbine and turbine.draw then
+      local ctx = { X=X, Y=Y, W=W, H=H, text=text, lcd=lcd, C=C, f_sml=f_sml, f_mid=f_mid, f_dbl=f_dbl, f_xxl=f_xxl, f_0=f_0, is_trn=is_trn, is_transp=is_transp, sensor=sensor, stat=stat, amps=amps, volts=volts, panel=panel, getOption=getOption, RIGHT=RIGHT, CENTER=CENTER }
+      turbine.draw(w, ctx)
+    else
+      -- Fallback if module is missing
+      panel(X(295), Y(245), W(495), H(160), is_trn, is_transp)
+      text(540, 310, "TURBINE MODULE MISSING", CENTER + f_mid, C.red)
+    end
+  elseif is_nitro_mode then
+    -- Nitro Mode (Dynamic Module Loading)
     local nitro = loadModule("nitro")
     if nitro and nitro.draw then
-      local ctx = { X=X, Y=Y, W=W, H=H, text=text, lcd=lcd, C=C, f_sml=f_sml, f_mid=f_mid, f_dbl=f_dbl, f_xxl=f_xxl, f_0=f_0, is_trn=is_trn, is_transp=is_transp, sensor=sensor, stat=stat, amps=amps, volts=volts, panel=panel }
+      local ctx = { X=X, Y=Y, W=W, H=H, text=text, lcd=lcd, C=C, f_sml=f_sml, f_mid=f_mid, f_dbl=f_dbl, f_xxl=f_xxl, f_0=f_0, is_trn=is_trn, is_transp=is_transp, sensor=sensor, stat=stat, amps=amps, volts=volts, panel=panel, RIGHT=RIGHT, CENTER=CENTER }
       nitro.draw(w, ctx)
     else
+      -- Fallback if module is missing
       panel(X(295), Y(245), W(495), H(160), is_trn, is_transp)
       text(540, 310, "NITRO MODULE MISSING", CENTER + f_mid, C.red)
     end
   else
-    -- Electric Mode (AMPS, Cell, BEC, ESC Temp)
+    -- Standard Electric Mode
+    panel(X(295), Y(245), W(495), H(160), is_trn, is_transp)
     local labels = { "AMPS", "Cell", "BEC", "ESC Temp" }
     local nums = { string.format("%.1f", curr), string.format("%.2f", vcel), string.format("%.1f", vbec), string.format("%.0f", tesc) }
     local units = { "A", "V", "V", "°C" }
@@ -1055,6 +1218,9 @@ local function refresh(w, event, touchState)
       text(612, 429, user_name, CENTER + f_mid, C.white)
     end
   end
+end
+
+local function background(w)
 end
 
 return { name = NAME, options = options, create = create, update = update, refresh = refresh, background = background }
