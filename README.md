@@ -4,11 +4,20 @@
 ### Standard UI (預設標準介面)
 ![Standard UI](Pic/Standard%20UI.jpg)
 
-### Clean UI (透明背景模式)
-![Pic/Clean UI](Pic/Clean%20UI.jpg)
+### Clean UI (半透背景模式)
+![Clean UI](Pic/Clean%20UI.jpg)
 
 ### Transparent UI (TRN 全透無框模式)
 ![Transparent UI](Pic/Transparent%20UI.jpg)
+
+### Nitro UI (燃油引擎專屬模式)
+![Nitro UI](Pic/Nitro%20UI.jpg)
+
+### Logbook & Chart UI (飛行日誌與五線譜圖表)
+![Logbook UI](Pic/Logbook%20UI.jpg)
+
+### Widget Settings Menu (小工具設定選單)
+![Menu UI](Pic/Menu%20UI.jpg)
 
 (English below)
 
