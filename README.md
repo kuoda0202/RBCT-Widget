@@ -14,7 +14,7 @@
 ![Nitro UI](Pic/Nitro%20UI.jpg)
 
 ### Battery Fleet Manager UI (機隊電池管理總表)
-![Battery Fleet Manager UI](Pic/Battery%20UI.png)
+![Battery Fleet Manager UI](Pic/Battery%20UI.jpg)
 
 ### Logbook & Chart UI (飛行日誌與五線譜圖表)
 ![Logbook UI](Pic/Logbook%20UI.jpg)
