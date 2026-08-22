@@ -22,6 +22,10 @@
     *   **零負載極速繪圖引擎**：完全由記憶體運作的 5 線譜折線圖（綠線 RPM、橘線 電壓、紅線 電流、藍線 BEC、黃線 溫度），精準分析劇烈動作時的電壓陡降與掉轉現象。在解鎖狀態下甚至能呈現「即時調機」效果！
 *   **自動飛行次數計數器 (Flight Counter)**：獨立追蹤每台機型的「今日飛行次數 (Today)」與「歷史總飛行次數 (Total)」，皆以純文字檔儲存於 SD 卡，支援手動編輯。
 *   **即時遙測數據顯示**：監控並顯示包含電池總電壓 (Vbat)、電流 (A)、消耗容量 (mAh)、BEC 電壓、單節最低電壓 (Cell) 以及 ESC / MCU 溫度。
+*   **智慧電池 S 數演算法與通電鎖定 (Smart Battery S-Cell Engine)**：
+    *   *第一優先 (Native Telemetry)*：直接讀取 Rotorflight / EdgeTX 原生電池 S 數感測器 (`Cel#` / `Cells` / `Cels`)。
+    *   *第二優先 (Exact Ratio)*：依總電壓與單芯電壓比例精確換算 $\text{S} = \text{round}(V_{bat} / V_{cel})$。完美解決未充飽/存儲電壓 (如 12S @ 45.9V/3.82V) 誤判為 11S，以及高壓鋰電 LiHV (如 12S @ 52.2V/4.35V) 誤判為 13S 的問題。
+    *   *通電記憶體鎖定 (S-Lock)*：通電完成偵測後即將 S 數鎖定於記憶體，飛行中大螺距瞬間壓降絕不跳動；換電池或斷電自動重置。
 *   **旋翼轉速監控 (Headspeed)**：即時顯示目前轉速 (RPM)，並記錄飛行過程中的最高 (max) 與最低 (min) 轉速。
 *   **定速狀態指示 (Governor)**：提供醒目直覺的定速開啟/關閉 (ON/OFF) 狀態圖示。
 *   **FBL 停懸段數 (Banks)**：根據您設定的遙控器開關或通道，動態顯示當前使用的 FBL 停懸段數 (Bank)。
@@ -59,6 +63,10 @@
 
 ## 📝 最新更新 (Latest Updates)
 
+### v1.0.701
+*   **修正電池 S 數判斷優化 (Battery S Detection)*：修正未滿電 (如 12S 45.9V/3.82V) 誤判為 11S 或高壓鋰電 LiHV (12S 52.2V/4.35V) 誤判為 13S 的問題。現在優先讀取 Rotorflight 原生 `Cel#` 遙測感測器與 `Vbat/Vcel` 精確比值，並在接上電池期間鎖定 S 數，徹底避免飛行壓降跳動。
+    *   *程式優化與修正。
+
 ### v1.0.7
 *   **功能升級 (自訂語音警示門檻、液晶高反差主題與光感自動切換)**：
     *   *液晶高反差主題 (LCD Theme)*：新增低飽和綠灰液晶底色 (`RGB: 212, 224, 206`) 搭配高反差深墨綠文字 (`RGB: 15, 25, 20`)，戶外強光下閱讀清晰度大幅提升。
@@ -84,7 +92,7 @@
 *   **功能新增 (Auto-Scaling 智慧動態刻度系統)**：圖表座標軸導入「無上限動態天井與智慧比例換算演算法」。
     *   *全機型自適應*：無論是 700 級 (12S/14S, 200A+ 大電流)、450/500 級 (6S)，或是 200 級 / 微型電直 (高轉速 3500+ ~ 10,000+ RPM, 2S/3S 電壓)，圖表刻度上限與區間皆會根據該趟飛行的實際數據自動動態推升（例如轉速自動以 500 RPM 為一階向上擴充），曲線絕對不破頂、不掉框。
 *   **介面修復 (常態刻度標籤)**：座標軸左右刻度文字標籤解鎖抽離條件式，不論記憶體內是否有實時曲線數據，進入 Logbook 介面時圖表左右兩側的刻度數值標籤永遠固定清晰顯示。
-*   **功能新增 (最後一趟曲線 SD 卡持久化)**：飛行結束切回上鎖 (DISARM) 時，自動將當前 200 個採樣點寫入 SD 卡 (`/WIDGETS/RBCT_Beta/chart_<機型>.txt`)。關機重開機或隨時點進 Logbook 都能完整還原上一趟飛行的動態遙測曲線！
+*   **功能新增 (最後一趟曲線 SD 卡持久化)**：飛行結束切回上鎖 (DISARM) 時，自動將當前 200 個採樣點寫入 SD 卡 (`/WIDGETS/RBCT/chart_<機型>.txt`)。關機重開機或隨時點進 Logbook 都能完整還原上一趟飛行的動態遙測曲線！
 
 ### v1.0.003
 *   **功能新增 (重大升級)**：將畫面上的 `0 Flights` 靜態文字升級為「雙重真實計數器」！現在畫面上會同時顯示 `Today` (今日次數) 與 `Total` (終身總次數)。
@@ -131,6 +139,10 @@
 
 *   **Dynamic Resolution Scaling**: Automatically adapts layout, font sizes, and image scaling for different screens, ensuring a perfect fit across multiple radio models.
 *   **Real-Time Telemetry Display**: Monitors and displays critical flight data including Battery Voltage, Current (Amps), Capacity (mAh), BEC Voltage, Lowest Cell Voltage, and ESC/MCU Temperatures.
+*   **Smart Battery S-Cell Engine & S-Lock**:
+    *   *Native Telemetry Priority*: Directly reads Rotorflight/EdgeTX `Cel#` (or `Cells`/`Cels`) sensor.
+    *   *Exact Ratio Priority*: Derives cell count via $\text{round}(V_{bat} / V_{cel})$. Accurately identifies partially charged packs (e.g. 12S @ 45.9V/3.82V as 12S) and High Voltage LiHV packs (e.g. 12S @ 52.2V/4.35V as 12S).
+    *   *Memory S-Lock*: Locks S-count into memory upon battery connection, preventing erratic S-count fluctuations during high-pitch punch-out voltage sags. Resets automatically upon battery disconnection.
 *   **Headspeed Tracking**: Displays current Headspeed (RPM) along with maximum and minimum RPM statistics during the flight.
 *   **Governor Status**: Clear visual indicator for Governor ON/OFF state.
 *   **FBL Bank Switching**: Dynamically displays the current FBL (Flybarless) Bank number based on your switch configuration.
@@ -147,7 +159,7 @@
 2. On your radio, navigate to the Telemetry screen setup.
 3. Select the `RBCT` widget and assign it to a full-screen layout.
 
-### Changelog (v1.0.8 DEV)
+### Changelog (v1.0.701)
 *   **Feature Upgrade (Custom Voice Thresholds, LCD Theme & Auto Light Sensor)**:
 
     *   *LCD High Contrast Theme*: Added a low-saturation pale green-gray background with dark green text, dramatically improving readability under direct harsh sunlight.
@@ -156,6 +168,7 @@
     *   *Battery % Voice Assistant*: Added stepped low battery voice alarms, critical continuous alarms, and auto-reset when changing battery packs.
     *   *Bitmap Font Compatibility*: Optimized Chinese localization strings (`電池日誌` and `光感應LCD主題`) to perfectly match the EdgeTX MK3 dot-matrix font, eliminating missing character boxes.
     *   *Turbine Jet Module*: Added `Turbine` to the Heli Type options. Implements a stunning, true-to-life Glass Cockpit (EICAS) interface for Jet pilots, dynamically displaying `EGT`, `CORE RPM`, `FUEL %`, and `ECU STATE`.
+    *   *Smart Battery S-Cell Detection*: Fixed issues where partially charged batteries (e.g. 12S @ 45.9V) were misidentified as 11S or 12S LiHV @ 52.2V as 13S. The widget now prioritizes Rotorflight native `Cel#` sensor and exact `Vbat/Vcel` ratio with in-flight S-locking.
 
 ### Changelog (v1.0.003)
 *   **New Feature (Major)**: Upgraded the static `0 Flights` text to a Dual Dynamic Flight Counter! The dashboard now simultaneously displays `Today` (today's flights) and `Total` (lifetime total flights).

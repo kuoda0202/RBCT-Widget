@@ -3,7 +3,7 @@
 -- Model picture order: Model Setup bitmap (/IMAGES), RBCT/modelImage/<model>.png,
 -- RBCT/modelImage/<model without its first character>.png, then default.png.
 local NAME = "RBCT"
-local VERSION = "v1.0.7"
+local VERSION = "v1.0.701"
 
 -- Keep this list byte-for-byte compatible with standard telemetry. The order is
 -- deliberately arranged to ensure standard telemetry setup works here.
@@ -103,7 +103,7 @@ local function getOption(w, key)
   return nil
 end
 
-local basePath = "/WIDGETS/RBCT_Beta"
+local basePath = "/WIDGETS/RBCT"
 
 local w_last_mod_err = ""
 
@@ -114,8 +114,8 @@ local function loadModule(name)
     local paths = {
       basePath .. "/modules/" .. name .. ".lua",
       basePath .. "/modules/" .. name,
-      "/WIDGETS/RBCT_Beta/modules/" .. name .. ".lua",
-      "WIDGETS/RBCT_Beta/modules/" .. name .. ".lua"
+      "/WIDGETS/RBCT/modules/" .. name .. ".lua",
+      "WIDGETS/RBCT/modules/" .. name .. ".lua"
     }
     local f, err = nil, ""
     for i = 1, #paths do
@@ -433,6 +433,7 @@ local function resetActiveBatLog(w)
   w.chart_data = {}
   w.fleet_data = nil
   w.log_loaded = false
+  w.detected_cells = nil
 end
 
 local function getLogFilePath(w)
@@ -601,11 +602,13 @@ local function background(w)
   local cur_vbat = sensor(1)
   if cur_vbat == 0 and mm[1] and mm[1].max and mm[1].max > 0 then
     resetMinMax()
+    if w then w.detected_cells = nil end
   end
 
   local cur_capa = sensor(4)
   if cur_capa < 10 and mm[4] and mm[4].max and mm[4].max > 50 then
     resetMinMax()
+    if w then w.detected_cells = nil end
   end
 
   for i = 1, #sensors do
@@ -632,6 +635,68 @@ local function amps(v)
   -- 移除 v > 200 的限制，避免 700 級直昇機大電流時顯示錯誤縮水 10 倍
       if v > 2000 then return v / 100 end
   return v
+end
+
+local function getBatteryCells(w, vbat, vcel)
+  if not vbat or vbat <= 3.0 then
+    if w then w.detected_cells = nil end
+    return 0
+  end
+
+  -- 接上電池鎖定 S 數，避免飛行中壓降造成數值跳動
+  if w and w.detected_cells and w.detected_cells > 0 then
+    return w.detected_cells
+  end
+
+  local detected = nil
+
+  -- 1. 第一優先：直接讀取 Rotorflight / EdgeTX 電池 S 數遙測感測器 (Cel#, Cells, Cels, Cel)
+  local cell_sensors = { "Cel#", "Cells", "Cels", "Cel", "Cel_count" }
+  for i = 1, #cell_sensors do
+    local sname = cell_sensors[i]
+    local val = nil
+    if getFieldInfo then
+      local info = getFieldInfo(sname)
+      if info then
+        val = getValue(info.id)
+      end
+    end
+    if val == nil or val == 0 then
+      val = getValue(sname)
+    end
+    if type(val) == "number" and val >= 1 and val <= 16 and math.floor(val) == val then
+      detected = math.floor(val)
+      break
+    elseif type(val) == "table" and #val > 0 then
+      detected = #val
+      break
+    end
+  end
+
+  -- 2. 第二優先：依總電壓 Vbat 與單芯電壓 Vcel 比例精確換算 (相除四捨五入)
+  -- 解決未充飽 (如 3.82V/12S 45.9V) 或高壓鋰電 LiHV (4.35V/12S 52.2V) 誤判問題
+  if not detected and vcel and vcel > 2.0 then
+    local c = math.floor((vbat / vcel) + 0.5)
+    if c >= 1 and c <= 16 then
+      detected = c
+    end
+  end
+
+  -- 3. 第三優先備援：無 Cel# 且無 Vcel 時，以名目電壓 3.85V 估算
+  if not detected then
+    local max_vbat = stat(1, "max")
+    local ref_v = (max_vbat and max_vbat > 0) and max_vbat or vbat
+    if ref_v and ref_v > 3.0 then
+      detected = math.max(1, math.floor(ref_v / 3.85 + 0.5))
+    end
+  end
+
+  if detected and detected > 0 then
+    if w then w.detected_cells = detected end
+    return detected
+  end
+
+  return 0
 end
 
 local function timerText(w)
@@ -1032,9 +1097,8 @@ local function refresh(w, event, touchState)
   local vbat, curr, hspd, capa = volts(sensor(1)), amps(sensor(2)), sensor(3), sensor(4)
   local tesc, vbec, gov, vcel = sensor(6), volts(sensor(12)), sensor(14), volts(sensor(15))
   local timer, timerColor = timerText(w)
-  -- 使用最高紀錄的電池電壓 (剛接上時的靜止電壓) 來計算 S 數，避免飛行中因壓降導致 S 數亂跳
-  local max_vbat = stat(1, "max")
-  local cells = max_vbat > 0 and math.max(1, math.floor(max_vbat / 4.2 + 0.85)) or 0
+  -- 優先讀取 Rotorflight Cel# 遙測感測器或 Vbat/Vcel 精確比例，並在接上電池期間鎖定 S 數
+  local cells = getBatteryCells(w, vbat, vcel)
   local telemetry = false
   for i = 1, #sensors do if id[i] and stat(i, "cur") ~= 0 then telemetry = true break end end
 

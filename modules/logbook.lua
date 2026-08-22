@@ -1,4 +1,4 @@
-local basePath = "/WIDGETS/RBCT_Beta"
+local basePath = "/WIDGETS/RBCT"
 
 local function loadFleetData(w, ctx)
   w.fleet_data = {}

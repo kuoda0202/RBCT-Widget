@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RBCT v1.0.8 Official Help System / 官方 Help 系統</title>
+  <title>RBCT v1.0.701 Official Help System / 官方 Help 系統</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Noto+Sans+TC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -475,7 +475,7 @@
         <div class="lang-zh" style="font-size: 0.8rem; color: var(--text-dim);">EdgeTX / Rotorflight 官方完整 Help 說明系統</div>
         <div class="lang-en" style="font-size: 0.8rem; color: var(--text-dim);">EdgeTX / Rotorflight Official Help System</div>
       </div>
-      <span class="version-badge">v1.0.8 Official Help</span>
+      <span class="version-badge">v1.0.701 Official Help</span>
     </div>
     
     <div class="header-actions">
@@ -998,18 +998,51 @@
         </ul>
 
         <div class="topic-sub-title">
-          <span class="lang-zh">🔬 防降壓亂跳的「電池 S 數記憶體鎖定演算法 (S-Count Locking)」</span>
-          <span class="lang-en">🔬 S-Count Memory Lock Algorithm</span>
+          <span class="lang-zh">🔬 智慧電池 S 數換算與「記憶體通電鎖定演算法 (Smart S-Count Engine & Lock)」</span>
+          <span class="lang-en">🔬 Smart S-Count Detection & Memory Lock Engine</span>
         </div>
 
         <div class="card" style="margin-bottom: 1.5rem;">
           <div class="card-title">
-            <span class="lang-zh">🛡️ 為何需要「通電鎖定 S 數」？</span>
-            <span class="lang-en">🛡️ Why Locked S-Count Prevents Glitches</span>
+            <span class="lang-zh">📐 1. 為什麼傳統「總電壓除以 4.2V」會算錯？</span>
+            <span class="lang-en">📐 1. Why Traditional Vbat / 4.2V Fails</span>
           </div>
           <div class="card-desc">
-            <span class="lang-zh">在大螺距暴力 3D 抽電時，鋰電池總電壓會瞬間劇烈下沉壓降。傳統儀表板如果隨時重新計算 S 數，會導致畫面上的 S 數亂跳（例如 6S 電池在壓降時被誤判為 5S 電池）。RBCT 在電池剛接上通電時，即 **自動計算並將 S 數永久鎖定於記憶體中**，整趟飛行過程中絕不誤判亂跳！</span>
-            <span class="lang-en">Heavy pitch-pumps cause temporary voltage sags. RBCT locks the S-count into memory upon battery connection, preventing erratic S-count jumps (e.g. 6S miscalculated as 5S) during voltage dips.</span>
+            <span class="lang-zh">
+              傳統小工具多採用固定公式 <code>floor(Vbat / 4.2 + 0.85)</code>，在未滿電或高壓鋰電 (LiHV) 時會產生嚴重誤判：<br>
+              • <strong>未充飽 / 存儲電壓 (以 12S @ 45.9V / 3.82V 為例)</strong>：<code>(45.9 / 4.2) + 0.85 = 11.77</code> ➔ 捨去後誤判為 <strong>11S</strong>！<br>
+              • <strong>高壓鋰電 LiHV 充飽 (以 12S @ 52.2V / 4.35V 為例)</strong>：<code>(52.2 / 4.2) + 0.85 = 13.27</code> ➔ 捨去後誤判為 <strong>13S</strong>！
+            </span>
+            <span class="lang-en">
+              Traditional scripts using <code>floor(Vbat / 4.2 + 0.85)</code> miscalculate non-full and LiHV packs:<br>
+              • <strong>Partially charged / Storage (12S @ 45.9V / 3.82V)</strong>: <code>(45.9 / 4.2) + 0.85 = 11.77</code> ➔ Miscalculated as <strong>11S</strong>.<br>
+              • <strong>High-Voltage LiHV (12S @ 52.2V / 4.35V)</strong>: <code>(52.2 / 4.2) + 0.85 = 13.27</code> ➔ Miscalculated as <strong>13S</strong>.
+            </span>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom: 1.5rem;">
+          <div class="card-title">
+            <span class="lang-zh">🚀 2. RBCT 三層式精確 S 數換算機制</span>
+            <span class="lang-en">🚀 2. RBCT 3-Tier S-Count Architecture</span>
+          </div>
+          <div class="card-desc">
+            <span class="lang-zh">
+              • <strong>第一優先 (原生遙測)</strong>：直接讀取 Rotorflight / EdgeTX 飛控原生感測器 <code>Cel#</code> (或 <code>Cells</code> / <code>Cels</code>)。<br>
+              • <strong>第二優先 (Vbat / Vcel 精確比例)</strong>：以飛控回傳之即時單芯平均電壓 <code>Vcel</code> 與總電壓 <code>Vbat</code> 精確相除並四捨五入 <code>round(Vbat / Vcel)</code>。<br>
+              &nbsp;&nbsp;➔ 例：<code>round(45.9V / 3.82V) = round(12.015) = 12S</code>（完美還原存儲電壓）！<br>
+              &nbsp;&nbsp;➔ 例：<code>round(52.2V / 4.35V) = round(12.000) = 12S</code>（完美支援 LiHV 高壓鋰電）！<br>
+              • <strong>第三優先 (名目電壓安全備援)</strong>：若無 <code>Cel#</code> 且無 <code>Vcel</code>，以 3.85V 名目中位數基準估算。<br>
+              • <strong>通電記憶體鎖定 (S-Lock)</strong>：接上電池偵測完畢即鎖定 S 數，飛行中大螺距暴力 3D 抽電之瞬間壓降絕不跳動；斷電更換電池自動重置。
+            </span>
+            <span class="lang-en">
+              • <strong>Tier 1 (Native Telemetry)</strong>: Reads Rotorflight native <code>Cel#</code> (or <code>Cells</code> / <code>Cels</code>) sensor directly.<br>
+              • <strong>Tier 2 (Exact Vbat / Vcel Ratio)</strong>: Calculates <code>round(Vbat / Vcel)</code> using real-time single-cell voltage.<br>
+              &nbsp;&nbsp;➔ e.g. <code>round(45.9V / 3.82V) = 12S</code> (100% accurate on storage voltage)!<br>
+              &nbsp;&nbsp;➔ e.g. <code>round(52.2V / 4.35V) = 12S</code> (100% accurate on LiHV high-voltage)!<br>
+              • <strong>Tier 3 (Safe Fallback)</strong>: Estimates using 3.85V nominal midpoint if no cell sensor exists.<br>
+              • <strong>In-Flight S-Lock</strong>: Locks detected S-count in memory during flight to prevent voltage sag jitter. Resets on pack swap.
+            </span>
           </div>
         </div>
 
@@ -1046,8 +1079,8 @@
           <span class="lang-en">📊 3. Battery Fleet Manager Table & Watermark</span>
         </div>
 
-        <p class="lang-zh">將 <code>Logbook Sw</code> 指派開關下撥 (SC↓)，即可叫出總表。當前選定之電池整列以 **綠色高亮框** 強調；左下角水印同步回饋 <code>v1.0.6 | BAT 1</code>。</p>
-        <p class="lang-en">Set <code>Logbook Sw</code> to DOWN (SC↓) to view the fleet table. Active battery row is highlighted in green with watermark <code>v1.0.6 | BAT 1</code>.</p>
+        <p class="lang-zh">將 <code>Logbook Sw</code> 指派開關下撥 (SC↓)，即可叫出總表。當前選定之電池整列以 **綠色高亮框** 強調；左下角水印同步回饋 <code>v1.0.701 | BAT 1</code>。</p>
+        <p class="lang-en">Set <code>Logbook Sw</code> to DOWN (SC↓) to view the fleet table. Active battery row is highlighted in green with watermark <code>v1.0.701 | BAT 1</code>.</p>
       </section>
 
       <!-- Topic 7: Logbook & 5-Line Chart -->
@@ -1462,7 +1495,7 @@
   </div>
 
   <footer>
-    RBCT Helicopter Dashboard Widget v1.0.8 | Author: 雷恩 / Ryan Kuo | Standard Application Help System
+    RBCT Helicopter Dashboard Widget v1.0.701 | Author: 雷恩 / Ryan Kuo | Standard Application Help System
   </footer>
 
   <script>
