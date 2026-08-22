@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RBCT v1.0.701 Official Help System / 官方 Help 系統</title>
+  <title>RBCT v1.0.8 Official Help System / 官方 Help 系統</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Noto+Sans+TC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -475,7 +475,7 @@
         <div class="lang-zh" style="font-size: 0.8rem; color: var(--text-dim);">EdgeTX / Rotorflight 官方完整 Help 說明系統</div>
         <div class="lang-en" style="font-size: 0.8rem; color: var(--text-dim);">EdgeTX / Rotorflight Official Help System</div>
       </div>
-      <span class="version-badge">v1.0.701 Official Help</span>
+      <span class="version-badge">v1.0.8 Official Help</span>
     </div>
     
     <div class="header-actions">
@@ -671,11 +671,27 @@
 
         <div class="alert alert-caution">
           <div class="alert-title">
-            <span class="lang-zh">⚠️ 必要限制：必須安裝 Rotorflight 設定腳本 (`rf.lua`)！</span>
-            <span class="lang-en">⚠️ Requirement: Rotorflight Setup Script (`rf.lua`) Required!</span>
+            <span class="lang-zh">⚠️ 必要限制：必須安裝 Rotorflight 2 背景遙測腳本 (`rf2bg.lua`)！</span>
+            <span class="lang-en">⚠️ Requirement: Rotorflight 2 Background Script (`rf2bg.lua`) Required!</span>
           </div>
-          <span class="lang-zh">如果您的記憶卡未安裝 <code>rf.lua</code> (Rotorflight 設定腳本)，小工具將無法自動讀取飛控回傳的 PID Profile (Bank 檔位)、Rate Profile 與 GOV 定速狀態！</span>
-          <span class="lang-en">Without <code>rf.lua</code> installed on your SD card, automated Bank (PID Profile) and GOV status telemetry will NOT function!</span>
+          <span class="lang-zh">如果您的記憶卡未安裝 <code>rf2bg.lua</code> (Rotorflight 2 背景遙測腳本)，小工具將無法自動讀取飛控回傳的 PID Profile (Bank 檔位)、Rate Profile 與 GOV 定速狀態！</span>
+          <span class="lang-en">Without <code>rf2bg.lua</code> installed on your SD card, automated Bank (PID Profile) and GOV status telemetry will NOT function!</span>
+        </div>
+
+        <div class="card" style="margin-top: 1rem;">
+          <div class="card-title">
+            <span class="lang-zh">⚡ RF 2.2 自訂遙測 CLI 一鍵設定指令</span>
+            <span class="lang-en">⚡ RF 2.2 Custom Telemetry CLI One-Click Setup</span>
+          </div>
+          <div class="card-desc">
+            <span class="lang-zh"><strong>RF2.2 自訂遙測無須自選</strong>，請在 Rotorflight Configurator 的 <strong>CLI (命令列)</strong> 中貼上以下指令並按 Enter 即可：</span>
+            <span class="lang-en"><strong>RF2.2 custom telemetry requires no manual selection</strong>. Simply paste the following into the Rotorflight Configurator <strong>CLI</strong> and press Enter:</span>
+            <pre style="background: rgba(0, 0, 0, 0.4); border: 1px solid var(--border); border-radius: 6px; padding: 12px; margin-top: 10px; color: var(--accent-cyan); font-family: monospace; font-size: 0.85rem; line-height: 1.4; overflow-x: auto; user-select: all;">set crsf_telemetry_mode = CUSTOM
+set telemetry_sensors = 3,4,5,6,8,15,43,50,52,60,61,88,89,90,91,92,93,95,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+set crsf_telemetry_link_rate = 500
+set crsf_telemetry_link_ratio = 8
+save</pre>
+          </div>
         </div>
       </section>
 
@@ -1023,25 +1039,23 @@
 
         <div class="card" style="margin-bottom: 1.5rem;">
           <div class="card-title">
-            <span class="lang-zh">🚀 2. RBCT 三層式精確 S 數換算機制</span>
-            <span class="lang-en">🚀 2. RBCT 3-Tier S-Count Architecture</span>
+            <span class="lang-zh">🚀 2. RBCT 直結飛控 S 數換算法則 (Vbat / Vcel 精確比例)</span>
+            <span class="lang-en">🚀 2. RBCT Flight Controller S-Count Sync (Direct Vbat / Vcel Ratio)</span>
           </div>
           <div class="card-desc">
             <span class="lang-zh">
-              • <strong>第一優先 (原生遙測)</strong>：直接讀取 Rotorflight / EdgeTX 飛控原生感測器 <code>Cel#</code> (或 <code>Cells</code> / <code>Cels</code>)。<br>
-              • <strong>第二優先 (Vbat / Vcel 精確比例)</strong>：以飛控回傳之即時單芯平均電壓 <code>Vcel</code> 與總電壓 <code>Vbat</code> 精確相除並四捨五入 <code>round(Vbat / Vcel)</code>。<br>
-              &nbsp;&nbsp;➔ 例：<code>round(45.9V / 3.82V) = round(12.015) = 12S</code>（完美還原存儲電壓）！<br>
-              &nbsp;&nbsp;➔ 例：<code>round(52.2V / 4.35V) = round(12.000) = 12S</code>（完美支援 LiHV 高壓鋰電）！<br>
-              • <strong>第三優先 (名目電壓安全備援)</strong>：若無 <code>Cel#</code> 且無 <code>Vcel</code>，以 3.85V 名目中位數基準估算。<br>
-              • <strong>通電記憶體鎖定 (S-Lock)</strong>：接上電池偵測完畢即鎖定 S 數，飛行中大螺距暴力 3D 抽電之瞬間壓降絕不跳動；斷電更換電池自動重置。
+              • <strong>核心原理 (直結飛控)</strong>：在 Rotorflight 飛控遙測機制中，單芯電壓 <code>Vcel</code> 本身即由飛控以「總電壓 ÷ 飛控設定之 S 數」即時計算產生。因此小工具直接將 <code>Vbat</code> 與 <code>Vcel</code> 相除並四捨五入 <code>math.floor((Vbat / Vcel) + 0.5)</code>，即可 100% 精準還原飛控設定的真實電池 S 數。<br>
+              • <strong>存儲電壓完美支援</strong>：例：<code>round(45.9V / 3.825V) = 12S</code>（未滿電存儲狀態絕不誤判為 11S）！<br>
+              • <strong>LiHV 高壓鋰電完美支援</strong>：例：<code>round(52.2V / 4.35V) = 12S</code>（高壓充飽狀態絕不誤判為 13S）！<br>
+              • <strong>3D 暴力抽電壓降不跳動</strong>：飛行中大螺距瞬間壓降時，<code>Vbat</code> 與 <code>Vcel</code> 同步等比例下降，除出來的比值永遠恆定，徹底告別傳統公式跳 S 數的問題。<br>
+              • <strong>無感測器安全備援</strong>：若接收機未傳送 <code>Vcel</code>，系統自動以 3.85V 名目中位數基準進行安全估算。
             </span>
             <span class="lang-en">
-              • <strong>Tier 1 (Native Telemetry)</strong>: Reads Rotorflight native <code>Cel#</code> (or <code>Cells</code> / <code>Cels</code>) sensor directly.<br>
-              • <strong>Tier 2 (Exact Vbat / Vcel Ratio)</strong>: Calculates <code>round(Vbat / Vcel)</code> using real-time single-cell voltage.<br>
-              &nbsp;&nbsp;➔ e.g. <code>round(45.9V / 3.82V) = 12S</code> (100% accurate on storage voltage)!<br>
-              &nbsp;&nbsp;➔ e.g. <code>round(52.2V / 4.35V) = 12S</code> (100% accurate on LiHV high-voltage)!<br>
-              • <strong>Tier 3 (Safe Fallback)</strong>: Estimates using 3.85V nominal midpoint if no cell sensor exists.<br>
-              • <strong>In-Flight S-Lock</strong>: Locks detected S-count in memory during flight to prevent voltage sag jitter. Resets on pack swap.
+              • <strong>Core Principle (FC Sync)</strong>: In Rotorflight telemetry, <code>Vcel</code> is calculated internally by the flight controller as <code>Vbat / configured_S_count</code>. RBCT directly calculates <code>math.floor((Vbat / Vcel) + 0.5)</code> to 100% accurately reflect the exact cell count configured in the FC.<br>
+              • <strong>Storage Voltage Accuracy</strong>: e.g. <code>round(45.9V / 3.825V) = 12S</code> (Partially charged packs are never miscalculated as 11S)!<br>
+              • <strong>High-Voltage LiHV Support</strong>: e.g. <code>round(52.2V / 4.35V) = 12S</code> (Fully charged LiHV packs are never miscalculated as 13S)!<br>
+              • <strong>Zero Voltage Sag Jitter</strong>: During extreme 3D collective punches, <code>Vbat</code> and <code>Vcel</code> drop proportionally in real-time, keeping the calculated ratio completely solid.<br>
+              • <strong>Safe Fallback</strong>: If no <code>Vcel</code> sensor is available from the receiver, the widget falls back to a 3.85V nominal midpoint estimate.
             </span>
           </div>
         </div>
@@ -1079,8 +1093,8 @@
           <span class="lang-en">📊 3. Battery Fleet Manager Table & Watermark</span>
         </div>
 
-        <p class="lang-zh">將 <code>Logbook Sw</code> 指派開關下撥 (SC↓)，即可叫出總表。當前選定之電池整列以 **綠色高亮框** 強調；左下角水印同步回饋 <code>v1.0.701 | BAT 1</code>。</p>
-        <p class="lang-en">Set <code>Logbook Sw</code> to DOWN (SC↓) to view the fleet table. Active battery row is highlighted in green with watermark <code>v1.0.701 | BAT 1</code>.</p>
+        <p class="lang-zh">將 <code>Logbook Sw</code> 指派開關下撥 (SC↓)，即可叫出總表。當前選定之電池整列以 **綠色高亮框** 強調；左下角水印同步回饋 <code>v1.0.8 | BAT 1</code>。</p>
+        <p class="lang-en">Set <code>Logbook Sw</code> to DOWN (SC↓) to view the fleet table. Active battery row is highlighted in green with watermark <code>v1.0.8 | BAT 1</code>.</p>
       </section>
 
       <!-- Topic 7: Logbook & 5-Line Chart -->
@@ -1495,7 +1509,7 @@
   </div>
 
   <footer>
-    RBCT Helicopter Dashboard Widget v1.0.701 | Author: 雷恩 / Ryan Kuo | Standard Application Help System
+    RBCT Helicopter Dashboard Widget v1.0.8 | Author: 雷恩 / Ryan Kuo | Standard Application Help System
   </footer>
 
   <script>
