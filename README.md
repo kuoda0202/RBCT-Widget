@@ -22,7 +22,7 @@
 ### Logbook & Chart UI (飛行日誌與曲線圖表)
 ![Logbook UI](Pic/Logbook%20UI.jpg?v=1.0.8)
 
-### Widget Settings Menu (小工具設定選單)
+### Multilingual Widget Settings Menu (小工具設定選單)
 ![Menu UI](Pic/Menu%20UI.jpg?v=1.0.8)
 
 ### Multilingual UI (多語系主畫面)
