@@ -911,6 +911,51 @@
           </div>
         </div>
 
+        <div class="topic-sub-title" style="margin-top: 2.2rem;">
+          <span class="lang-zh">📱 三大即時全彩觸控診斷彈窗 (3 Instant HUD Touch Diagnostic Popups)</span>
+          <span class="lang-en">📱 3 Instant HUD Touch Diagnostic Popups</span>
+        </div>
+        <p class="lang-zh">RBCT 導入高靈敏全螢幕觸控引擎，主儀表板三大區域輕觸即開，無需進入繁瑣選單即可直覺調出航次統計、單包電池健康與 5 軌動力動態曲線：</p>
+        <p class="lang-en">RBCT integrates a high-response touch engine. Tap any of the 3 discrete HUD zones to instantly pop up Flight Stats, Battery Health & Sag, or the 5-channel Headspeed & Power Chart:</p>
+
+        <div class="grid-2">
+          <div class="card" style="padding: 0.8rem;">
+            <div style="font-weight: 600; margin-bottom: 0.5rem; color: var(--accent-blue);">
+              <span class="lang-zh">1. Flight Session Stats (左上觸控：當前航次統計與架次清零)</span>
+              <span class="lang-en">1. Flight Session Stats (Top-Left Touch: Session & Reset)</span>
+            </div>
+            <img src="Pic/Flight%20session%20stats.png" alt="Flight Session Stats" style="width: 100%; border-radius: 6px; border: 1px solid var(--border-color); display: block; margin-bottom: 0.5rem;">
+            <div class="card-desc">
+              <span class="lang-zh">輕觸主螢幕左上方（圖片/架次/解鎖區），即可彈出即時航次統計，包含本日飛行架次 (TODAY)、歷史總架次 (LIFETIME TOTAL) 與直覺觸控清零按鈕。</span>
+              <span class="lang-en">Tap the top-left area to view current session stats, Today/Total flight counts, and instant touch reset buttons.</span>
+            </div>
+          </div>
+
+          <div class="card" style="padding: 0.8rem;">
+            <div style="font-weight: 600; margin-bottom: 0.5rem; color: var(--accent-green);">
+              <span class="lang-zh">2. Battery Health & Sag (左下觸控：電池健康與放電壓降診斷)</span>
+              <span class="lang-en">2. Battery Health & Sag (Bottom-Left Touch: Health & Sag)</span>
+            </div>
+            <img src="Pic/Battery%20Health.png" alt="Battery Health" style="width: 100%; border-radius: 6px; border: 1px solid var(--border-color); display: block; margin-bottom: 0.5rem;">
+            <div class="card-desc">
+              <span class="lang-zh">輕觸主螢幕左下方（電量條/電壓/mAh），即刻檢視當前電池剩餘容量 %、最大壓降 (Voltage Sag)、預測內阻 (Pack IR) 與動態放電曲線。</span>
+              <span class="lang-en">Tap the bottom-left area to inspect battery capacity %, max voltage sag under load, estimated Pack IR, and discharge trend.</span>
+            </div>
+          </div>
+
+          <div class="card" style="padding: 0.8rem;">
+            <div style="font-weight: 600; margin-bottom: 0.5rem; color: var(--accent-orange);">
+              <span class="lang-zh">3. Headspeed & Power Chart (右上觸控：主旋翼轉速、5軌動力曲線與空氣動力學)</span>
+              <span class="lang-en">3. Headspeed & Power Chart (Top-Right Touch: 5-Ch Curves & Aero)</span>
+            </div>
+            <img src="Pic/Headspeed.png" alt="Headspeed & Power Chart" style="width: 100%; border-radius: 6px; border: 1px solid var(--border-color); display: block; margin-bottom: 0.5rem;">
+            <div class="card-desc">
+              <span class="lang-zh">輕觸主螢幕右上方（RPM 轉速大字），瞬間開啟高解析 5 軌動態曲線（RPM/VOLT/AMPS/BEC/TEMP）、極值摘要（PEAK RPM/A/W/°C/MIN V）及旋翼尖端 G 力、線速度 (km/h) 與離心拉力 (kg)！</span>
+              <span class="lang-en">Tap the top-right RPM gauge to open high-res 5-channel curves (RPM/VOLT/AMPS/BEC/TEMP), peak summaries, and rotor tip aerodynamics (G-force, km/h, centrifugal pull).</span>
+            </div>
+          </div>
+        </div>
+
         <div class="alert alert-important" style="margin-top: 1.5rem;">
           <div class="alert-title">
             <span class="lang-zh">📱 支援遙控器與系統環境</span>
@@ -1470,15 +1515,53 @@
             </div>
             <div class="card-desc">
               <span class="lang-zh">
-                1. <strong>左上方區塊</strong> (圖片/次數/狀態)：點擊開啟 <code>FLIGHT SESSION STATS</code> 當前航次極值統計。<br>
-                2. <strong>左下方區塊</strong> (電量條/電壓/mAh)：點擊開啟 <code>BATTERY HEALTH</code> 電池健康與放電趨勢。<br>
-                3. <strong>右上方轉速</strong> (RPM 大數字)：點擊開啟 <code>POWER & ESC EXTREMES</code> 動力與電變極值分析。
+                1. <strong>左上方區塊</strong> (圖片/次數/狀態)：點擊開啟 <code>FLIGHT SESSION STATS</code> 當前航次極值統計與一鍵清零。<br>
+                2. <strong>左下方區塊</strong> (電量條/電壓/mAh)：點擊開啟 <code>BATTERY HEALTH</code> 電池健康、最大壓降與放電趨勢。<br>
+                3. <strong>右上方轉速</strong> (RPM 大數字)：點擊開啟 <code>HEADSPEED & POWER CHART</code> 5 軌動力曲線與空氣動力學分析。
               </span>
               <span class="lang-en">
-                1. <strong>Upper-Left</strong>: Opens Flight Session Stats.<br>
-                2. <strong>Lower-Left</strong>: Opens Battery Health & Discharge Status.<br>
-                3. <strong>Upper-Right</strong>: Opens Power & ESC Extremes.
+                1. <strong>Upper-Left</strong>: Opens Flight Session Stats and one-tap reset panel.<br>
+                2. <strong>Lower-Left</strong>: Opens Battery Health, Max Sag, and Discharge Status.<br>
+                3. <strong>Upper-Right</strong>: Opens Headspeed & Power Chart and Rotor Aerodynamics.
               </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-2" style="margin-top: 1rem;">
+          <div class="card" style="padding: 0.8rem;">
+            <div style="font-weight: 600; margin-bottom: 0.4rem; color: var(--accent-blue);">
+              <span class="lang-zh">📍 左上熱區：FLIGHT SESSION STATS</span>
+              <span class="lang-en">📍 Upper-Left: FLIGHT SESSION STATS</span>
+            </div>
+            <img src="Pic/Flight%20session%20stats.png" alt="Flight Session Stats" style="width: 100%; border-radius: 6px; border: 1px solid var(--border-color); display: block; margin-bottom: 0.4rem;">
+            <div class="card-desc">
+              <span class="lang-zh">即時統計本日/總計架次，支援 <code>本日清零</code> 與 <code>總計清零</code> 觸控操作。</span>
+              <span class="lang-en">Tracks Today/Total flight counts with direct touch reset buttons.</span>
+            </div>
+          </div>
+
+          <div class="card" style="padding: 0.8rem;">
+            <div style="font-weight: 600; margin-bottom: 0.4rem; color: var(--accent-green);">
+              <span class="lang-zh">📍 左下熱區：BATTERY HEALTH</span>
+              <span class="lang-en">📍 Lower-Left: BATTERY HEALTH</span>
+            </div>
+            <img src="Pic/Battery%20Health.png" alt="Battery Health" style="width: 100%; border-radius: 6px; border: 1px solid var(--border-color); display: block; margin-bottom: 0.4rem;">
+            <div class="card-desc">
+              <span class="lang-zh">展示剩餘電量 %、最大壓降 (Voltage Sag)、預測內阻 (Pack IR) 與放電曲線。</span>
+              <span class="lang-en">Displays remaining %, max voltage sag, estimated Pack IR, and discharge trend.</span>
+            </div>
+          </div>
+
+          <div class="card" style="padding: 0.8rem; grid-column: 1 / -1;">
+            <div style="font-weight: 600; margin-bottom: 0.4rem; color: var(--accent-orange);">
+              <span class="lang-zh">📍 右上熱區：HEADSPEED & POWER CHART</span>
+              <span class="lang-en">📍 Upper-Right: HEADSPEED & POWER CHART</span>
+            </div>
+            <img src="Pic/Headspeed.png" alt="Headspeed & Power Chart" style="width: 100%; max-height: 360px; object-fit: contain; background: #000; border-radius: 6px; border: 1px solid var(--border-color); display: block; margin-bottom: 0.4rem;">
+            <div class="card-desc">
+              <span class="lang-zh">5 軌動態折線圖（RPM/VOLT/AMPS/BEC/TEMP）+ PEAK 極值摘要 + 旋翼尖端 G 力、線速度 (km/h) 與離心拉力 (kg)。</span>
+              <span class="lang-en">5-channel curves (RPM/VOLT/AMPS/BEC/TEMP) + PEAK extremes + blade tip G-force, velocity (km/h) and centrifugal load (kg).</span>
             </div>
           </div>
         </div>
@@ -2437,6 +2520,77 @@ save</pre>
             • <strong>Belt/Shaft Tails & Nitro</strong>: Auto-hides `TAIL RPM` for mechanical tails or Nitro mode.
           </span>
         </div>
+
+        <div class="topic-sub-title">
+          <span class="lang-zh">👆 主螢幕三大全彩觸控診斷熱區實機圖解 (Main HUD 3 Touch Hotspots & Diagnostic Overlays)</span>
+          <span class="lang-en">👆 Main HUD 3 Touch Hotspots & Diagnostic Overlays</span>
+        </div>
+        <p class="lang-zh">RBCT 主儀表板將全螢幕劃分為三大直覺觸控感應熱區。飛手無需翻找選單或撥動實體開關，直接在彩螢幕上輕觸相應區塊，即可毫秒級叫出專屬即時診斷彈窗（點擊螢幕任意位置即可關閉返回）：</p>
+        <p class="lang-en">RBCT divides the main HUD into three intuitive touch hotspot zones. Simply tap any zone on your color touchscreen for instant diagnostic popups (tap anywhere to dismiss):</p>
+
+        <div class="grid-2">
+          <div class="card" style="padding: 1rem;">
+            <div class="card-title">
+              <span class="lang-zh">📍 1. 左上方觸控區：FLIGHT SESSION STATS<span class="card-sub">(航次統計 / 總計 / 獨立一鍵清零)</span></span>
+              <span class="lang-en">📍 1. Upper-Left Zone: FLIGHT SESSION STATS<span class="card-sub">(Session Stats & One-Tap Reset)</span></span>
+            </div>
+            <img src="Pic/Flight%20session%20stats.png" alt="Flight Session Stats" style="width: 100%; border-radius: 6px; border: 1px solid var(--border-color); display: block; margin-bottom: 0.8rem;">
+            <div class="card-desc">
+              <span class="lang-zh">
+                • <strong>觸控位置</strong>：主畫面左上角（模型圖片、Today/Total 架次、ARMED 解鎖狀態區）。<br>
+                • <strong>顯示內容</strong>：即時展示 <code>TODAY</code>（本日飛行次數）與 <code>LIFETIME TOTAL</code>（歷史總架次）。<br>
+                • <strong>觸控按鈕</strong>：提供 <code>RESET TODAY (本日清零)</code> 與 <code>RESET TOTAL (總計清零)</code> 兩個獨立按鈕，免撥開關一鍵歸零並即時存檔！
+              </span>
+              <span class="lang-en">
+                • <strong>Hotspot</strong>: Upper-left corner (Craft image, Today/Total flight counts, Arm state).<br>
+                • <strong>Metrics</strong>: Displays active <code>TODAY</code> flights and <code>LIFETIME TOTAL</code> flight counts.<br>
+                • <strong>Actions</strong>: Includes dedicated touch buttons <code>RESET TODAY</code> and <code>RESET TOTAL</code> for instant zeroing.
+              </span>
+            </div>
+          </div>
+
+          <div class="card" style="padding: 1rem;">
+            <div class="card-title">
+              <span class="lang-zh">📍 2. 左下方觸控區：BATTERY HEALTH & SAG<span class="card-sub">(電池健康度 / 最大壓降 / 預測內阻)</span></span>
+              <span class="lang-en">📍 2. Lower-Left Zone: BATTERY HEALTH & SAG<span class="card-sub">(Health / Sag Min V / Pack IR)</span></span>
+            </div>
+            <img src="Pic/Battery%20Health.png" alt="Battery Health" style="width: 100%; border-radius: 6px; border: 1px solid var(--border-color); display: block; margin-bottom: 0.8rem;">
+            <div class="card-desc">
+              <span class="lang-zh">
+                • <strong>觸控位置</strong>：主畫面左下角（動態電量橫條、總電壓 Vbat、消耗 mAh 區塊）。<br>
+                • <strong>顯示內容</strong>：<code>CAPACITY %</code> 剩餘電量、<code>Voltage Sag</code> 飛行最大瞬間壓降、<code>Pack IR (Est)</code> 預測電池包內阻。<br>
+                • <strong>放電趨勢圖</strong>：<code>DISCHARGE TREND</code> 動態繪製放電電壓曲線，即時評估電池老化與放電衰退程度。
+              </span>
+              <span class="lang-en">
+                • <strong>Hotspot</strong>: Lower-left area (Dynamic battery bar, Vbat, Consumed mAh).<br>
+                • <strong>Metrics</strong>: Remaining <code>CAPACITY %</code>, peak <code>Voltage Sag</code> under load, and estimated <code>Pack IR</code>.<br>
+                • <strong>Trend Graph</strong>: Dynamic <code>DISCHARGE TREND</code> curve assessing pack degradation and C-rate health.
+              </span>
+            </div>
+          </div>
+
+          <div class="card" style="padding: 1rem; grid-column: 1 / -1;">
+            <div class="card-title">
+              <span class="lang-zh">📍 3. 右上方觸控區：HEADSPEED & POWER CHART<span class="card-sub">(5 軌動力曲線 / 極值峰值 / 旋翼空氣動力學)</span></span>
+              <span class="lang-en">📍 3. Upper-Right Zone: HEADSPEED & POWER CHART<span class="card-sub">(5-Ch Curves / Peaks / Rotor Aero)</span></span>
+            </div>
+            <img src="Pic/Headspeed.png" alt="Headspeed & Power Chart" style="width: 100%; max-height: 380px; object-fit: contain; background: #000; border-radius: 6px; border: 1px solid var(--border-color); display: block; margin-bottom: 0.8rem;">
+            <div class="card-desc">
+              <span class="lang-zh">
+                • <strong>觸控位置</strong>：主畫面右上角（<code>RPM</code> 轉速特大數字與儀表區）。<br>
+                • <strong>5 軌高解析曲線</strong>：即時原繪 <span style="color: #4ade80; font-weight: bold;">RPM (綠)</span>、<span style="color: #fb923c; font-weight: bold;">VOLT (橘)</span>、<span style="color: #f87171; font-weight: bold;">AMPS (紅)</span>、<span style="color: #38bdf8; font-weight: bold;">BEC (藍)</span>、<span style="color: #facc15; font-weight: bold;">TEMP (黃)</span> 多軌同步折線圖。<br>
+                • <strong>PEAK 峰值極值摘要</strong>：<code>PEAK: 最高 RPM | 最高 A (功率 W) | 最高 °C   MIN: 最低 V | 最低 BEC V</code>。<br>
+                • <strong>ROTOR DYNAMICS 旋翼空氣動力學指標</strong>：依據翼展與轉速即時運算 <code>TIP: 翼尖 G 力 | SPEED: 翼尖時速 (km/h & Mach 馬赫數) | PULL: 離心拉力 (kg)</code>！
+              </span>
+              <span class="lang-en">
+                • <strong>Hotspot</strong>: Upper-right area (Oversized <code>RPM</code> digital display & gauge).<br>
+                • <strong>5-Channel Telemetry Graph</strong>: Real-time rendering of <span style="color: #4ade80; font-weight: bold;">RPM (Green)</span>, <span style="color: #fb923c; font-weight: bold;">VOLT (Orange)</span>, <span style="color: #f87171; font-weight: bold;">AMPS (Red)</span>, <span style="color: #38bdf8; font-weight: bold;">BEC (Blue)</span>, <span style="color: #facc15; font-weight: bold;">TEMP (Yellow)</span>.<br>
+                • <strong>PEAK Summary</strong>: <code>PEAK: Max RPM | Max Amps (Power Watts) | Max Temp °C   MIN: Min Vbat | Min BEC V</code>.<br>
+                • <strong>Rotor Dynamics Telemetry</strong>: Real-time calculation of blade tip <code>TIP: G-Force | SPEED: km/h & Mach | PULL: Centrifugal load (kg)</code>!
+              </span>
+            </div>
+          </div>
+        </div>
       </section>
 
       <!-- Topic 7: Power Modes (Electric / Nitro / Turbine Jet) -->
@@ -2723,6 +2877,39 @@ save</pre>
             </span>
           </div>
         </div>
+
+        <div class="topic-sub-title">
+          <span class="lang-zh">⚡ HUD 觸控即時 5 軌動力曲線與空氣動力學極值 (Instant HUD Touch Headspeed & Power Chart)</span>
+          <span class="lang-en">⚡ Instant HUD Touch Headspeed & Power Chart</span>
+        </div>
+        <p class="lang-zh">除了降落後撥動開關進入全頁黑盒子日誌外，飛手在主儀表板上<strong>直接輕觸右上角 RPM 轉速大數字</strong>，即可毫秒級彈出完整高解析度 5 軌即時動力曲線圖與旋翼空氣動力學指標：</p>
+        <p class="lang-en">In addition to flipping switches to access full-page blackbox logs, pilots can <strong>tap the upper-right RPM gauge on the main HUD</strong> to instantly open the 5-channel real-time curves and aerodynamic load analytics:</p>
+
+        <div class="card" style="padding: 1.2rem; margin-bottom: 1.5rem;">
+          <div class="card-title">
+            <span class="lang-zh">📈 HEADSPEED & POWER CHART 全功能解析</span>
+            <span class="lang-en">📈 HEADSPEED & POWER CHART Full Telemetry Breakdown</span>
+          </div>
+          <img src="Pic/Headspeed.png" alt="Headspeed & Power Chart" style="width: 100%; max-height: 380px; object-fit: contain; background: #000; border-radius: 8px; border: 1px solid var(--border-color); display: block; margin: 0.8rem 0;">
+          <div class="card-desc">
+            <span class="lang-zh">
+              • <strong style="color: #4ade80;">RPM (綠) 轉速曲線</strong>：檢驗定速器 (GOV) 補償是否即時，大螺距衝刺時轉速是否掉轉。<br>
+              • <strong style="color: #fb923c;">VOLT (橘) 電壓曲線</strong>：檢視瞬間大抽電時之動力電池總電壓壓降 (Voltage Sag)。<br>
+              • <strong style="color: #f87171;">AMPS (紅) 電流曲線</strong>：監控暴力 3D 特技動作瞬間之峰值放電安培數 (支援 300A+)。<br>
+              • <strong style="color: #38bdf8;">BEC (藍) 接收曲線</strong>：確認伺服器全速推動時 BEC 供電是否穩固 (>7.0V)。<br>
+              • <strong style="color: #facc15;">TEMP (黃) 溫度曲線</strong>：追蹤電變 ESC 工作溫度與溫升散熱狀態。<br>
+              • <strong>ROTOR DYNAMICS 旋翼動態指標</strong>：顯示當前主旋翼尖端 G 力 (TIP G)、時速 (SPEED km/h 與 Mach 馬赫數) 以及離心拉力負載 (PULL kg)。
+            </span>
+            <span class="lang-en">
+              • <strong style="color: #4ade80;">RPM (Green)</strong>: Validates Governor feedforward and headspeed stability under heavy pitch.<br>
+              • <strong style="color: #fb923c;">VOLT (Orange)</strong>: Tracks instantaneous battery sag during full collective punch-outs.<br>
+              • <strong style="color: #f87171;">AMPS (Red)</strong>: Monitors peak burst discharge current (supports 300A+).<br>
+              • <strong style="color: #38bdf8;">BEC (Blue)</strong>: Ensures servo power rail stability (>7.0V) during violent cyclic inputs.<br>
+              • <strong style="color: #facc15;">TEMP (Yellow)</strong>: Tracks ESC temperature ramp and thermal dissipation.<br>
+              • <strong>ROTOR DYNAMICS</strong>: Real-time blade tip G-force, tip velocity (km/h & Mach), and centrifugal load (kg).
+            </span>
+          </div>
+        </div>
       </section>
 
       <!-- Topic 9: Battery Fleet Manager -->
@@ -2777,6 +2964,35 @@ save</pre>
 
         <p class="lang-zh">將 <code>Logbook Sw</code> 指派開關下撥 (SC↓)，即可叫出總表。當前選定之電池整列以 **綠色高亮框** 強調；左下角電池代號同步顯示 <code>v1.0.8 | BAT 1</code>。</p>
         <p class="lang-en">Set <code>Logbook Sw</code> to DOWN (SC↓) to view the fleet table. Active battery row is highlighted in green with watermark <code>v1.0.8 | BAT 1</code>.</p>
+
+        <div class="topic-sub-title">
+          <span class="lang-zh">🔋 4. 主螢幕左下角即時觸控：單包電池健康度、最大壓降 (Sag) 與放電曲線 (Instant Single-Pack Health & Sag Analysis)</span>
+          <span class="lang-en">🔋 4. Instant Single-Pack Health & Sag Analysis</span>
+        </div>
+        <p class="lang-zh">除了查看 6 包電池機隊管理總表外，飛手在主螢幕上<strong>輕觸左下角電量條/電壓區塊</strong>，即可立即檢視當前使用電池包的專屬健康彈窗：</p>
+        <p class="lang-en">In addition to the 6-pack fleet matrix table, tapping the <strong>lower-left battery gauge on the main HUD</strong> immediately pops up the health and sag analysis for the active battery pack:</p>
+
+        <div class="card" style="padding: 1.2rem; margin-bottom: 1.5rem;">
+          <div class="card-title">
+            <span class="lang-zh">🔋 BATTERY HEALTH 單包電池即時診斷</span>
+            <span class="lang-en">🔋 BATTERY HEALTH Real-Time Single-Pack Diagnostics</span>
+          </div>
+          <img src="Pic/Battery%20Health.png" alt="Battery Health" style="width: 100%; max-height: 380px; object-fit: contain; background: #000; border-radius: 8px; border: 1px solid var(--border-color); display: block; margin: 0.8rem 0;">
+          <div class="card-desc">
+            <span class="lang-zh">
+              • <strong>CAPACITY % 剩餘電量</strong>：依據高精確單芯電壓動態計算之剩餘百分比。<br>
+              • <strong>Voltage Sag 最大壓降</strong>：記錄本趟飛行在最大抽電負載下的最低電壓與單芯極限壓降，一眼看出電池是否老化。<br>
+              • <strong>Pack IR (Est) 預測內阻</strong>：演算法自動估算之電池包內阻狀態，作為汰換老舊電池之客觀依據。<br>
+              • <strong>DISCHARGE TREND 放電趨勢曲線</strong>：繪製飛行過程中的電壓放電走勢，協助飛手精確掌握電池放電平台。
+            </span>
+            <span class="lang-en">
+              • <strong>CAPACITY %</strong>: Real-time remaining battery percentage based on precise cell voltage.<br>
+              • <strong>Voltage Sag</strong>: Records lowest sag voltage under heavy load to detect battery degradation.<br>
+              • <strong>Pack IR (Est)</strong>: Algorithmically estimated pack internal resistance for battery retirement decisions.<br>
+              • <strong>DISCHARGE TREND</strong>: Visualizes voltage discharge profile across the flight.
+            </span>
+          </div>
+        </div>
       </section>
 
       <!-- Topic 10: Voice Assistant & Safety Alerts -->
@@ -2955,6 +3171,37 @@ save</pre>
             </tr>
           </tbody>
         </table>
+
+        <div class="topic-sub-title">
+          <span class="lang-zh">📱 觸控飛行統計面板一鍵清零實機圖解 (Touch Stats Reset Panel Showcase)</span>
+          <span class="lang-en">📱 Touch Stats Reset Panel Showcase</span>
+        </div>
+        <p class="lang-zh">輕觸主畫面左上角模型圖片與飛行狀態區域，即可呼叫 <code>FLIGHT SESSION STATS</code> 彈窗，提供飛手最快速便利的觸控清零方案：</p>
+        <p class="lang-en">Tap the upper-left craft image area on the HUD to open the <code>FLIGHT SESSION STATS</code> popup for instant one-touch counter zeroing:</p>
+
+        <div class="card" style="padding: 1.2rem; margin-bottom: 1.5rem;">
+          <div class="card-title">
+            <span class="lang-zh">📊 FLIGHT SESSION STATS 航次統計與獨立清零</span>
+            <span class="lang-en">📊 FLIGHT SESSION STATS & Independent Counter Reset</span>
+          </div>
+          <img src="Pic/Flight%20session%20stats.png" alt="Flight Session Stats" style="width: 100%; max-height: 380px; object-fit: contain; background: #000; border-radius: 8px; border: 1px solid var(--border-color); display: block; margin: 0.8rem 0;">
+          <div class="card-desc">
+            <span class="lang-zh">
+              • <strong>TODAY (本日架次)</strong>：顯示當日有效起降次數，午夜自動歸零。<br>
+              • <strong>LIFETIME TOTAL (歷史總架次)</strong>：累積記錄此機型所有歷史飛行總次數。<br>
+              • <strong>RESET TODAY (本日清零)</strong>：獨立將今日架次歸零，<strong>完全不影響</strong> 歷史總計架次。<br>
+              • <strong>RESET TOTAL (總計清零)</strong>：將終身歷史架次歸零並寫入 SD 卡（適用於重組大修或更換新機身）。<br>
+              • <strong>Tap anywhere to close</strong>：點按螢幕任意非按鈕區域即可無縫關閉返回主畫面。
+            </span>
+            <span class="lang-en">
+              • <strong>TODAY</strong>: Active day's valid flight count, auto-resets at midnight.<br>
+              • <strong>LIFETIME TOTAL</strong>: Cumulative lifetime flight count for this craft.<br>
+              • <strong>RESET TODAY</strong>: Independently resets Today count to 0 without affecting lifetime total.<br>
+              • <strong>RESET TOTAL</strong>: Resets lifetime total count (useful after airframe overhaul).<br>
+              • <strong>Tap anywhere to close</strong>: Tap anywhere outside buttons to seamlessly dismiss.
+            </span>
+          </div>
+        </div>
       </section>
 
       <!-- Topic 12: FMEA & Protection Rules -->
