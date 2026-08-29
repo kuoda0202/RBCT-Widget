@@ -76,7 +76,8 @@
 * **介面優化**：**模型圖片全解析度自適應** - 原生支援 PNG/JPG/BMP 全格式，大圖自動等比超採樣壓縮並觸發抗鋸齒，小圖自動等比放大填滿，支援 2D 水平與垂直置中。
 * **介面優化**：**新增全螢幕觸控引擎** - 劃分左上（飛行數據）、左下（電池健康度）與右上（轉速與 ESC 極值）三大獨立觸控熱區，極速秒開子頁。
 * **介面優化**：**模型上電提示橫幅與音效回饋** - 插上電池彈出 10 秒平滑倒數條（顯示 `電池已連線: 將記錄於 BAT 1`）與提示音，解鎖後(ARM) 瞬間自動隱藏。
-* **介面優化**：**圖示與曲線計算顯示優化。
+* **介面優化**：**圖示與曲線計算顯示優化**。
+* **介面優化**：**日誌與機隊總表隔行斑馬紋色塊美化** - Logbook (Tab 1) 飛行日誌表與 Battery Fleet (Tab 2) 機隊總表導入交替色塊背景 (`C.panel`) 與當前選定電池高亮框 (`C.panel2` + `C.blue`)，大幅提升橫向數據檢視舒適度。
 * **邏輯修復**：**機型預設值校正** - 新增模型預設動力模式一律對齊為 `電機 (Electric)` 模式。
 
 ### v1.0.7 / v1.0.701
@@ -186,6 +187,7 @@ To customize the helicopter picture on the dashboard:
 * **UI Optimization**: **Full-Screen Touch Engine** - Divides into top-left (Flight Data), bottom-left (Battery Health), and top-right (RPM & ESC Extremes) three independent touch zones for instant subpage access.
 * **UI Optimization**: **Power-On Battery Prompt Banner & Audio Feedback** - Displays a 10-second smooth countdown bar upon battery plug-in (showing `Battery Connected: Logging to BAT 1`) with prompt tone, automatically hiding immediately after arming (ARM).
 * **UI Optimization**: **Icon & Chart Calculation Display Optimization**.
+* **UI Optimization**: **Zebra Row Striping for Tables** - Introduced alternating row background color blocks (`C.panel`) and active pack row highlight (`C.panel2` + `C.blue` border) across Logbook (Tab 1) and Battery Fleet Manager (Tab 2) tables for optimal reading legibility.
 * **Logic Fix**: **Default Heli Mode Calibration** - Defaults new model power mode to `Electric` mode.
 
 ### v1.0.7 / v1.0.701

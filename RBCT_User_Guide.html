@@ -2851,6 +2851,9 @@ save</pre>
                   <tr><td>9</td><td><strong>已消耗</strong></td><td><code>USED</code></td><td>單趟累計消耗電量 (毫安時 mAh)</td></tr>
                 </tbody>
               </table>
+              <div style="font-size: 0.85rem; color: var(--accent-blue); margin-top: 0.5rem;">
+                💡 <strong>【隔行斑馬紋色塊】</strong>：日誌列表支援奇偶行交替色塊背景（<code>C.panel</code>），9 欄跨欄水平比對數據更加清晰！
+              </div>
             </span>
             <span class="lang-en">
               RBCT Flight Logbook automatically records 9 critical telemetry metrics upon takeoff and landing:
@@ -2962,8 +2965,8 @@ save</pre>
           <span class="lang-en">📊 3. Battery Fleet Manager Table & Watermark</span>
         </div>
 
-        <p class="lang-zh">將 <code>Logbook Sw</code> 指派開關下撥 (SC↓)，即可叫出總表。當前選定之電池整列以 **綠色高亮框** 強調；左下角電池代號同步顯示 <code>v1.0.8 | BAT 1</code>。</p>
-        <p class="lang-en">Set <code>Logbook Sw</code> to DOWN (SC↓) to view the fleet table. Active battery row is highlighted in green with watermark <code>v1.0.8 | BAT 1</code>.</p>
+        <p class="lang-zh">將 <code>Logbook Sw</code> 指派開關下撥 (SC↓)，即可叫出總表。表格採用<strong>隔行斑馬紋色塊背景 (Zebra Striping)</strong>，當前選定之電池整列以 **面板高亮色塊 (<code>C.panel2</code>) + 藍色框線 (<code>C.blue</code>) + 綠色字體** 強調；左下角電池代號同步顯示 <code>v1.0.8 | BAT 1</code>。</p>
+        <p class="lang-en">Set <code>Logbook Sw</code> to DOWN (SC↓) to view the fleet table. The table features <strong>alternating zebra striping (<code>C.panel</code>)</strong>, with the active battery row highlighted with <strong>panel color (<code>C.panel2</code>), blue border box (<code>C.blue</code>), and green text</strong> with watermark <code>v1.0.8 | BAT 1</code>.</p>
 
         <div class="topic-sub-title">
           <span class="lang-zh">🔋 4. 主螢幕左下角即時觸控：單包電池健康度、最大壓降 (Sag) 與放電曲線 (Instant Single-Pack Health & Sag Analysis)</span>
@@ -3521,6 +3524,16 @@ save</pre>
             <div class="card-desc">
               <span class="lang-zh"><strong>【邏輯修復】</strong>新增模型預設動力模式一律對齊為 <strong>`電機 (Electric)`</strong> 模式，通電立即顯示標準動力電壓、電變溫度與 S 數。</span>
               <span class="lang-en"><strong>[Logic Fix]</strong> New models and widgets default to <strong>`Electric`</strong> mode out of the box, immediately showing standard voltage, ESC temp, and S-count.</span>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">
+              <span class="lang-zh">🎨 日誌與機隊總表隔行斑馬紋色塊美化<span class="card-sub">(Zebra Striping & Active Border)</span></span>
+              <span class="lang-en">🎨 Zebra Row Striping for Tables<span class="card-sub">(Logbook & Battery Fleet)</span></span>
+            </div>
+            <div class="card-desc">
+              <span class="lang-zh"><strong>【介面優化】</strong>Logbook 飛行日誌表（Tab 1）與機隊電池總表（Tab 2）全面導入奇偶行交替色塊背景（<code>C.panel</code>），當前選定電池包特別加上高亮填色（<code>C.panel2</code>）與立體邊框框線（<code>C.blue</code>），橫向跨欄比對數據更加清晰舒適。</span>
+              <span class="lang-en"><strong>[UI Optimization]</strong> Introduced alternating row color blocks (<code>C.panel</code>) and active pack row highlight (<code>C.panel2</code> + <code>C.blue</code> border) across Logbook (Tab 1) and Battery Fleet Manager (Tab 2) tables for optimal reading legibility.</span>
             </div>
           </div>
           <div class="card">
