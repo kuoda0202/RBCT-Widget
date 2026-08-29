@@ -2,25 +2,28 @@
 
 **Author / 作者**: 雷恩 / Ryan Kuo
 ### Standard UI (預設標準介面)
-![Standard UI](Pic/Standard%20UI.jpg?v=2)
+![Standard UI](Pic/Standard%20UI.jpg?v=1.0.8)
 
 ### Clean UI (半透背景模式)
-![Clean UI](Pic/Clean%20UI.jpg?v=2)
+![Clean UI](Pic/Clean%20UI.jpg?v=1.0.8)
 
 ### Transparent UI (TRN 全透無框模式)
-![Transparent UI](Pic/Transparent%20UI.jpg?v=2)
+![Transparent UI](Pic/Transparent%20UI.jpg?v=1.0.8)
 
 ### Nitro UI (燃油引擎專屬模式)
-![Nitro UI](Pic/Nitro%20UI.jpg?v=2)
+![Nitro UI](Pic/Nitro%20UI.jpg?v=1.0.8)
+
+### Turbine UI (渦輪噴射專屬模式)
+![Turbine UI](Pic/Turbine%20UI.jpg?v=1.0.8)
 
 ### Battery Fleet Manager UI (機隊電池管理總表)
-![Battery Fleet Manager UI](Pic/Battery%20UI.jpg?v=2)
+![Battery Fleet Manager UI](Pic/Battery%20UI.jpg?v=1.0.8)
 
 ### Logbook & Chart UI (飛行日誌與曲線圖表)
-![Logbook UI](Pic/Logbook%20UI.jpg?v=2)
+![Logbook UI](Pic/Logbook%20UI.jpg?v=1.0.8)
 
 ### Widget Settings Menu (小工具設定選單)
-![Menu UI](Pic/Menu%20UI.jpg?v=2)
+![Menu UI](Pic/Menu%20UI.jpg?v=1.0.8)
 
 (English below)
 
