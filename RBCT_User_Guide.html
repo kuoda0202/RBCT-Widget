@@ -31,13 +31,29 @@
     }
 
     body {
-      font-family: 'Noto Sans TC', 'Outfit', sans-serif;
+      font-family: 'Noto Sans TC', 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft JhengHei", "微軟正黑體", "PingFang TC", "Helvetica Neue", Arial, "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif;
       background-color: var(--bg-dark);
       color: var(--text-main);
       display: flex;
       flex-direction: column;
       min-height: 100vh;
       line-height: 1.7;
+    }
+
+    /* Custom Smooth Scrollbar to eliminate broken default scroll handles */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--bg-dark);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1e293b;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--accent-blue);
     }
 
     /* Language Switch Visibility */
@@ -108,25 +124,38 @@
       gap: 1rem;
     }
 
-    .lang-btn {
-      background: rgba(56, 189, 248, 0.1);
-      border: 1px solid var(--accent-blue);
-      color: var(--accent-blue);
-      padding: 0.55rem 1.2rem;
+    .lang-selector-group {
+      display: inline-flex;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
       border-radius: 8px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.2s;
-      font-size: 0.9rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
+      padding: 3px;
+      gap: 3px;
     }
 
-    .lang-btn:hover {
+    .lang-choice-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 0.35rem 0.8rem;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+
+    .lang-choice-btn:hover {
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .lang-choice-btn.active {
       background: var(--accent-blue);
       color: #0b0f19;
-      box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+      font-weight: 700;
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
     }
 
     .search-box {
@@ -588,9 +617,11 @@
     </div>
     
     <div class="header-actions">
-      <button class="lang-btn" onclick="toggleLanguage()">
-        🌐 <span class="lang-zh">Switch to English</span><span class="lang-en">切換為 繁體中文</span>
-      </button>
+      <div class="lang-selector-group">
+        <button class="lang-choice-btn active" id="btnLangTW" onclick="setLanguage('tw')">繁體</button>
+        <button class="lang-choice-btn" id="btnLangCN" onclick="setLanguage('cn')">简体</button>
+        <button class="lang-choice-btn" id="btnLangEN" onclick="setLanguage('en')">EN</button>
+      </div>
       <div class="search-box">
         <span class="search-icon">🔍</span>
         <input type="text" id="searchInput" placeholder="搜尋主題與問答 / Search Help..." onkeyup="filterContent()">
@@ -633,11 +664,11 @@
         <span class="lang-en">🔥 7. Electric / Nitro / Turbine</span>
       </a>
       <a class="nav-item" onclick="scrollToSection('topic-logbook')">
-        <span class="lang-zh">📈 8. 飛行日誌與 5 線譜圖表</span>
-        <span class="lang-en">📈 8. Logbook & 5-Line Chart</span>
+        <span class="lang-zh">📈 8. 飛行日誌與 曲線圖表</span>
+        <span class="lang-en">📈 8. Logbook & Telemetry Chart</span>
       </a>
       <a class="nav-item" onclick="scrollToSection('topic-battery')">
-        <span class="lang-zh">🔋 9. 電池 Fleet 機隊管理</span>
+        <span class="lang-zh">🔋 9. 機隊電池管理</span>
         <span class="lang-en">🔋 9. Battery Fleet Manager</span>
       </a>
       <a class="nav-item" onclick="scrollToSection('topic-voice')">
@@ -686,8 +717,8 @@
             <span class="lang-en">🚀 How to install & setup CLI?</span>
           </button>
           <button class="quick-btn" onclick="scrollToSection('topic-options')">
-            <span class="lang-zh">⚙️ 21 項選單設定與全透明/光圈怎麼調？</span>
-            <span class="lang-en">⚙️ How to configure 21 options & LED/TRN?</span>
+            <span class="lang-zh">⚙️ 22 項選單設定與全透明/光圈怎麼調？</span>
+            <span class="lang-en">⚙️ How to configure 22 options & LED/TRN?</span>
           </button>
           <button class="quick-btn" onclick="scrollToSection('topic-image')">
             <span class="lang-zh">🖼️ 如何設定專屬直昇機圖片與自動辨識？</span>
@@ -698,8 +729,8 @@
             <span class="lang-en">🔥 How to enable Nitro/Turbine Mode?</span>
           </button>
           <button class="quick-btn" onclick="scrollToSection('topic-logbook')">
-            <span class="lang-zh">🛠️ 如何用 5 線譜圖表『調機與排錯』？</span>
-            <span class="lang-en">🛠️ How to use 5-line chart for flight tuning?</span>
+            <span class="lang-zh">🛠️ 如何用 曲線圖表『調機與排錯』？</span>
+            <span class="lang-en">🛠️ How to use telemetry chart for flight tuning?</span>
           </button>
           <button class="quick-btn" onclick="scrollToSection('topic-battery')">
             <span class="lang-zh">🔋 機隊電池 (6 包電池) 如何自動管理？</span>
@@ -735,11 +766,11 @@
           </div>
           <div class="card">
             <div class="card-title">
-              <span class="lang-zh">📈 5 線譜黑盒子極速日誌</span>
-              <span class="lang-en">📈 5-Line Zero-Latency Chart Logbook</span>
+              <span class="lang-zh">📈 曲線黑盒子極速日誌</span>
+              <span class="lang-en">📈 Zero-Latency Telemetry Chart Logbook</span>
             </div>
             <div class="card-desc">
-              <span class="lang-zh">降落後撥動開關，彩幕原繪 5 線譜折線圖（RPM、電壓、電流、BEC、溫度），飛行中 0 次 SD 讀寫、零延遲極速調機排錯！</span>
+              <span class="lang-zh">降落後撥動開關，彩幕原繪 曲線折線圖（RPM、電壓、電流、BEC、溫度），飛行中 0 次 SD 讀寫、零延遲極速調機排錯！</span>
               <span class="lang-en">Instant post-flight 5-channel line chart rendering on transmitter screen with zero SD latency during mid-air flight.</span>
             </div>
           </div>
@@ -766,8 +797,8 @@
         </div>
 
         <div class="topic-sub-title" style="margin-top: 2rem;">
-          <span class="lang-zh">📸 七大實戰介面圖鑑 (Visual UI Showcase)</span>
-          <span class="lang-en">📸 Visual UI Showcase (7 Layouts)</span>
+          <span class="lang-zh">📸 九大實戰介面圖鑑 (Visual UI Showcase)</span>
+          <span class="lang-en">📸 Visual UI Showcase (9 Layouts)</span>
         </div>
 
         <div class="grid-2">
@@ -776,7 +807,7 @@
               <span class="lang-zh">1. Standard UI (預設標準介面)</span>
               <span class="lang-en">1. Standard UI (Default Mode)</span>
             </div>
-            <img src="Pic/Standard%20UI.jpg" alt="Standard UI" style="width: 100%; border-radius: 6px; border: 1px solid var(--border-color); display: block; margin-bottom: 0.5rem;">
+            <img src="Pic/Standard%20UI_tw.jpg" data-src-tw="Pic/Standard%20UI_tw.jpg" data-src-cn="Pic/Standard%20UI_cn.jpg" data-src-en="Pic/Standard%20UI.jpg" alt="Standard UI" class="lang-dynamic-img" style="width: 100%; border-radius: 6px; border: 1px solid var(--border-color); display: block; margin-bottom: 0.5rem;">
             <div class="card-desc">
               <span class="lang-zh">經典深色航太 HUD 介面，支援即時 Vbat、Amps (300A+)、mAh、ESC 溫度、單芯電壓與動態彩色電量條。</span>
               <span class="lang-en">Classic dark HUD layout with real-time Vbat, Amps, mAh, ESC temp, and dynamic battery bar.</span>
@@ -788,7 +819,7 @@
               <span class="lang-zh">2. Clean UI (半透背景模式)</span>
               <span class="lang-en">2. Clean UI (Translucent BG)</span>
             </div>
-            <img src="Pic/Clean%20UI.jpg" alt="Clean UI" style="width: 100%; border-radius: 6px; border: 1px solid var(--border-color); display: block; margin-bottom: 0.5rem;">
+            <img src="Pic/Clean%20UI_tw.jpg" data-src-tw="Pic/Clean%20UI_tw.jpg" data-src-cn="Pic/Clean%20UI_cn.jpg" data-src-en="Pic/Clean%20UI.jpg" alt="Clean UI" class="lang-dynamic-img" style="width: 100%; border-radius: 6px; border: 1px solid var(--border-color); display: block; margin-bottom: 0.5rem;">
             <div class="card-desc">
               <span class="lang-zh">開啟 <code>Transp BG</code>，隱藏主背景底色露出自訂桌布，但保留各資訊儀表的半透明磨砂玻璃框。</span>
               <span class="lang-en">Translucent background mode revealing radio wallpaper while keeping sleek info cards.</span>
@@ -800,7 +831,7 @@
               <span class="lang-zh">3. Transparent UI (TRN 全透無框模式)</span>
               <span class="lang-en">3. Transparent UI (TRN Frameless)</span>
             </div>
-            <img src="Pic/Transparent%20UI.jpg" alt="Transparent UI" style="width: 100%; border-radius: 6px; border: 1px solid var(--border-color); display: block; margin-bottom: 0.5rem;">
+            <img src="Pic/Transparent%20UI_tw.jpg" data-src-tw="Pic/Transparent%20UI_tw.jpg" data-src-cn="Pic/Transparent%20UI_cn.jpg" data-src-en="Pic/Transparent%20UI.jpg" alt="Transparent UI" class="lang-dynamic-img" style="width: 100%; border-radius: 6px; border: 1px solid var(--border-color); display: block; margin-bottom: 0.5rem;">
             <div class="card-desc">
               <span class="lang-zh">選擇 <code>TRN</code> 主題，隱藏所有底框與線條，搭配全域文字黑陰影強化，遙控器桌布成為絕對主角！</span>
               <span class="lang-en">Pure frameless design with text drop-shadows, making your wallpaper the centerpiece.</span>
@@ -812,7 +843,7 @@
               <span class="lang-zh">4. Nitro UI (燃油引擎專屬模式)</span>
               <span class="lang-en">4. Nitro UI (Nitro Native Layout)</span>
             </div>
-            <img src="Pic/Nitro%20UI.jpg" alt="Nitro UI" style="width: 100%; border-radius: 6px; border: 1px solid var(--border-color); display: block; margin-bottom: 0.5rem;">
+            <img src="Pic/Nitro%20UI_tw.jpg" data-src-tw="Pic/Nitro%20UI_tw.jpg" data-src-cn="Pic/Nitro%20UI_cn.jpg" data-src-en="Pic/Nitro%20UI.jpg" alt="Nitro UI" class="lang-dynamic-img" style="width: 100%; border-radius: 6px; border: 1px solid var(--border-color); display: block; margin-bottom: 0.5rem;">
             <div class="card-desc">
               <span class="lang-zh">自動拉伸為 XXL 雙欄特大黃金版面：<code>ENGINE TEMP</code> (>120°C 警示) 與 <code>RX PACK</code> (<6.6V 警示)。</span>
               <span class="lang-en">Oversized dual gauge layout for Engine Temp (>120°C alert) and RX Pack voltage (<6.6V alert).</span>
@@ -820,11 +851,23 @@
           </div>
 
           <div class="card" style="padding: 0.8rem;">
-            <div style="font-weight: 600; margin-bottom: 0.5rem; color: var(--accent-blue);">
-              <span class="lang-zh">5. Battery Fleet UI (機隊電池管理總表)</span>
-              <span class="lang-en">5. Battery Fleet Manager UI</span>
+            <div style="font-weight: 600; margin-bottom: 0.5rem; color: var(--accent-orange);">
+              <span class="lang-zh">5. Turbine UI (噴射渦輪專屬模式)</span>
+              <span class="lang-en">5. Turbine UI (Jet Turbine Mode)</span>
             </div>
-            <img src="Pic/Battery%20UI.jpg" alt="Battery Fleet Manager UI" style="width: 100%; border-radius: 6px; border: 1px solid var(--border-color); display: block; margin-bottom: 0.5rem;">
+            <img src="Pic/Turbine%20UI_tw.jpg" data-src-tw="Pic/Turbine%20UI_tw.jpg" data-src-cn="Pic/Turbine%20UI_cn.jpg" data-src-en="Pic/Turbine%20UI.jpg" alt="Turbine UI" class="lang-dynamic-img" style="width: 100%; border-radius: 6px; border: 1px solid var(--border-color); display: block; margin-bottom: 0.5rem;">
+            <div class="card-desc">
+              <span class="lang-zh">專為噴射渦輪設計之 EICAS 玻璃座艙儀表：即時監控 ECU 狀態、排氣溫度 (EGT)、核心轉速 (RPM)、油量 (FUEL) 與油泵電壓 (PUMP)。</span>
+              <span class="lang-en">EICAS glass cockpit dashboard for Jet Turbines: real-time monitoring of ECU Status, EGT, Core RPM, Fuel %, and Pump Voltage.</span>
+            </div>
+          </div>
+
+          <div class="card" style="padding: 0.8rem;">
+            <div style="font-weight: 600; margin-bottom: 0.5rem; color: var(--accent-blue);">
+              <span class="lang-zh">6. Battery Fleet UI (機隊電池管理總表)</span>
+              <span class="lang-en">6. Battery Fleet Manager UI</span>
+            </div>
+            <img src="Pic/Battery%20UI_tw.jpg" data-src-tw="Pic/Battery%20UI_tw.jpg" data-src-cn="Pic/Battery%20UI_cn.jpg" data-src-en="Pic/Battery%20UI.jpg" alt="Battery Fleet Manager UI" class="lang-dynamic-img" style="width: 100%; border-radius: 6px; border: 1px solid var(--border-color); display: block; margin-bottom: 0.5rem;">
             <div class="card-desc">
               <span class="lang-zh">SC↓ 開啟機隊總表，獨立追蹤 BAT 1 ~ BAT 6 的起降次數、最低電壓、最高溫度與平均航程。</span>
               <span class="lang-en">Fleet matrix independently tracking cycles, min voltage, max temp, and avg duration for BAT 1 ~ 6.</span>
@@ -833,25 +876,37 @@
 
           <div class="card" style="padding: 0.8rem;">
             <div style="font-weight: 600; margin-bottom: 0.5rem; color: var(--accent-green);">
-              <span class="lang-zh">6. Logbook & Chart UI (飛行日誌與五線譜圖表)</span>
-              <span class="lang-en">6. Logbook & 5-Line Chart UI</span>
+              <span class="lang-zh">7. Logbook & Chart UI (飛行日誌與曲線圖表)</span>
+              <span class="lang-en">7. Logbook & Telemetry Chart UI</span>
             </div>
-            <img src="Pic/Logbook%20UI.jpg" alt="Logbook UI" style="width: 100%; border-radius: 6px; border: 1px solid var(--border-color); display: block; margin-bottom: 0.5rem;">
+            <img src="Pic/Logbook%20UI_tw.jpg" data-src-tw="Pic/Logbook%20UI_tw.jpg" data-src-cn="Pic/Logbook%20UI_cn.jpg" data-src-en="Pic/Logbook%20UI.jpg" alt="Logbook UI" class="lang-dynamic-img" style="width: 100%; border-radius: 6px; border: 1px solid var(--border-color); display: block; margin-bottom: 0.5rem;">
             <div class="card-desc">
-              <span class="lang-zh">最近 10 趟極值摘要與雙層物理隔離 5 線譜動態折線圖，毫秒級時間軸對齊，零 SD 延遲極速調機！</span>
+              <span class="lang-zh">最近 10 趟極值摘要與雙層物理隔離 曲線動態折線圖，毫秒級時間軸對齊，零 SD 延遲極速調機！</span>
               <span class="lang-en">10-flight summary table and 5-channel line chart for real-time collective and PID tuning.</span>
             </div>
           </div>
 
           <div class="card" style="padding: 0.8rem;">
             <div style="font-weight: 600; margin-bottom: 0.5rem; color: var(--text-main);">
-              <span class="lang-zh">7. Widget Settings Menu (小工具 21 項雙語設定選單)</span>
-              <span class="lang-en">7. Widget Settings Menu (21 Options)</span>
+              <span class="lang-zh">8. Widget Settings Menu (小工具三語系設定選單)</span>
+              <span class="lang-en">8. Widget Settings Menu (22 Options)</span>
             </div>
             <img src="Pic/Menu%20UI.jpg" alt="Menu UI" style="width: 100%; border-radius: 6px; border: 1px solid var(--border-color); display: block; margin-bottom: 0.5rem;">
             <div class="card-desc">
-              <span class="lang-zh">完整 21 項設定選單，支援繁體中文/英文自動偵測、100% 點陣字庫相容、安全門檻自訂與光圈控制。</span>
-              <span class="lang-en">21 customizable options with bilingual support, 100% font compatibility, and custom alarm thresholds.</span>
+              <span class="lang-zh">完整 22 項設定選單，支援繁體中文/簡體中文/英文自動適配、100% 點陣字庫相容、安全門檻自訂與光圈控制。</span>
+              <span class="lang-en">22 customizable options with multilingual support, 100% font compatibility, and custom alarm thresholds.</span>
+            </div>
+          </div>
+
+          <div class="card" style="padding: 0.8rem;">
+            <div style="font-weight: 600; margin-bottom: 0.5rem; color: var(--accent-purple);">
+              <span class="lang-zh">9. Multi-Language UI (繁中 / 簡中 / 英文三語即時切換)</span>
+              <span class="lang-en">9. Multi-Language UI (Trad / Simp / English HUD)</span>
+            </div>
+            <img src="Pic/Standard%20UI_tw.jpg" data-src-tw="Pic/Standard%20UI_tw.jpg" data-src-cn="Pic/Standard%20UI_cn.jpg" data-src-en="Pic/Standard%20UI.jpg" alt="Multi-Language UI" class="lang-dynamic-img" style="width: 100%; border-radius: 6px; border: 1px solid var(--border-color); display: block; margin-bottom: 0.5rem;">
+            <div class="card-desc">
+              <span class="lang-zh">主儀表板、三大觸控診斷彈窗、黑盒子日誌及電池管理總表全面支援三語對映，字庫安全引擎保證 100% 零缺字！</span>
+              <span class="lang-en">Full multilingual support across main HUD, popups, and logbook with 100% font-safe compatibility!</span>
             </div>
           </div>
         </div>
@@ -887,10 +942,10 @@
             <span class="lang-en">🌟 Quick Index across 8 RBCT Subsystems</span>
           </div>
           <span class="lang-zh">
-            RBCT 整合了現代航太玻璃座艙、雙層五線譜動態圖表、飛控 S 數通電鎖定、6 包電池機隊管理與全自動機型同步。以下為八大核心子系統的完整功能與技術解析：
+            RBCT 整合了現代航太玻璃座艙、雙層動態曲線圖表、飛控 S 數通電鎖定、6 包機隊電池管理與全自動機型同步。以下為八大核心子系統的完整功能與技術解析：
           </span>
           <span class="lang-en">
-            RBCT integrates aerospace glass cockpit HUD, dual-layer 5-line dynamic charts, S-Lock memory engine, 6-pack battery fleet management, and dynamic craft synchronization. Below is the detailed breakdown across all 8 subsystems:
+            RBCT integrates aerospace glass cockpit HUD, dual-layer dynamic telemetry charts, S-Lock memory engine, 6-pack battery fleet management, and dynamic craft synchronization. Below is the detailed breakdown across all 8 subsystems:
           </span>
         </div>
 
@@ -1095,13 +1150,13 @@
 
           <div class="card">
             <div class="card-title">
-              <span class="lang-zh">🔋 6 組電池機隊管理<span class="card-sub">(每包電池獨立履歷與日誌)</span></span>
+              <span class="lang-zh">🔋 6 組機隊電池管理<span class="card-sub">(每包電池獨立履歷與日誌)</span></span>
               <span class="lang-en">🔋 6-Pack Battery Fleet<span class="card-sub">(Dedicated Profiles for BAT 1 ~ 6)</span></span>
             </div>
             <div class="card-desc">
               <span class="lang-zh">
                 • <strong>獨立循環與極值紀錄</strong>：針對 BAT 1 ~ BAT 6 獨立追蹤起降次數 (CYCLES)、歷史最低電壓 (MIN VOLT)、最高溫度 (MAX TMP)、平均飛行時間 (AVG DUR)。<br>
-                • <strong>獨立日誌與圖表檔案</strong>：每包電池在 SD 卡維持專屬的 10 趟報表 (<code>logbook_&lt;機型&gt;_BAT1~6.txt</code>) 與 5 線譜圖表 (<code>chart_&lt;機型&gt;_BAT1~6.txt</code>)。
+                • <strong>獨立日誌與圖表檔案</strong>：每包電池在 SD 卡維持專屬的 10 趟報表 (<code>logbook_&lt;機型&gt;_BAT1~6.txt</code>) 與 曲線圖表 (<code>chart_&lt;機型&gt;_BAT1~6.txt</code>)。
               </span>
               <span class="lang-en">
                 • <strong>Independent Metrics</strong>: Tracks CYCLES, MIN VOLT, MAX TMP, and AVG DUR for BAT 1 ~ BAT 6.<br>
@@ -1117,12 +1172,12 @@
             </div>
             <div class="card-desc">
               <span class="lang-zh">
-                • <strong>全自動掃描</strong>：自動感測實體與邏輯開關 <code>6P1..6P6</code>、<code>SW1..SW6</code>、<code>L1..L6</code>，按鍵瞬間切換當前電池檔位。<br>
-                • <strong>選單指派開關</strong>：亦可於 <code>Bat Track</code> 選單指派專屬通道或開關進行檔位切換。
+                • <strong>全自動感測 (預設)</strong>：選單維持 <code>---</code> 時，開箱即自動偵測 6POS 實體按鍵（<code>6P1..6P6</code>、<code>6POS</code>），按鍵瞬間切換當前電池檔位。<br>
+                • <strong>選單自訂指派</strong>：亦可於 <code>Bat Track</code> 選單手動指定開關、通道或旋鈕進行檔位切換。
               </span>
               <span class="lang-en">
-                • <strong>Auto-Scan</strong>: Automatically senses <code>6P1..6P6</code>, <code>SW1..SW6</code>, <code>L1..L6</code> for instant battery switching.<br>
-                • <strong>Custom Assignment</strong>: Assign specific channel or switch via <code>Bat Track</code> option.
+                • <strong>Full Auto-Sense (Default)</strong>: When set to <code>---</code>, auto-detects physical 6POS buttons (<code>6P1..6P6</code>, <code>6POS</code>) for instant battery switching out of the box.<br>
+                • <strong>Custom Assignment</strong>: Optionally assign specific channel, switch, or pot via <code>Bat Track</code> option.
               </span>
             </div>
           </div>
@@ -1164,17 +1219,17 @@
           </div>
         </div>
 
-        <!-- Subsystem 4: Blackbox Logbook & 5-Line Chart -->
+        <!-- Subsystem 4: Blackbox Logbook & Telemetry Chart -->
         <div class="topic-sub-title">
-          <span class="lang-zh">📈 4. 飛行日誌與 5 線譜調機圖表 (Flight Logbook & Chart)</span>
-          <span class="lang-en">📈 4. Flight Logbook & 5-Line Telemetry Chart</span>
+          <span class="lang-zh">📈 4. 飛行日誌與 曲線調機圖表 (Flight Logbook & Chart)</span>
+          <span class="lang-en">📈 4. Flight Logbook & Telemetry Chart</span>
         </div>
 
         <div class="grid-2">
           <div class="card">
             <div class="card-title">
-              <span class="lang-zh">📊 5 線譜即時飛行圖表<span class="card-sub">(雙層分流不打結)</span></span>
-              <span class="lang-en">📊 5-Line Telemetry Chart<span class="card-sub">(Dual Layers)</span></span>
+              <span class="lang-zh">📊 曲線即時飛行圖表<span class="card-sub">(雙層分流不打結)</span></span>
+              <span class="lang-en">📊 Telemetry Chart<span class="card-sub">(Dual Layers)</span></span>
             </div>
             <div class="card-desc">
               <span class="lang-zh">
@@ -1245,34 +1300,34 @@
 
           <div class="card">
             <div class="card-title">
-              <span class="lang-zh">📋 最近 10 趟飛行日誌<span class="card-sub">(降落一鍵翻轉查看)</span></span>
-              <span class="lang-en">📋 Last 10 Flights History Table<span class="card-sub">(Instant Post-Flight Check)</span></span>
+              <span class="lang-zh">📋 最近 10 趟 9 欄精密飛行日誌<span class="card-sub">(降落一鍵翻轉查看)</span></span>
+              <span class="lang-en">📋 Last 10 Flights 9-Column History Table<span class="card-sub">(Instant Post-Flight Check)</span></span>
             </div>
             <div class="card-desc">
               <span class="lang-zh">
-                • <strong>降落 1 秒檢視</strong>：撥動 SC 中撥 (或點擊螢幕) 立即翻轉為該機最近 10 趟報表。<br>
-                • <strong>完整極值摘要</strong>：記錄起飛時間、時長、MAX RPM、MAX A、MIN V、MIN BEC、MAX TMP、mAh。
+                • <strong>降落 1 秒檢視</strong>：撥動 SC 中撥 (或點擊螢幕) 立即翻轉為該機最近 10 趟精密日誌報表。<br>
+                • <strong>9 欄完整極值摘要</strong>：記錄起飛時間 (RTC 時:分)、飛行時長、最高轉速 (MAX RPM)、最高電流 (MAX A)、最高功率 (MAX W)、最低電壓 (MIN V)、最低接收 (MIN 1RSS)、最高溫度 (MAX TMP)、已消耗 (mAh)。
               </span>
               <span class="lang-en">
                 • <strong>Instant Logbook</strong>: Flip SC switch to MID to inspect last 10 flight records.<br>
-                • <strong>Comprehensive Summary</strong>: Logs Time, Duration, Peak RPM, Max Amps, Min Volt, Min BEC, Max Temp, mAh.
+                • <strong>9-Column Summary</strong>: Logs Takeoff Time (RTC HH:MM), Duration, Peak RPM, Max Amps, Max Power (W), Min Volt, Min RSSI, Max Temp, mAh.
               </span>
             </div>
           </div>
 
           <div class="card">
             <div class="card-title">
-              <span class="lang-zh">💾 最後一趟飛行曲線自動存檔<span class="card-sub">(關機不遺失)</span></span>
-              <span class="lang-en">💾 Last Flight Chart Auto-Save<span class="card-sub">(Non-Volatile)</span></span>
+              <span class="lang-zh">💾 最新一次飛行曲線圖自動存檔<span class="card-sub">(關機不遺失)</span></span>
+              <span class="lang-en">💾 Latest Flight Chart Auto-Save<span class="card-sub">(Non-Volatile)</span></span>
             </div>
             <div class="card-desc">
               <span class="lang-zh">
                 • <strong>上鎖自動存檔</strong>：降落上鎖 (DISARM) 時將採樣點寫入 SD 卡 <code>chart_&lt;機型&gt;_BAT1~6.txt</code>。<br>
-                • <strong>關機不遺失</strong>：遙控器關機重開機隨時可還原上一趟飛行的動態折線圖。
+                • <strong>關機不遺失</strong>：遙控器關機重開機隨時可還原最新一次飛行的 5 色動態折線圖。
               </span>
               <span class="lang-en">
                 • <strong>Auto-Save on DISARM</strong>: Writes telemetry points to SD card upon disarming.<br>
-                • <strong>Non-Volatile Memory</strong>: Reloads last flight chart anytime even after power-cycling.
+                • <strong>Non-Volatile Memory</strong>: Reloads the latest flight chart anytime even after power-cycling.
               </span>
             </div>
           </div>
@@ -1428,7 +1483,7 @@
           </div>
         </div>
 
-        <!-- Subsystem 7: Defensive Rules & 21 Options -->
+        <!-- Subsystem 7: Defensive Rules & 22 Options -->
         <div class="topic-sub-title">
           <span class="lang-zh">🛡️ 7. 安全防護與選單設定 (Safety Protection & Settings)</span>
           <span class="lang-en">🛡️ 7. Safety Protection & Settings</span>
@@ -1499,8 +1554,8 @@
 
           <div class="card">
             <div class="card-title">
-              <span class="lang-zh">🌐 21 項繁中/英文選單<span class="card-sub">(字庫完全相容不缺字)</span></span>
-              <span class="lang-en">🌐 21 Bilingual Options<span class="card-sub">(100% Font Compatible)</span></span>
+              <span class="lang-zh">🌐 22 項繁中/簡中/英文選單<span class="card-sub">(字庫完全相容不缺字)</span></span>
+              <span class="lang-en">🌐 22 Bilingual Options<span class="card-sub">(100% Font Compatible)</span></span>
             </div>
             <div class="card-desc">
               <span class="lang-zh">
@@ -1740,11 +1795,11 @@ save</pre>
         </h2>
 
         <div class="topic-sub-title">
-          <span class="lang-zh">📋 1. 全功能 21 項設定選單一覽表 (Widget Options Master Table)</span>
-          <span class="lang-en">📋 1. Complete 21 Widget Options Master Table</span>
+          <span class="lang-zh">📋 1. 全功能 22 項設定選單一覽表 (Widget Options Master Table)</span>
+          <span class="lang-en">📋 1. Complete 22 Widget Options Master Table</span>
         </div>
-        <p class="lang-zh">RBCT 小工具支援繁體/簡體中文與英文自動語系偵測，共有 21 項詳細自訂選項可於 EdgeTX 桌面設定中進行調配：</p>
-        <p class="lang-en">RBCT supports automatic multilingual detection (Traditional/Simplified Chinese and English). A total of 21 customizable options are available in EdgeTX widget settings:</p>
+        <p class="lang-zh">RBCT 小工具支援繁體/簡體中文與英文自動語系偵測，共有 22 項詳細自訂選項可於 EdgeTX 桌面設定中進行調配：</p>
+        <p class="lang-en">RBCT supports automatic multilingual detection (Traditional/Simplified Chinese and English). A total of 22 customizable options are available in EdgeTX widget settings:</p>
 
         <table>
           <thead>
@@ -1803,7 +1858,7 @@ save</pre>
               <td><code>Heli Type</code></td>
               <td style="text-align: center;"><code>CHOICE</code></td>
               <td>
-                <span class="lang-zh">切換動力模式：<code>電機 (Electric)</code>（預設）、<code>燃油機 (Nitro)</code>、<code>Turbine (Jet)</code>。</span>
+                <span class="lang-zh">切換動力模式：<code>電機 (Electric)</code>（預設）、<code>油機 (Nitro)</code>、<code>Turbine (Jet)</code>。</span>
                 <span class="lang-en">Switch powertrain mode: <code>Electric</code> (default), <code>Nitro</code>, or <code>Turbine (Jet)</code>.</span>
               </td>
             </tr>
@@ -1834,7 +1889,7 @@ save</pre>
               <td style="text-align: center;"><code>SOURCE</code></td>
               <td>
                 <span class="lang-zh">指定三段開關呼叫飛行日誌（中段：Logbook/圖表，下段：Fleet 管理）。</span>
-                <span class="lang-en">Assign 3-position switch to open Logbook (Mid: 5-line chart, Low: Fleet manager).</span>
+                <span class="lang-en">Assign 3-position switch to open Logbook (Mid: telemetry chart, Low: Fleet manager).</span>
               </td>
             </tr>
             <tr>
@@ -1953,8 +2008,8 @@ save</pre>
               <td><code>Bat Track</code></td>
               <td style="text-align: center;"><code>SOURCE</code></td>
               <td>
-                <span class="lang-zh">指定實體 6 段開關切換目前電池編號（BAT 1 ~ 6）。</span>
-                <span class="lang-en">Assign 6-position switch to select active battery pack (BAT 1 ~ 6).</span>
+                <span class="lang-zh">切換目前電池編號（預設 <code>---</code> 為全自動偵測 6POS 實體鍵；亦可手動指派開關或旋鈕切換 BAT 1 ~ 6）。</span>
+                <span class="lang-en">Selects active battery pack (Defaults to auto-detecting physical 6POS buttons when set to <code>---</code>; or assign a custom switch/knob for BAT 1 ~ 6).</span>
               </td>
             </tr>
             <tr>
@@ -1965,6 +2020,16 @@ save</pre>
               <td>
                 <span class="lang-zh">指定實體開關重置目前電池的所有歷史紀錄。</span>
                 <span class="lang-en">Assign physical switch to wipe and reset historical logs for active battery.</span>
+              </td>
+            </tr>
+            <tr>
+              <td style="text-align: center;"><strong>22</strong></td>
+              <td><strong>UI 語言</strong></td>
+              <td><code>UI Lang</code></td>
+              <td style="text-align: center;"><code>CHOICE</code></td>
+              <td>
+                <span class="lang-zh">設定主儀表板與彈窗之介面語言。可選：<code>自動 (Auto)</code>（依遙控器韌體原生語系自動適配）、<code>英文 (English)</code>（強制經典航太英文 HUD）。</span>
+                <span class="lang-en">Configures dashboard HUD and modal popups language. Options: <code>Auto</code> (auto-adapts to radio firmware native language), <code>English</code> (forces classic aerospace English HUD).</span>
               </td>
             </tr>
           </tbody>
@@ -1998,6 +2063,48 @@ save</pre>
             • <strong>Method A</strong>: Set <strong>`Theme`</strong> option to <strong>`TRN` (Transparent Theme)</strong>.<br>
             • <strong>Method B</strong>: Set <strong>`Transp BG`</strong> to <strong>`1 (ON)`</strong>.<br><br>
             Panel backgrounds vanish into a sleek glassmorphism dashboard!
+          </span>
+        </div>
+
+        <div class="topic-sub-title">
+          <span class="lang-zh">🌐 5. 語系自動適配與英文 HUD 切換 (`UI 語言` / `UI Lang`) 運作機制</span>
+          <span class="lang-en">🌐 5. Multi-Language Auto-Adapt & English HUD (`UI Lang`) Engine</span>
+        </div>
+        <p class="lang-zh">RBCT v1.0.8 導入了全新的多語系即時切換引擎，主儀表板、三大觸控診斷彈窗、黑盒子飛行日誌（Tab 1）與機隊電池總表（Tab 2）全面支援三語對映：</p>
+        <p class="lang-en">RBCT v1.0.8 introduces a dynamic multilingual UI engine covering the main HUD, touch diagnostic popups, logbook (Tab 1), and battery fleet manager (Tab 2):</p>
+
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 140px;"><span class="lang-zh">選項模式</span><span class="lang-en">Option Mode</span></th>
+              <th><span class="lang-zh">運作原理與適用情境</span><span class="lang-en">Mechanism & Best Use Case</span></th>
+              <th><span class="lang-zh">介面呈現效果</span><span class="lang-en">HUD Display</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong><span class="lang-zh">1. 自動 (Auto)<br>(預設推薦 🌟)</span><span class="lang-en">1. Auto<br>(Default 🌟)</span></strong></td>
+              <td><span class="lang-zh"><strong>環境語系自動適配（零缺字防呆保證）！</strong> 自動偵測 EdgeTX 韌體原生字庫：繁中韌體 (TW) 自動呈現 100% 官方點陣相容繁體、簡中韌體 (CN) 自動呈現簡體、英文系統呈現經典 HUD。徹底根絕跨韌體字庫缺失留白之問題！</span><span class="lang-en"><strong>Auto Firmware Adaptation (Zero Missing Glyphs)!</strong> Detects EdgeTX native firmware: TW firmware renders 100% font-safe Trad Chinese, CN renders Simp Chinese, EN renders classic HUD.</span></td>
+              <td><span class="lang-zh">隨韌體語系完美自動適配</span><span class="lang-en">Dynamic native auto-switch</span></td>
+            </tr>
+            <tr>
+              <td><strong><span class="lang-zh">2. 英文 (English)</span><span class="lang-en">2. English</span></strong></td>
+              <td><span class="lang-zh"><strong>強制使用經典直升機航太英文 HUD！</strong> 顯示 <code>RPM</code>、<code>GOV</code>、<code>ARMED</code>、<code>SAFE</code>、<code>BATTERY</code>、<code>AMPS</code> 等國際通用標準飛控縮寫，純粹專業。</span><span class="lang-en"><strong>Locks to classic aerospace helicopter HUD!</strong> Displays standard acronyms (<code>RPM</code>, <code>GOV</code>, <code>ARMED</code>, <code>SAFE</code>, <code>BATTERY</code>, <code>AMPS</code>).</span></td>
+              <td><span class="lang-zh">純英文 HUD 介面</span><span class="lang-en">Pure English HUD</span></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="alert alert-tip">
+          <div class="alert-title">
+            <span class="lang-zh">💡 UI 語言與語音播報完全獨立分開</span>
+            <span class="lang-en">💡 UI Language & Voice Alarms Operate Independently</span>
+          </div>
+          <span class="lang-zh">
+            小工具的 <code>UI 語言 (UI Lang)</code> 與 <strong>Option #17 語音播報</strong> 採獨立架構運作！飛手可依喜好自由混搭，例如：<strong>「經典英文 HUD 視覺介面 + 繁體中文真人口語播報」</strong> 或 <strong>「繁體中文儀表板 + 英文語音播報」</strong>，享受極致彈性！
+          </span>
+          <span class="lang-en">
+            <code>UI Lang</code> and <strong>Option #17 Voice Alarms</strong> are completely decoupled! Pilots can freely combine <strong>English HUD visual + Traditional Chinese voice alarms</strong> or <strong>Traditional Chinese HUD + English voice alarms</strong> for ultimate customization!
           </span>
         </div>
       </section>
@@ -2038,7 +2145,7 @@ save</pre>
             <tr>
               <td><strong>Tier 3</strong></td>
               <td><code>/WIDGETS/RBCT/default.png</code></td>
-              <td class="lang-zh">當前兩者皆未找到時，自動載入安全預設直昇機剪影</td>
+              <td class="lang-zh">當前兩者皆未找到時，自動載入預設RF圖片</td>
               <td class="lang-en">Default helicopter silhouette fallback</td>
             </tr>
           </tbody>
@@ -2112,7 +2219,7 @@ save</pre>
         </div>
 
         <div class="topic-sub-title">
-          <span class="lang-zh">🎮 遙控器端啟用「Model on TX」自動同步教學 (TX16S 手把手)</span>
+          <span class="lang-zh">🎮 遙控器端啟用「Model on TX」自動同步教學 (TX16S 手把手設定教學)</span>
           <span class="lang-en">🎮 Enabling "Model on TX" Automatic Synchronization on Transmitter (TX16S Guide)</span>
         </div>
 
@@ -2450,22 +2557,22 @@ save</pre>
         </div>
       </section>
 
-      <!-- Topic 8: Logbook & 5-Line Chart -->
+      <!-- Topic 8: Logbook & Telemetry Chart -->
       <section id="topic-logbook" class="section">
         <h2 class="section-title">
-          <span class="lang-zh">📈 8. 飛行日誌與 5 線譜圖表</span>
-          <span class="lang-en">📈 8. Logbook & 5-Line Telemetry Chart</span>
+          <span class="lang-zh">📈 8. 飛行日誌與 曲線圖表</span>
+          <span class="lang-en">📈 8. Logbook & Telemetry Chart</span>
         </h2>
 
         <div class="topic-sub-title">
           <span class="lang-zh">🎯 開發動機：降落後 1 秒分析動力系統健康度</span>
           <span class="lang-en">🎯 Motivation: Immediate Telemetry Inspection</span>
         </div>
-        <p class="lang-zh">以往飛手降落後需要拔下 SD 卡連電腦開 Log 檔才能看電壓與轉速變化。RBCT 直接在遙控器全彩彩幕上原繪 **5 線譜動態折線圖**，讓飛手在降落後撥動開關 (如 SC 中撥)，即可 1 秒內檢視剛才飛行的轉速是否平穩、電壓壓降 (Voltage Sag) 與電流峰值。</p>
+        <p class="lang-zh">以往飛手降落後需要拔下 SD 卡連電腦開 Log 檔才能看電壓與轉速變化。RBCT 直接在遙控器全彩彩幕上原繪 **曲線動態折線圖**，讓飛手在降落後撥動開關 (如 SC 中撥)，即可 1 秒內檢視剛才飛行的轉速是否平穩、電壓壓降 (Voltage Sag) 與電流峰值。</p>
         <p class="lang-en">Eliminates the hassle of pulling SD cards to inspect flight logs on a PC. RBCT renders a 5-channel line chart directly on EdgeTX color screens for instant post-flight analysis.</p>
 
         <div class="topic-sub-title">
-          <span class="lang-zh">🛠️ 5 線譜折線圖在『飛手調機 (Flight Tuning)』上的四大實戰診斷應用</span>
+          <span class="lang-zh">🛠️ 曲線折線圖在『飛手調機 (Flight Tuning)』上的四大實戰診斷應用</span>
           <span class="lang-en">🛠️ 4 Practical Flight Tuning & Diagnostic Applications</span>
         </div>
 
@@ -2513,8 +2620,8 @@ save</pre>
         </div>
 
         <div class="topic-sub-title">
-          <span class="lang-zh">🔬 5 線譜折線圖數據採樣原理與演算法</span>
-          <span class="lang-en">🔬 5-Line Telemetry Chart Engine & Sampling Algorithm</span>
+          <span class="lang-zh">🔬 曲線折線圖數據採樣原理與演算法</span>
+          <span class="lang-en">🔬 Telemetry Chart Engine & Sampling Algorithm</span>
         </div>
 
         <div class="card" style="margin-bottom: 1.5rem;">
@@ -2549,12 +2656,79 @@ save</pre>
             <span class="lang-en">Data points are buffered strictly in RAM while ARMED. Writes to SD card only upon DISARMING, guaranteeing 0 SD latency in mid-air.</span>
           </div>
         </div>
+
+        <div class="card" style="margin-bottom: 1.5rem;">
+          <div class="card-title">
+            <span class="lang-zh">🌊 4. 全機型自適應動態採樣與輕量 3 點平滑濾波 (Adaptive Sampling & Anti-Aliased Smoothing)</span>
+            <span class="lang-en">🌊 4. Adaptive Sampling Density & 3-Point Smoothing Filter</span>
+          </div>
+          <div class="card-desc">
+            <span class="lang-zh">針對各級彩螢幕遙控器（TX16S 800×480、TX15 480×320、標準 480×272）自動計算最佳採樣密度（每段維持 5.5px 緊湊間距），搭配零記憶體開銷（Zero GC）的 3 點即時低通濾波與高解析度抗鋸齒加粗，徹底消除折線毛刺與鋸齒感！</span>
+            <span class="lang-en">Auto-scales sampling density (~5.5px per step) for all radio screen sizes (800×480, 480×320, 480×272) combined with zero-GC 3-point smoothing and screen-aware bold lines, completely eliminating curve jaggies and telemetry noise.</span>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom: 1.5rem;">
+          <div class="card-title">
+            <span class="lang-zh">📋 5. 9 欄式精密歷史飛行日誌表結構 (9-Column Master Logbook Architecture)</span>
+            <span class="lang-en">📋 5. 9-Column Master Logbook Architecture</span>
+          </div>
+          <div class="card-desc">
+            <span class="lang-zh">
+              RBCT 飛行日誌整合 9 欄關鍵遙測指標，於起飛解鎖與降落結算時全自動即時寫入：
+              <table style="margin-top: 0.8rem; margin-bottom: 0.5rem;">
+                <thead>
+                  <tr>
+                    <th>欄位</th>
+                    <th>中文標題</th>
+                    <th>英文標題</th>
+                    <th>數據含義與單位</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>1</td><td><strong>起飛時間</strong></td><td><code>TAKEOFF</code></td><td>起飛解鎖瞬間自動擷取遙控器 RTC 系統時間 (HH:MM)，精確對齊黑盒子日誌</td></tr>
+                  <tr><td>2</td><td><strong>飛行時長</strong></td><td><code>DUR</code></td><td>有效飛行秒數，格式為 <code>MM:SS</code></td></tr>
+                  <tr><td>3</td><td><strong>最高轉速</strong></td><td><code>MAX RPM</code></td><td>主旋翼單趟最高轉速極值</td></tr>
+                  <tr><td>4</td><td><strong>最高電流</strong></td><td><code>MAX A</code></td><td>單趟瞬間峰值放電電流 (安培 A)</td></tr>
+                  <tr><td>5</td><td><strong>最高功率</strong></td><td><code>MAX PWR</code></td><td>單趟最大輸出功率 (瓦特 W，獨立分欄)</td></tr>
+                  <tr><td>6</td><td><strong>最低電壓</strong></td><td><code>MIN V</code></td><td>單趟最低總電壓與單芯極限壓降</td></tr>
+                  <tr><td>7</td><td><strong>最低接收</strong></td><td><code>MIN 1RSS</code></td><td>單趟接收機訊號強度最低值 (dB / %)</td></tr>
+                  <tr><td>8</td><td><strong>最高溫度</strong></td><td><code>MAX TMP</code></td><td>單趟電變 ESC 最高工作溫度 (°C)</td></tr>
+                  <tr><td>9</td><td><strong>已消耗</strong></td><td><code>USED</code></td><td>單趟累計消耗電量 (毫安時 mAh)</td></tr>
+                </tbody>
+              </table>
+            </span>
+            <span class="lang-en">
+              RBCT Flight Logbook automatically records 9 critical telemetry metrics upon takeoff and landing:
+              <table style="margin-top: 0.8rem; margin-bottom: 0.5rem;">
+                <thead>
+                  <tr>
+                    <th>Col</th>
+                    <th>Header</th>
+                    <th>Metric & Unit</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>1</td><td><code>TAKEOFF</code></td><td>RTC system clock at ARM moment (HH:MM) to align with Blackbox logs</td></tr>
+                  <tr><td>2</td><td><code>DUR</code></td><td>Effective flight duration in <code>MM:SS</code></td></tr>
+                  <tr><td>3</td><td><code>MAX RPM</code></td><td>Peak main rotor headspeed RPM</td></tr>
+                  <tr><td>4</td><td><code>MAX A</code></td><td>Peak burst discharge current (Amps)</td></tr>
+                  <tr><td>5</td><td><code>MAX PWR</code></td><td>Peak maximum power output (Watts, dedicated column)</td></tr>
+                  <tr><td>6</td><td><code>MIN V</code></td><td>Lowest pack voltage during flight</td></tr>
+                  <tr><td>7</td><td><code>MIN 1RSS</code></td><td>Minimum receiver signal RSSI (dB / %)</td></tr>
+                  <tr><td>8</td><td><code>MAX TMP</code></td><td>Peak ESC temperature (°C)</td></tr>
+                  <tr><td>9</td><td><code>USED</code></td><td>Total accumulated capacity consumed (mAh)</td></tr>
+                </tbody>
+              </table>
+            </span>
+          </div>
+        </div>
       </section>
 
       <!-- Topic 9: Battery Fleet Manager -->
       <section id="topic-battery" class="section">
         <h2 class="section-title">
-          <span class="lang-zh">🔋 9. 電池 Fleet 機隊管理</span>
+          <span class="lang-zh">🔋 9. 機隊電池管理</span>
           <span class="lang-en">🔋 9. Battery Fleet Management</span>
         </h2>
 
@@ -2565,7 +2739,7 @@ save</pre>
         <p class="lang-zh">RBCT 支援針對每一台直昇機獨立追蹤最多 **6 包電池 (BAT 1 ~ BAT 6)** 的健康數據與飛行歷史：</p>
         <ul style="margin-left: 1.5rem; color: var(--text-muted); margin-bottom: 1.5rem;">
           <li><strong class="lang-zh">獨立飛行數據</strong><strong class="lang-en">Independent Flight Metrics</strong><span class="lang-zh">：每一包電池都有自己獨立的「起降次數 (Cycles)」、「歷史最低電壓 (Min Volt)」、「最高溫度 (Max Temp)」、「平均飛行時間 (Avg Dur)」。</span><span class="lang-en">: Each pack tracks its own flight cycles, min voltage, max temp, and avg flight time.</span></li>
-          <li><strong class="lang-zh">獨立歷史日誌與圖表檔案</strong><strong class="lang-en">Dedicated History Logs & Chart Files</strong><span class="lang-zh">：每包電池皆在 SD 卡維持專屬的最近 10 趟飛行報表 (<code>logbook_&lt;機型&gt;_BAT1~6.txt</code>) 與上一趟 5 線譜動態折線圖 (<code>chart_&lt;機型&gt;_BAT1~6.txt</code>)。</span><span class="lang-en">: Maintains separate files for each pack: <code>logbook_&lt;Model&gt;_BAT1~6.txt</code> and <code>chart_&lt;Model&gt;_BAT1~6.txt</code>.</span></li>
+          <li><strong class="lang-zh">獨立歷史日誌與圖表檔案</strong><strong class="lang-en">Dedicated History Logs & Chart Files</strong><span class="lang-zh">：每包電池皆在 SD 卡維持專屬的最近 10 趟飛行報表 (<code>logbook_&lt;機型&gt;_BAT1~6.txt</code>) 與上一趟 曲線動態折線圖 (<code>chart_&lt;機型&gt;_BAT1~6.txt</code>)。</span><span class="lang-en">: Maintains separate files for each pack: <code>logbook_&lt;Model&gt;_BAT1~6.txt</code> and <code>chart_&lt;Model&gt;_BAT1~6.txt</code>.</span></li>
         </ul>
 
         <div class="topic-sub-title">
@@ -2576,32 +2750,32 @@ save</pre>
         <div class="grid-2">
           <div class="card">
             <div class="card-title">
-              <span class="lang-zh">方式 A：全自動開關感測 (最推薦)</span>
-              <span class="lang-en">Method A: Full Auto Switch Sense (Recommended)</span>
+              <span class="lang-zh">方式 A：全自動 6-POS 感測 (預設推薦，免設定)</span>
+              <span class="lang-en">Method A: Full Auto 6-POS Sense (Default, Zero-Config)</span>
             </div>
             <div class="card-desc">
-              <span class="lang-zh">自動掃描實體/邏輯開關：<code>6P1..6P6</code>、<code>SW1..SW6</code>、<code>L1..L6</code>。按下 6P1 或 SW1 瞬間自動切換為 <strong>BAT 1</strong>。</span>
-              <span class="lang-en">Auto-scans physical buttons: <code>6P1..6P6</code>, <code>SW1..SW6</code>, <code>L1..L6</code>. Pressing button 6P1 or SW1 switches active profile to BAT 1.</span>
+              <span class="lang-zh">選單維持 <code>---</code> 即可！系統開機自動掃描實體 6POS 按鍵（<code>6P1..6P6</code>、<code>6POS</code>），按下按鍵瞬間自動切換為 <strong>BAT 1 ~ BAT 6</strong>，並彈出 10 秒提示橫條。</span>
+              <span class="lang-en">Keep menu setting at <code>---</code>! The system automatically senses physical 6POS buttons (<code>6P1..6P6</code>, <code>6POS</code>) to switch active profiles (<strong>BAT 1 ~ BAT 6</strong>) with a 10s countdown banner.</span>
             </div>
           </div>
           <div class="card">
             <div class="card-title">
-              <span class="lang-zh">方式 B：選單指派開關 (Bat Track)</span>
+              <span class="lang-zh">方式 B：選單手動指派開關 (Bat Track)</span>
               <span class="lang-en">Method B: Menu Switch Assignment (Bat Track)</span>
             </div>
             <div class="card-desc">
-              <span class="lang-zh">長按滾輪進入選單，在 <code>Bat Track</code> 指派對應的通道或 6POS 旋鈕來切換電池檔位。</span>
-              <span class="lang-en">Assign <code>Bat Track</code> option in settings menu to a specific channel or knob to control battery selection.</span>
+              <span class="lang-zh">針對無 6POS 按鍵之遙控器（如 Pocket、Zorro），可在 <code>Bat Track</code> 手動指派三段開關（如 SA/SB）、通道或旋鈕進行檔位切換。</span>
+              <span class="lang-en">For radios without physical 6POS buttons (e.g. Pocket, Zorro), manually assign <code>Bat Track</code> to a 3-pos switch (e.g. SA/SB), channel, or pot.</span>
             </div>
           </div>
         </div>
 
         <div class="topic-sub-title">
-          <span class="lang-zh">📊 3. 查看機隊電池管理總表 (SC↓ 下撥) 與浮水印</span>
+          <span class="lang-zh">📊 3. 查看機隊電池管理總表 (SC↓ 下撥) 與電池代號</span>
           <span class="lang-en">📊 3. Battery Fleet Manager Table & Watermark</span>
         </div>
 
-        <p class="lang-zh">將 <code>Logbook Sw</code> 指派開關下撥 (SC↓)，即可叫出總表。當前選定之電池整列以 **綠色高亮框** 強調；左下角水印同步回饋 <code>v1.0.8 | BAT 1</code>。</p>
+        <p class="lang-zh">將 <code>Logbook Sw</code> 指派開關下撥 (SC↓)，即可叫出總表。當前選定之電池整列以 **綠色高亮框** 強調；左下角電池代號同步顯示 <code>v1.0.8 | BAT 1</code>。</p>
         <p class="lang-en">Set <code>Logbook Sw</code> to DOWN (SC↓) to view the fleet table. Active battery row is highlighted in green with watermark <code>v1.0.8 | BAT 1</code>.</p>
       </section>
 
@@ -2762,6 +2936,15 @@ save</pre>
               <td class="lang-en">Resets Today to 0. Does NOT wipe Total lifetime flights or battery logs.</td>
             </tr>
             <tr>
+              <td><strong class="lang-zh">觸控飛行統計頁歸零<br>(本日清零 / 總計清零)</strong><strong class="lang-en">Touch Stats Reset<br>(Today / Total)</strong></td>
+              <td class="lang-zh">點按主畫面左上角飛行區塊開啟「飛行統計」彈窗，直接點擊 <code>本日清零</code> 或 <code>總計清零</code> 按鈕</td>
+              <td class="lang-en">Tap top-left dashboard to open Flight Stats popup, then tap <code>RESET TODAY</code> or <code>RESET TOTAL</code></td>
+              <td class="lang-zh">可獨立重置 <code>Today (本日)</code> 或 <code>Total (總計)</code> 架次</td>
+              <td class="lang-en">Independently resets Today or Total lifetime flights</td>
+              <td class="lang-zh">直覺觸控操作，免撥開關即可獨立將當日架次或終身總飛行架次立即歸零並寫入 SD 卡。</td>
+              <td class="lang-en">Instant touchscreen reset for today's flights or lifetime total count.</td>
+            </tr>
+            <tr>
               <td><strong class="lang-zh">電池數據重置<br>(`Rst BatLog`)</strong><strong class="lang-en">Battery Profile Wipe<br>(`Rst BatLog`)</strong></td>
               <td class="lang-zh">1. 撥動 `Rst BatLog` 開關<br>2. 於 Tab 2 總表頁面撥動 `Reset Flight Cnt`</td>
               <td class="lang-en">1. Toggle `Rst BatLog` switch<br>2. Toggle `Reset Flight Cnt` while viewing Tab 2</td>
@@ -2812,7 +2995,94 @@ save</pre>
               <span class="lang-en">Locks active theme while ARMED, preventing mid-air color flashes from shadow changes. Resumes sensing only after DISARMING.</span>
             </div>
           </div>
+          <div class="card" style="grid-column: 1 / -1;">
+            <div class="card-title">
+              <span class="lang-zh">規則 4：智慧複合飛行判定與電池防護鎖 (Smart In-Flight Guard)</span>
+              <span class="lang-en">Rule 4: Smart In-Flight Guard & Battery Protection</span>
+            </div>
+            <div class="card-desc">
+              <span class="lang-zh">
+                • <strong>智慧複合起飛判定</strong>：需同時滿足【機子有上電】+【已解鎖 ARM】+【油門 > 0 或 轉速 > 300 RPM 或 電流 > 1.5A】才啟動飛行模式。<strong>桌上未插電除錯、停機坪待機時 100% 自由操作完全不受限</strong>。<br>
+                • <strong>觸控自由保留</strong>：飛行中維持全螢幕觸控彈窗自由度，點擊隨時可查看電池健康與放電曲線，背景 200ms 語音警報持續即時監控。<br>
+                • <strong>架次彈性清零</strong>：空中撥動架次清零開關即時更新記憶體數值，並延後至降落上鎖 (DISARM) 寫入記憶卡，維持空中 0 寫卡安全。<br>
+                • <strong>電池歷史防誤清空</strong>：實體「電池重置 (`Rst BatLog`)」開關僅在降落停機或桌上未飛行時生效，防止空中誤撥清空整包電池歷史紀錄。<br>
+                • <strong>機型防抖保護</strong>：起飛旋翼轉動後鎖定機型，遠距電波雜訊不引發重複讀卡，保障系統極致穩定。
+              </span>
+              <span class="lang-en">
+                • <strong>Smart Composite Flight Detection</strong>: Requires [Power Connected] + [ARM Active] + [Throttle &gt; 0 or RPM &gt; 300 or Amps &gt; 1.5A] to enter in-flight mode. Bench testing and ground standby remain 100% unrestricted.<br>
+                • <strong>Touchscreen Freedom</strong>: Full-screen touch modals remain accessible in-flight with 200ms voice monitoring active.<br>
+                • <strong>Flight Count Flexibility</strong>: Today's flight count can be reset in RAM anytime and committed to SD upon DISARM.<br>
+                • <strong>Battery History Protection</strong>: `Rst BatLog` switch operates only when DISARMED, preventing accidental battery log wipes.<br>
+                • <strong>Noise Immunity</strong>: Active craft profile is locked during powered flight to prevent telemetry noise file reloads.
+              </span>
+            </div>
+          </div>
         </div>
+
+        <h3 style="margin-top: 1.5rem; margin-bottom: 0.8rem; color: var(--accent-cyan);">
+          <span class="lang-zh">📊 實戰情境安全行為矩陣對照表</span>
+          <span class="lang-en">📊 In-Flight Safety Behavior Matrix</span>
+        </h3>
+        <table class="table">
+          <thead>
+            <tr>
+              <th><span class="lang-zh">實戰場景</span><span class="lang-en">Scenario</span></th>
+              <th><span class="lang-zh">機子通電</span><span class="lang-en">Power</span></th>
+              <th><span class="lang-zh">解鎖開關</span><span class="lang-en">ARM Sw</span></th>
+              <th><span class="lang-zh">油門 / 轉速</span><span class="lang-en">Thr / RPM</span></th>
+              <th><span class="lang-zh">系統判定狀態</span><span class="lang-en">System Mode</span></th>
+              <th><span class="lang-zh">觸控與開關行為</span><span class="lang-en">Touch & Switch</span></th>
+              <th><span class="lang-zh">寫卡 I/O 行為</span><span class="lang-en">Disk I/O</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong><span class="lang-zh">客廳 / 桌上除錯</span><span class="lang-en">Bench Setup</span></strong></td>
+              <td><span class="badge badge-danger"><span class="lang-zh">❌ 未插電</span><span class="lang-en">❌ No Bat</span></span></td>
+              <td><span class="lang-zh">隨意位置</span><span class="lang-en">Any</span></td>
+              <td>0</td>
+              <td><span class="badge badge-primary"><span class="lang-zh">桌上模式</span><span class="lang-en">Bench Mode</span></span></td>
+              <td><span class="lang-zh">100% 自由操作，清零、看日誌完全不受限</span><span class="lang-en">100% unrestricted, free resets & log viewing</span></td>
+              <td><span class="lang-zh">正常即時讀寫</span><span class="lang-en">Normal Instant I/O</span></td>
+            </tr>
+            <tr>
+              <td><strong><span class="lang-zh">停機坪通電待機</span><span class="lang-en">Ground Standby</span></strong></td>
+              <td><span class="badge badge-success"><span class="lang-zh">✅ 已插電</span><span class="lang-en">✅ Powered</span></span></td>
+              <td><span class="lang-zh">鎖定 / 解鎖</span><span class="lang-en">Safe / Arm</span></td>
+              <td>0 (<span class="lang-zh">未轉動</span><span class="lang-en">Idle</span>)</td>
+              <td><span class="badge badge-primary"><span class="lang-zh">待機模式</span><span class="lang-en">Standby Mode</span></span></td>
+              <td><span class="lang-zh">100% 自由操作，可隨意點按螢幕確認電池狀態</span><span class="lang-en">100% free operation, tap to check battery</span></td>
+              <td><span class="lang-zh">正常即時讀寫</span><span class="lang-en">Normal Instant I/O</span></td>
+            </tr>
+            <tr>
+              <td><strong><span class="lang-zh">起飛飛行中</span><span class="lang-en">Active Flight</span></strong></td>
+              <td><span class="badge badge-success"><span class="lang-zh">✅ 已插電</span><span class="lang-en">✅ Powered</span></span></td>
+              <td><span class="badge badge-danger"><span class="lang-zh">✅ 已解鎖</span><span class="lang-en">✅ ARMED</span></span></td>
+              <td><span class="lang-zh">旋翼轉動 / 油門>0</span><span class="lang-en">RPM &gt; 300 / Thr &gt; 0</span></td>
+              <td><span class="badge badge-warning"><span class="lang-zh">空中模式</span><span class="lang-en">In-Flight</span></span></td>
+              <td><span class="lang-zh">觸控自由查看彈窗，安全鎖保護電池歷史不被誤刪</span><span class="lang-en">Touch modals accessible, battery history protected</span></td>
+              <td><span class="badge badge-success"><span class="lang-zh">空中 0 寫卡 (緩存於 RAM)</span><span class="lang-en">Zero SD Write (RAM Only)</span></span></td>
+            </tr>
+            <tr>
+              <td><strong><span class="lang-zh">空中熄火降落練習</span><span class="lang-en">Auto-rotation Practice</span></strong></td>
+              <td><span class="badge badge-success"><span class="lang-zh">✅ 已插電</span><span class="lang-en">✅ Powered</span></span></td>
+              <td><span class="badge badge-danger"><span class="lang-zh">✅ 已解鎖</span><span class="lang-en">✅ ARMED</span></span></td>
+              <td>0 (<span class="lang-zh">熄火滑翔</span><span class="lang-en">Gliding</span>)</td>
+              <td><span class="badge badge-warning"><span class="lang-zh">空中模式 (起飛記憶)</span><span class="lang-en">In-Flight (Latched)</span></span></td>
+              <td><span class="lang-zh">持續穩定記錄飛行曲線，語音警報 200ms 秒報監控</span><span class="lang-en">Continuous curve logging, 200ms voice active</span></td>
+              <td><span class="badge badge-success"><span class="lang-zh">空中 0 寫卡</span><span class="lang-en">Zero SD Write</span></span></td>
+            </tr>
+            <tr>
+              <td><strong><span class="lang-zh">降落切上鎖 (DISARM)</span><span class="lang-en">Landed & DISARM</span></strong></td>
+              <td><span class="badge badge-success"><span class="lang-zh">✅ 已插電</span><span class="lang-en">✅ Powered</span></span></td>
+              <td><span class="badge badge-success"><span class="lang-zh">❌ 切上鎖</span><span class="lang-en">❌ SAFE</span></span></td>
+              <td>0 (<span class="lang-zh">旋翼停轉</span><span class="lang-en">Stopped</span>)</td>
+              <td><span class="badge badge-primary"><span class="lang-zh">結算存檔</span><span class="lang-en">Save & Settle</span></span></td>
+              <td><span class="lang-zh">自動結算架次、日誌與放電曲線一次性安全寫入 SD 卡</span><span class="lang-en">Safely commits flight log & charts to SD card</span></td>
+              <td><span class="lang-zh">一次性安全寫卡完成</span><span class="lang-en">Safe Commit Done</span></td>
+            </tr>
+          </tbody>
+        </table>
       </section>
 
       <!-- Topic 13: Complete Pilot FAQ Index -->
@@ -2835,56 +3105,100 @@ save</pre>
 
         <div class="card" style="margin-bottom: 1rem;">
           <div class="card-title">
-            <span class="lang-zh">Q2: 如何設定 21 項小工具選單與全透明/光圈？</span>
-            <span class="lang-en">Q2: How to configure 21 options & transparent / LED effects?</span>
+            <span class="lang-zh">Q2: 為什麼遙控器畫面顯示「NO DATA」或電壓、轉速等數值都是 0？</span>
+            <span class="lang-en">Q2: Why does the screen show "NO DATA" or all telemetry values are 0?</span>
           </div>
           <div class="card-desc">
-            <span class="lang-zh">A: 請參考 <strong><a onclick="scrollToSection('topic-options')" style="color: var(--accent-blue); cursor: pointer;">⚙️ 4. 小工具設定選單說明</a></strong>。內含 21 項設定詳細對照表、全透明 (TRN)、搖桿 RGB 光圈連動與專屬飛手簽名教學。</span>
-            <span class="lang-en">A: See <strong><a onclick="scrollToSection('topic-options')" style="color: var(--accent-blue); cursor: pointer;">⚙️ 4. Widget Settings Menu</a></strong>. Contains complete 21 options master table, TRN transparent mode, gimbal LED, and custom callsign guide.</span>
+            <span class="lang-zh">A: 請參考 <strong><a onclick="scrollToSection('topic-dashboard')" style="color: var(--accent-blue); cursor: pointer;">📊 6. 主儀表板與遙測感測器</a></strong> 與 <strong><a onclick="scrollToSection('topic-install')" style="color: var(--accent-blue); cursor: pointer;">🚀 3. 快速安裝與啟用指南</a></strong>。代表 EdgeTX 尚未收到飛控遙測感測器。請確認接收機連線正常，至遙控器 Model Telemetry 頁面點擊 <code>Discover new sensors</code> (發現新感測器)，並確認 Rotorflight 已開啟 Telemetry 輸出及在 CLI 執行設定腳本。</span>
+            <span class="lang-en">A: See <strong><a onclick="scrollToSection('topic-dashboard')" style="color: var(--accent-blue); cursor: pointer;">📊 6. Main Dashboard & Sensors</a></strong> and <strong><a onclick="scrollToSection('topic-install')" style="color: var(--accent-blue); cursor: pointer;">🚀 3. Setup & Installation Guide</a></strong>. Indicates EdgeTX has not received telemetry sensors. Ensure RX link is active, go to Model Telemetry page and tap <code>Discover new sensors</code>, and verify Rotorflight telemetry output / CLI script setup.</span>
           </div>
         </div>
 
         <div class="card" style="margin-bottom: 1rem;">
           <div class="card-title">
-            <span class="lang-zh">Q3: 如何設定直昇機專屬去背圖片與自動辨識？</span>
-            <span class="lang-en">Q3: How to set custom craft image & automatic recognition?</span>
+            <span class="lang-zh">Q3: 為什麼小工具沒有語音播報（電量提醒、超溫警報）？語音包該放哪裡？</span>
+            <span class="lang-en">Q3: Why are there no voice alerts for battery or temperature? Where should sound files be placed?</span>
           </div>
           <div class="card-desc">
-            <span class="lang-zh">A: 請參考 <strong><a onclick="scrollToSection('topic-image')" style="color: var(--accent-blue); cursor: pointer;">🖼️ 5. 模型圖片與動態辨識</a></strong>。飛控設定 Craft Name（如 <code>S200</code>），將 <code>S200.png</code> 放入 <code>/IMAGES/</code> 或 <code>/WIDGETS/RBCT/modelImage/</code>，通電自動載入！</span>
-            <span class="lang-en">A: See <strong><a onclick="scrollToSection('topic-image')" style="color: var(--accent-blue); cursor: pointer;">🖼️ 5. Craft Image DIY & Sync</a></strong>. Set Craft Name in FC (e.g. <code>S200</code>) and place <code>S200.png</code> in <code>/IMAGES/</code> or <code>modelImage/</code>.</span>
+            <span class="lang-zh">A: 請參考 <strong><a onclick="scrollToSection('topic-voice')" style="color: var(--accent-blue); cursor: pointer;">📢 10. 智能語音與極值警示</a></strong>。EdgeTX 系統只會讀取記憶卡根目錄的 <code>/SOUNDS/</code>。請將專案 <code>SOUND/tw/</code> (繁中)、<code>SOUND/cn/</code> (簡中) 或 <code>SOUND/en/</code> (英文) 內所有語音檔複製覆蓋至記憶卡根目錄 <code>/SOUNDS/&lt;語言代碼&gt;/</code>，並至遙控器系統設定確認語音路徑。</span>
+            <span class="lang-en">A: See <strong><a onclick="scrollToSection('topic-voice')" style="color: var(--accent-blue); cursor: pointer;">📢 10. Voice Assistant & Alerts</a></strong>. EdgeTX only reads from root <code>/SOUNDS/</code> directory. Copy files from <code>SOUND/tw/</code> (Traditional Chinese), <code>SOUND/cn/</code> (Simplified Chinese), or <code>SOUND/en/</code> (English) directly into SD card root <code>/SOUNDS/&lt;lang&gt;/</code>, then verify radio system voice settings.</span>
           </div>
         </div>
 
         <div class="card" style="margin-bottom: 1rem;">
           <div class="card-title">
-            <span class="lang-zh">Q4: 我是燃油直昇機 (Nitro) 或噴射機 (Turbine)，如何開啟專屬模式？</span>
-            <span class="lang-en">Q4: How do I enable Nitro or Turbine Jet Mode?</span>
+            <span class="lang-zh">Q4: 如何讓小工具自動顯示我每一台直昇機的照片與機型名稱？</span>
+            <span class="lang-en">Q4: How to automatically show custom craft picture and model name for my fleet?</span>
           </div>
           <div class="card-desc">
-            <span class="lang-zh">A: 請參考 <strong><a onclick="scrollToSection('topic-powermodes')" style="color: var(--accent-blue); cursor: pointer;">🔥 7. 三大動力模式專屬儀表</a></strong>。進入設定選單將 <code>Heli Type</code> 切換為 <code>Nitro</code> 或 <code>Turbine</code>，畫面自動變形為專屬高對比版面。</span>
-            <span class="lang-en">A: See <strong><a onclick="scrollToSection('topic-powermodes')" style="color: var(--accent-blue); cursor: pointer;">🔥 7. Power Modes</a></strong>. Change <code>Heli Type</code> to <code>Nitro</code> or <code>Turbine</code> in settings menu.</span>
+            <span class="lang-zh">A: 請參考 <strong><a onclick="scrollToSection('topic-image')" style="color: var(--accent-blue); cursor: pointer;">🖼️ 5. 模型圖片與動態辨識</a></strong>。遙控器只需建立單一通用模型（如 <code>RF_Heli</code>），在 Rotorflight 飛控設定 <code>Craft Name</code>（如 <code>S200</code>、<code>RAW580</code>），將同名去背圖片（<code>S200.png</code>）放入 <code>/IMAGES/</code> 或 <code>/WIDGETS/RBCT/modelImage/</code>，通電連線即自動辨識載入！</span>
+            <span class="lang-en">A: See <strong><a onclick="scrollToSection('topic-image')" style="color: var(--accent-blue); cursor: pointer;">🖼️ 5. Craft Image DIY & Sync</a></strong>. Use a single transmitter profile (e.g. <code>RF_Heli</code>). Set <code>Craft Name</code> in Rotorflight (e.g. <code>S200</code>, <code>RAW580</code>) and place matching transparent PNG (<code>S200.png</code>) in <code>/IMAGES/</code> or <code>/WIDGETS/RBCT/modelImage/</code>. It syncs automatically on connection!</span>
           </div>
         </div>
 
         <div class="card" style="margin-bottom: 1rem;">
           <div class="card-title">
-            <span class="lang-zh">Q5: 5 線譜折線圖數據採樣頻率是多少？能用來調機嗎？</span>
-            <span class="lang-en">Q5: What is chart sampling rate & can it be used for flight tuning?</span>
+            <span class="lang-zh">Q5: 電池沒充飽（存儲電壓）或使用 LiHV 高壓鋰電時，S 數會誤判嗎？飛行中大動作抽電會跳 S 數嗎？</span>
+            <span class="lang-en">Q5: Will battery S-cell be miscalculated on storage/LiHV packs or high-pitch punch outs?</span>
           </div>
           <div class="card-desc">
-            <span class="lang-zh">A: 請參考 <strong><a onclick="scrollToSection('topic-logbook')" style="color: var(--accent-blue); cursor: pointer;">📈 8. 飛行日誌與 5 線譜圖表</a></strong>。每 3.0 秒採樣一次，記錄最長 10 分鐘。可用於：1. GOV 定速 PID 調校、2. 電池 C 數壓降診斷、3. BEC 供電負載安全、4. 電調溫升過熱預警！</span>
-            <span class="lang-en">A: See <strong><a onclick="scrollToSection('topic-logbook')" style="color: var(--accent-blue); cursor: pointer;">📈 8. Logbook & 5-Line Chart</a></strong>. Samples every 3.0s (up to 10 mins). Used for Gov PID tuning, battery sag check, BEC load safety, and ESC thermal warnings!</span>
+            <span class="lang-zh">A: 請參考 <strong><a onclick="scrollToSection('topic-dashboard')" style="color: var(--accent-blue); cursor: pointer;">📊 6. 主儀表板與遙測感測器</a></strong> 及 <strong><a onclick="scrollToSection('topic-fmea')" style="color: var(--accent-blue); cursor: pointer;">⚠️ 12. 邊界異常與防爆規則</a></strong>。RBCT 具備「真確 S 數比例演算法」與「通電鎖定 (S-Lock)」機制。通電即以 <code>Vbat / Vcel</code> 鎖定真實 S 數（存儲 12S @ 45.9V 絕不誤判 11S，LiHV 12S @ 52.2V 絕不誤判 13S），飛行中 3D 暴力抽電壓降絕不跳 S 數，換電池斷電自動重新辨識。</span>
+            <span class="lang-en">A: See <strong><a onclick="scrollToSection('topic-dashboard')" style="color: var(--accent-blue); cursor: pointer;">📊 6. Main Dashboard & Sensors</a></strong> and <strong><a onclick="scrollToSection('topic-fmea')" style="color: var(--accent-blue); cursor: pointer;">⚠️ 12. FMEA & Protection Rules</a></strong>. RBCT features an exact ratio algorithm and in-flight RAM S-Lock. It locks cell count upon power-up via <code>Vbat / Vcel</code> (12S @ 45.9V never misjudged as 11S; LiHV 12S @ 52.2V never 13S) and resists high-pitch voltage sags.</span>
           </div>
         </div>
 
         <div class="card" style="margin-bottom: 1rem;">
           <div class="card-title">
-            <span class="lang-zh">Q6: 機隊電池管理系統 (6 包電池) 如何運作？</span>
-            <span class="lang-en">Q6: How does 6-pack battery fleet management work?</span>
+            <span class="lang-zh">Q6: 機隊電池管理系統 (6 包電池) 如何運作？我該如何切換或追蹤不同的電池？</span>
+            <span class="lang-en">Q6: How does 6-pack battery fleet management work and how do I track different packs?</span>
           </div>
           <div class="card-desc">
-            <span class="lang-zh">A: 請參考 <strong><a onclick="scrollToSection('topic-battery')" style="color: var(--accent-blue); cursor: pointer;">🔋 9. 電池 Fleet 機隊管理</a></strong>。自動追蹤 BAT 1 ~ BAT 6 各自的架次與極值，下撥日誌開關 (SC↓) 可隨時查看管理總表。</span>
-            <span class="lang-en">A: See <strong><a onclick="scrollToSection('topic-battery')" style="color: var(--accent-blue); cursor: pointer;">🔋 9. Battery Fleet Manager</a></strong>. Independently tracks BAT 1 ~ 6 cycles and metrics. Toggle Logbook switch DOWN (SC↓) to view summary table.</span>
+            <span class="lang-zh">A: 請參考 <strong><a onclick="scrollToSection('topic-battery')" style="color: var(--accent-blue); cursor: pointer;">🔋 9. 機隊電池管理</a></strong>。在選單 <code>Bat Track</code> 指派實體開關或邏輯開關（如 6P 開關、按鍵）。換上第 1~6 包電池時撥至對應檔位，系統獨立記錄各包電池起降架次、最低電壓、最高溫度與平均飛行時間。下撥日誌開關 (SC↓) 可隨時查看機隊管理總表。</span>
+            <span class="lang-en">A: See <strong><a onclick="scrollToSection('topic-battery')" style="color: var(--accent-blue); cursor: pointer;">🔋 9. Battery Fleet Manager</a></strong>. Assign physical/logical switch (e.g. 6P switch or buttons) in <code>Bat Track</code>. Switch to corresponding position when changing packs. Tracks flight cycles, min voltage, max temp, and average flight time per pack. Toggle Logbook switch DOWN (SC↓) to view fleet summary table.</span>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom: 1rem;">
+          <div class="card-title">
+            <span class="lang-zh">Q7: 飛行日誌與 曲線折線圖要如何開啟？能用來做什麼調機或排錯分析？</span>
+            <span class="lang-en">Q7: How to open telemetry chart and use it for flight tuning & diagnosis?</span>
+          </div>
+          <div class="card-desc">
+            <span class="lang-zh">A: 請參考 <strong><a onclick="scrollToSection('topic-logbook')" style="color: var(--accent-blue); cursor: pointer;">📈 8. 飛行日誌與 曲線圖表</a></strong>。降落後撥動 <code>Logbook Sw</code> 切至中段 (SC-)，或點擊螢幕觸控熱區即可開啟。每 3.0 秒採樣一次，可用於：1. <strong>GOV 定速 PID 調校</strong>（轉速 vs 電壓）、2. <strong>電池 C 數壓降診斷</strong>（電流 vs 電壓）、3. <strong>BEC 供電負載安全</strong>（伺服機瞬間抽載）、4. <strong>電調溫升過熱預警</strong>！</span>
+            <span class="lang-en">A: See <strong><a onclick="scrollToSection('topic-logbook')" style="color: var(--accent-blue); cursor: pointer;">📈 8. Logbook & Telemetry Chart</a></strong>. Flip <code>Logbook Sw</code> to MID (SC-) or tap touch zone post-flight. Samples every 3.0s (up to 10 mins). Used for: 1. <strong>Gov PID tuning</strong> (RPM vs Voltage), 2. <strong>Battery sag / C-rate check</strong> (Amps vs Voltage), 3. <strong>BEC load safety</strong>, 4. <strong>ESC thermal warning</strong>!</span>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom: 1rem;">
+          <div class="card-title">
+            <span class="lang-zh">Q8: 我是燃油直昇機 (Nitro) 或噴射機 (Turbine)，如何開啟專屬動力儀表？</span>
+            <span class="lang-en">Q8: How do I enable Nitro or Turbine Jet dedicated flight dashboards?</span>
+          </div>
+          <div class="card-desc">
+            <span class="lang-zh">A: 請參考 <strong><a onclick="scrollToSection('topic-powermodes')" style="color: var(--accent-blue); cursor: pointer;">🔥 7. 三大動力模式專屬儀表</a></strong>。進入小工具設定選單將 <code>Heli Type</code> 切換為 <code>Nitro</code> 或 <code>Turbine</code>。畫面將自動變形：油機模式即時顯示氣缸溫度、油門開度與 RX 接收電壓；噴射機模式則監控 EGT 尾氣溫度、100k+ 核心轉速、油量百分比與 ECU 狀態碼。</span>
+            <span class="lang-en">A: See <strong><a onclick="scrollToSection('topic-powermodes')" style="color: var(--accent-blue); cursor: pointer;">🔥 7. Three Dedicated Powertrain Modes</a></strong>. Change <code>Heli Type</code> to <code>Nitro</code> or <code>Turbine</code> in settings menu. Layout transforms automatically: Nitro displays cylinder head temp, throttle %, and RX voltage; Turbine displays EGT exhaust temp, 100k+ core RPM, fuel %, and ECU status codes.</span>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom: 1rem;">
+          <div class="card-title">
+            <span class="lang-zh">Q9: 飛行架次是如何計算的？桌上通電調機拔馬達會不會誤算？如何手動歸零？</span>
+            <span class="lang-en">Q9: How is flight count calculated? Will bench testing falsely count flights? How to reset?</span>
+          </div>
+          <div class="card-desc">
+            <span class="lang-zh">A: 請參考 <strong><a onclick="scrollToSection('topic-reset')" style="color: var(--accent-blue); cursor: pointer;">🔄 11. 重置歸零與資料夾維護</a></strong> 及 <strong><a onclick="scrollToSection('topic-fmea')" style="color: var(--accent-blue); cursor: pointer;">⚠️ 12. 邊界異常與防爆規則</a></strong>。內建防呆過濾機制：解鎖超過 60 秒且轉速 > 1000 RPM 或電流 > 5A 才會判定為有效飛行，桌上調機絕不誤判幽靈航班。跨日午夜開機 <code>Today</code> 自動歸零，<code>Total</code> 持續累積；可在選單指派 <code>Reset FlyCount</code> 實體開關（如 SH）隨時一鍵手動歸零今日架次。</span>
+            <span class="lang-en">A: See <strong><a onclick="scrollToSection('topic-reset')" style="color: var(--accent-blue); cursor: pointer;">🔄 11. Reset & Maintenance</a></strong> and <strong><a onclick="scrollToSection('topic-fmea')" style="color: var(--accent-blue); cursor: pointer;">⚠️ 12. FMEA & Protection Rules</a></strong>. Built-in smart anti-ghost flight filter: requires ARMED > 60s and RPM > 1000 or Current > 5A. Bench testing will never trigger false flights. Today count resets automatically at midnight, Total persists. Assign <code>Reset FlyCount</code> switch (e.g. SH) for instant manual reset.</span>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom: 1rem;">
+          <div class="card-title">
+            <span class="lang-zh">Q10: 如何更換儀表板主題顏色、開啟全透明 (TRN) 模式、大太陽強光 LCD 主題或自訂飛手簽名？</span>
+            <span class="lang-en">Q10: How to customize theme colors, transparent TRN mode, sunlight LCD theme, or callsign?</span>
+          </div>
+          <div class="card-desc">
+            <span class="lang-zh">A: 請參考 <strong><a onclick="scrollToSection('topic-options')" style="color: var(--accent-blue); cursor: pointer;">⚙️ 4. 小工具設定選單說明</a></strong>。在選單中：<code>Theme</code> 提供 10 種配色（含 <code>TRN</code> 全透無框與 <code>LCD</code> 戶外強光高反差主題）；可指派 <code>Light Theme Sw</code> 連動光感應器自動切換 LCD 主題；<code>Transp BG</code> 支援透出遙控器桌布；<code>LED Color</code> 連動搖桿 RGB 光圈；<code>UserName</code> 可自訂專屬飛手英文簽名。</span>
+            <span class="lang-en">A: See <strong><a onclick="scrollToSection('topic-options')" style="color: var(--accent-blue); cursor: pointer;">⚙️ 4. Widget Settings Menu</a></strong>. In settings: <code>Theme</code> offers 10 palettes (including <code>TRN</code> frameless transparent & <code>LCD</code> high-contrast sunlight theme); <code>Light Theme Sw</code> enables auto light sensor switching; <code>Transp BG</code> reveals wallpaper; <code>LED Color</code> controls gimbal RGB LED; <code>UserName</code> displays custom pilot callsign signature.</span>
           </div>
         </div>
       </section>
@@ -2918,8 +3232,8 @@ save</pre>
               <span class="lang-en">🚁 Rotorflight Craft Name Auto-Sync<span class="card-sub">(One Profile for Fleet)</span></span>
             </div>
             <div class="card-desc">
-              <span class="lang-zh"><strong>【功能新增】</strong>遙控器只需建立單一通用模型設定（如 <code>RF_Heli</code>），通電連線時小工具自動讀取飛控廣播之 <code>Craft Name</code>（如 <code>S200</code>、<code>RAW580</code>），自動比對 SD 卡同名圖檔（<code>SD卡/IMAGES/S200.png</code> 或 <code>/WIDGETS/RBCT/modelImage/S200.png</code>）載入愛機照片與抬頭，並將飛行架次 (<code>flight_count_&lt;機型&gt;.txt</code>)、機隊電池 (<code>battery_&lt;機型&gt;.txt</code>) 與五線譜日誌 (<code>logbook_&lt;機型&gt;.txt</code>) 依機型獨立歸檔，達成一組設定通用全機隊。</span>
-              <span class="lang-en"><strong>[New Feature]</strong> Automatically matches Rotorflight <code>Craft Name</code> (e.g. <code>S200</code>, <code>RAW580</code>) with SD card images (<code>/IMAGES/S200.png</code> or <code>/WIDGETS/RBCT/modelImage/S200.png</code>) to load craft picture and title, storing flight counts (<code>flight_count_&lt;craft&gt;.txt</code>), battery profiles (<code>battery_&lt;craft&gt;.txt</code>), and 5-line logbooks (<code>logbook_&lt;craft&gt;.txt</code>) independently.</span>
+              <span class="lang-zh"><strong>【功能新增】</strong>遙控器只需建立單一通用模型設定（如 <code>RF_Heli</code>），通電連線時小工具自動讀取飛控廣播之 <code>Craft Name</code>（如 <code>S200</code>、<code>RAW580</code>），自動比對 SD 卡同名圖檔（<code>SD卡/IMAGES/S200.png</code> 或 <code>/WIDGETS/RBCT/modelImage/S200.png</code>）載入愛機照片與抬頭，並將飛行架次 (<code>flight_count_&lt;機型&gt;.txt</code>)、機隊電池 (<code>battery_&lt;機型&gt;.txt</code>) 與曲線日誌 (<code>logbook_&lt;機型&gt;.txt</code>) 依機型獨立歸檔，達成一組設定通用全機隊。</span>
+              <span class="lang-en"><strong>[New Feature]</strong> Automatically matches Rotorflight <code>Craft Name</code> (e.g. <code>S200</code>, <code>RAW580</code>) with SD card images (<code>/IMAGES/S200.png</code> or <code>/WIDGETS/RBCT/modelImage/S200.png</code>) to load craft picture and title, storing flight counts (<code>flight_count_&lt;craft&gt;.txt</code>), battery profiles (<code>battery_&lt;craft&gt;.txt</code>), and telemetry chart logbooks (<code>logbook_&lt;craft&gt;.txt</code>) independently.</span>
             </div>
           </div>
           <div class="card">
@@ -2960,6 +3274,46 @@ save</pre>
             <div class="card-desc">
               <span class="lang-zh"><strong>【邏輯修復】</strong>新增模型預設動力模式一律對齊為 <strong>`電機 (Electric)`</strong> 模式，通電立即顯示標準動力電壓、電變溫度與 S 數。</span>
               <span class="lang-en"><strong>[Logic Fix]</strong> New models and widgets default to <strong>`Electric`</strong> mode out of the box, immediately showing standard voltage, ESC temp, and S-count.</span>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">
+              <span class="lang-zh">🔤 繁/簡/英 三語系 UI 即時切換<span class="card-sub">(Option #22: UI 語言)</span></span>
+              <span class="lang-en">🔤 Tri-Language UI Switcher<span class="card-sub">(Option #22: UI Lang)</span></span>
+            </div>
+            <div class="card-desc">
+              <span class="lang-zh"><strong>【功能新增】</strong>選單新增第 22 項 <code>UI 語言 (UI Lang)</code>，支援 <code>自動 (Auto)</code> 與 <code>英文 (English)</code> 切換模式，依遙控器原生韌體精準適配，杜絕跨字庫留白缺字。全套主儀表 HUD、三大觸控診斷彈窗、黑盒子日誌（Tab 1）與機隊電池總表（Tab 2）全面支援即時切換，且與語音播報完全獨立運作。</span>
+              <span class="lang-en"><strong>[New Feature]</strong> Added Option #22 <code>UI Lang</code> supporting <code>Auto</code>, <code>English</code>, <code>Trad Chinese</code>, and <code>Simp Chinese</code>. Full HUD, popups, logbook (Tab 1), and battery fleet manager (Tab 2) support instant switching independently from voice alarms.</span>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">
+              <span class="lang-zh">🌐 全套 UI 字庫相容性深度重構<span class="card-sub">(Font-Safe Engine)</span></span>
+              <span class="lang-en">🌐 Universal Font-Safe Refactoring<span class="card-sub">(100% Bitmap Font Compatible)</span></span>
+            </div>
+            <div class="card-desc">
+              <span class="lang-zh"><strong>【介面優化】</strong>針對 EdgeTX / OpenTX 內嵌點陣字型進行字庫安全檢驗，徹底剔除「每」、「力」、「健」、「康」、「估」、「阻」等缺字字元，全面精修為「定速」、「轉速 / 分鐘」、「本日清零」、「電池狀態」、「最高/最低」等 100% 驗證通過之安全字彙，保證實機零缺字、不露白。</span>
+              <span class="lang-en"><strong>[UI Optimization]</strong> Comprehensive font audit for EdgeTX bitmap glyphs, eliminating missing characters and standardizing verified terms (<code>轉速 / 分鐘</code>, <code>定速</code>, <code>本日清零</code>, <code>電池狀態</code>) for flawless on-screen rendering.</span>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">
+              <span class="lang-zh">🔒 飛行架次嚴格三重防呆鎖<span class="card-sub">(Triple-Shield Protection)</span></span>
+              <span class="lang-en">🔒 Triple-Shield Flight Count Protection<span class="card-sub">(No Ghost Flights)</span></span>
+            </div>
+            <div class="card-desc">
+              <span class="lang-zh"><strong>【防護升級】</strong>升級飛行架次判定邏輯：必須偵測到直升機通電連線 (<code>Vbat >= 5.0V</code> 或 <code>BEC >= 3.5V</code>) 且進入有效解鎖狀態持續 15 秒以上或轉速 > 400 RPM。遙控器未連線直升機或工作台拔馬達除錯切換開關，絕不誤計次！</span>
+              <span class="lang-en"><strong>[Safety Upgrade]</strong> Hardened flight counting logic: requires active telemetry connection (<code>Vbat >= 5.0V</code> or <code>BEC >= 3.5V</code>) and armed flight > 15s or rotor RPM > 400. Bench testing while powered off will NEVER increment flight counts.</span>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">
+              <span class="lang-zh">✨ 狀態框與定速框立體陰影渲染<span class="card-sub">(Drop Shadow Contrast)</span></span>
+              <span class="lang-en">✨ High-Contrast Text Drop Shadows<span class="card-sub">(STATUS & GOV Boxes)</span></span>
+            </div>
+            <div class="card-desc">
+              <span class="lang-zh"><strong>【視覺優化】</strong>為解鎖狀態 (ARMED / SAFE / RESCUE) 與定速狀態 (GOV ON / OFF) 方塊加入 +1px 高對比文字立體陰影，白字於綠底/紅底與深色底框上更加銳利醒目，大幅降低戶外辨識干擾。</span>
+              <span class="lang-en"><strong>[Visual Optimization]</strong> Added +1px high-contrast drop shadows under ARMED, SAFE, RESCUE, and GOV box labels for crisp, bold legibility against colored backgrounds.</span>
             </div>
           </div>
         </div>
@@ -3044,8 +3398,8 @@ save</pre>
               <span class="lang-en">📊 3-Position Switch Fleet Manager View</span>
             </div>
             <div class="card-desc">
-              <span class="lang-zh"><strong>【功能新增】</strong>透過 <code>Logbook Sw</code> 三段開關控制：切至中段 (MID) 顯示 5 線譜即時圖表；切至下段 (DOWN) 顯示 BATTERY FLEET MANAGER 機隊總表，當前選定電池以高亮綠框醒目標示，左下角浮水印同步顯示當前電池編號 (如 BAT 1)。</span>
-              <span class="lang-en"><strong>[New Feature]</strong> <code>Logbook Sw</code> MID opens 5-line chart; DOWN opens Battery Fleet Manager summary table with active pack highlighted in green and watermark showing current pack (e.g. BAT 1).</span>
+              <span class="lang-zh"><strong>【功能新增】</strong>透過 <code>Logbook Sw</code> 三段開關控制：切至中段 (MID) 顯示 曲線即時圖表；切至下段 (DOWN) 顯示 BATTERY FLEET MANAGER 機隊總表，當前選定電池以高亮綠框醒目標示，左下角電池代號同步顯示當前電池編號 (如 BAT 1)。</span>
+              <span class="lang-en"><strong>[New Feature]</strong> <code>Logbook Sw</code> MID opens telemetry chart; DOWN opens Battery Fleet Manager summary table with active pack highlighted in green and watermark showing current pack (e.g. BAT 1).</span>
             </div>
           </div>
           <div class="card" style="grid-column: 1 / -1;">
@@ -3146,11 +3500,11 @@ save</pre>
           </div>
           <div class="card">
             <div class="card-title">
-              <span class="lang-zh">📊 五線譜分析圖表物理分層</span>
-              <span class="lang-en">📊 Dual-Layer 5-Line Telemetry Chart</span>
+              <span class="lang-zh">📊 曲線分析圖表物理分層</span>
+              <span class="lang-en">📊 Dual-Layer Telemetry Chart</span>
             </div>
             <div class="card-desc">
-              <span class="lang-zh"><strong>【介面優化】</strong>日誌下方新增 5 線譜即時圖表，物理分割為上下兩層 (上層：轉速/電壓/電流，下層：溫度/BEC)，解決刻度重疊並完美對齊時間 X 軸。</span>
+              <span class="lang-zh"><strong>【介面優化】</strong>日誌下方新增 曲線即時圖表，物理分割為上下兩層 (上層：轉速/電壓/電流，下層：溫度/BEC)，解決刻度重疊並完美對齊時間 X 軸。</span>
               <span class="lang-en"><strong>[UI Optimization]</strong> Split graph into upper layer (RPM/Vbat/Amps) and lower layer (Temp/BEC) with aligned time axis.</span>
             </div>
           </div>
@@ -3272,11 +3626,11 @@ save</pre>
           </div>
           <div class="card">
             <div class="card-title">
-              <span class="lang-zh">✨ 標頭視覺淨化與版本浮水印</span>
+              <span class="lang-zh">✨ 標頭視覺淨化與版本電池代號</span>
               <span class="lang-en">✨ Header Cleanup & Version Watermark</span>
             </div>
             <div class="card-desc">
-              <span class="lang-zh"><strong>【介面優化】</strong>移除右上角電壓與時間中間多餘斜線 <code>/</code>；左下角加入淡淡版本號浮水印 (<code>v 1.0.001</code>)；修正電池資訊與 NO DATA 重疊錯誤。</span>
+              <span class="lang-zh"><strong>【介面優化】</strong>移除右上角電壓與時間中間多餘斜線 <code>/</code>；左下角加入淡淡版本號電池代號 (<code>v 1.0.001</code>)；修正電池資訊與 NO DATA 重疊錯誤。</span>
               <span class="lang-en"><strong>[UI Optimization]</strong> Removed redundant <code>/</code> in header and added faint watermark (<code>v 1.0.001</code>); fixed battery info overlapping bug.</span>
             </div>
           </div>
@@ -3311,6 +3665,54 @@ save</pre>
             </div>
           </div>
         </div>
+
+        <!-- v1.0.000 -->
+        <div class="topic-sub-title" style="margin-top: 2rem;">
+          <span class="lang-zh">🎉 v1.0.000 (初始上線版本)</span>
+          <span class="lang-en">🎉 v1.0.000 (Initial Release)</span>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">
+              <span class="lang-zh">🚁 RBCT 直昇機儀表板小工具正式上線</span>
+              <span class="lang-en">🚁 RBCT Helicopter Dashboard Official Launch</span>
+            </div>
+            <div class="card-desc">
+              <span class="lang-zh"><strong>【初始發布】</strong>專為 EdgeTX 與 Rotorflight 飛控打造的高階直昇機全彩儀表板小工具正式上線！提供 480×272、480×320 及 800×480 多解析度自適應座艙介面。</span>
+              <span class="lang-en"><strong>[Initial Launch]</strong> Official release of RBCT Helicopter Telemetry Dashboard for EdgeTX & Rotorflight! Featuring multi-resolution cockpit HUD for 480×272, 480×320, and 800×480 screens.</span>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">
+              <span class="lang-zh">📊 核心即時遙測 HUD 儀表</span>
+              <span class="lang-en">📊 Core Real-Time Telemetry HUD</span>
+            </div>
+            <div class="card-desc">
+              <span class="lang-zh"><strong>【核心功能】</strong>即時整合監控主動力電池總電壓 (Vbat)、單芯電壓 (Cell)、馬達運作電流 (A)、消耗電量 (mAh)、旋翼轉速 (RPM)、定速狀態 (GOV)、BEC 供電電壓、電調溫度 (ESC Temp) 與接收訊號品質 (RSSI)。</span>
+              <span class="lang-en"><strong>[Core Feature]</strong> Real-time monitoring of pack voltage (Vbat), cell voltage, motor current (Amps), consumption (mAh), headspeed (RPM), Governor status, BEC voltage, ESC temperature, and RSSI link.</span>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">
+              <span class="lang-zh">🔒 飛控 FBL 段數 (Bank) 與解鎖狀態指示</span>
+              <span class="lang-en">🔒 FBL Flight Mode / Bank & Arm Status</span>
+            </div>
+            <div class="card-desc">
+              <span class="lang-zh"><strong>【核心功能】</strong>動態顯示當前飛控 PID Profile / Bank 段數，並醒目整合上鎖 (SAFE / DISARMED) 與解鎖 (ARMED) 動態安全圖示指示。</span>
+              <span class="lang-en"><strong>[Core Feature]</strong> Dynamic display of active FBL PID Profile / Bank, integrated with clear ARMED / DISARMED safety status indicator icons.</span>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">
+              <span class="lang-zh">🎨 多款高對比主題色彩與模型圖片支援</span>
+              <span class="lang-en">🎨 Multi-Theme Color Palettes & Model Picture</span>
+            </div>
+            <div class="card-desc">
+              <span class="lang-zh"><strong>【介面自訂】</strong>內建 11 種經典高對比主題色彩（Red、Orange、Yellow、Green、Blue、Cyan、Violet、Pink 等），並原生支援讀取 SD 卡 <code>/IMAGES/</code> 模型同名圖片，為愛機打造專屬座艙視覺。</span>
+              <span class="lang-en"><strong>[UI Customization]</strong> Built-in 8 classic high-contrast color themes (Red, Orange, Yellow, Green, Blue, Indigo, Violet) and native support for custom model pictures from <code>/IMAGES/</code>.</span>
+            </div>
+          </div>
+        </div>
       </section>
 
     </main>
@@ -3321,9 +3723,6 @@ save</pre>
   </footer>
 
   <script>
-    let currentLang = 'zh';
-    let activeSectionId = 'topic-overview';
-
     const chapterList = [
       { id: 'topic-overview', num: 1, zh: '🌟 1. 產品簡介與核心亮點', en: '🌟 1. Overview & Features' },
       { id: 'topic-features-bugs', num: 2, zh: '🛠️ 2. 最新功能與 BUG 修正', en: '🛠️ 2. New Features & Bug Fixes' },
@@ -3332,8 +3731,8 @@ save</pre>
       { id: 'topic-image', num: 5, zh: '🖼️ 5. 模型圖片與動態辨識', en: '🖼️ 5. Craft Image DIY & Sync' },
       { id: 'topic-dashboard', num: 6, zh: '📊 6. 主儀表板與遙測感測器', en: '📊 6. Main Dashboard & Sensors' },
       { id: 'topic-powermodes', num: 7, zh: '🔥 7. 三大動力模式專屬儀表', en: '🔥 7. Electric / Nitro / Turbine' },
-      { id: 'topic-logbook', num: 8, zh: '📈 8. 飛行日誌與 5 線譜圖表', en: '📈 8. Logbook & 5-Line Chart' },
-      { id: 'topic-battery', num: 9, zh: '🔋 9. 電池 Fleet 機隊管理', en: '🔋 9. Battery Fleet Manager' },
+      { id: 'topic-logbook', num: 8, zh: '📈 8. 飛行日誌與 曲線圖表', en: '📈 8. Logbook & Telemetry Chart' },
+      { id: 'topic-battery', num: 9, zh: '🔋 9. 機隊電池管理', en: '🔋 9. Battery Fleet Manager' },
       { id: 'topic-voice', num: 10, zh: '📢 10. 智能語音與極值警示', en: '📢 10. Voice Assistant & Alerts' },
       { id: 'topic-reset', num: 11, zh: '🔄 11. 重置歸零與資料夾維護', en: '🔄 11. Reset & Maintenance' },
       { id: 'topic-fmea', num: 12, zh: '⚠️ 12. 邊界異常與防爆規則', en: '⚠️ 12. FMEA & Protection Rules' },
@@ -3341,15 +3740,105 @@ save</pre>
       { id: 'topic-changelog', num: 14, zh: '📜 14. 版本更新歷程全紀錄', en: '📜 14. Version Release History' }
     ];
 
-    function toggleLanguage() {
-      const body = document.body;
-      if (currentLang === 'zh') {
-        currentLang = 'en';
-        body.classList.add('lang-en-mode');
-      } else {
-        currentLang = 'zh';
-        body.classList.remove('lang-en-mode');
+    let currentLang = 'tw'; // 'tw', 'cn', 'en'
+    let activeSectionId = 'topic-overview';
+
+    // 3559 Official OpenCC verified Traditional to Simplified character mappings
+    const T2S_DICT = {"鯞": "𫚡", "軬": "𫐊", "魯": "鲁", "龎": "厐", "訓": "训", "攢": "攒", "矑": "𪾦", "繰": "缲", "竪": "竖", "釴": "𬬩", "駻": "𫘣", "蟘": "𫋌", "縉": "缙", "羶": "膻", "樢": "㭤", "獵": "猎", "歸": "归", "諗": "谂", "槮": "椮", "瞼": "睑", "箋": "笺", "溡": "𪶄", "鐄": "𨱑", "濰": "潍", "鏰": "镚", "細": "细", "連": "连", "燼": "烬", "輿": "舆", "駰": "骃", "闈": "闱", "衊": "蔑", "俁": "俣", "壣": "𪤚", "慣": "惯", "璵": "玙", "襬": "摆", "腳": "脚", "薳": "䓕", "廠": "厂", "鬆": "松", "條": "条", "鎬": "镐", "巔": "巅", "艙": "舱", "蓧": "𦰏", "銂": "𫟻", "輗": "𫐐", "韉": "鞯", "詎": "讵", "穀": "谷", "鑕": "锧", "傌": "㐷", "繶": "𫄷", "鏜": "镗", "駧": "𩧲", "鉶": "铏", "鐇": "𫔍", "餖": "饾", "繫": "系", "絀": "绌", "誷": "𫍬", "齋": "斋", "膩": "腻", "閒": "闲", "餷": "馇", "屜": "屉", "談": "谈", "餪": "𫗬", "煬": "炀", "鈍": "钝", "隮": "𬯀", "縴": "纤", "麯": "曲", "緔": "绱", "銥": "铱", "遼": "辽", "鑹": "镩", "踐": "践", "闔": "阖", "錒": "锕", "恥": "耻", "餳": "饧", "誌": "志", "銃": "铳", "臢": "臜", "鳲": "鸤", "贃": "𧹗", "噴": "喷", "鎧": "铠", "麨": "𪎊", "諟": "𬤊", "鈄": "钭", "飯": "饭", "綱": "纲", "蠐": "蛴", "譚": "谭", "戶": "户", "銷": "销", "絪": "𬘡", "嬀": "妫", "償": "偿", "賰": "䞐", "諴": "𫍯", "裡": "里", "橋": "桥", "犞": "𪺭", "寀": "采", "憖": "慭", "綆": "绠", "鮶": "鲪", "鐲": "镯", "濺": "溅", "羈": "羁", "譅": "𰶎", "壞": "坏", "斃": "毙", "鮞": "鲕", "緱": "缑", "餭": "𫗮", "拚": "拼", "鶡": "鹖", "轟": "轰", "慶": "庆", "繻": "𦈡", "竈": "灶", "鸏": "鹲", "詘": "诎", "繏": "𦈝", "嶧": "峄", "淨": "净", "訞": "𫍚", "緄": "绲", "鑑": "鉴", "吒": "咤", "愨": "悫", "幷": "并", "飪": "饪", "麽": "么", "驃": "骠", "鮠": "𬶏", "癐": "𤶊", "梖": "𪱷", "鱊": "𫚪", "錥": "𫓾", "鬖": "𩭹", "關": "关", "槳": "桨", "殘": "残", "漿": "浆", "劑": "剂", "蓯": "苁", "護": "护", "譓": "𬤝", "鷴": "鹇", "燴": "烩", "絍": "𫟃", "諰": "𫍰", "詼": "诙", "壠": "垅", "籅": "𥫣", "媯": "妫", "雲": "云", "鑽": "钻", "牘": "牍", "鎲": "镋", "尷": "尴", "鰈": "鲽", "涼": "凉", "裊": "袅", "矇": "蒙", "錈": "锩", "綜": "综", "許": "许", "幣": "币", "輪": "轮", "摻": "掺", "廂": "厢", "鎔": "镕", "鄭": "郑", "揀": "拣", "賂": "赂", "蓽": "荜", "爾": "尔", "薀": "蕰", "齙": "龅", "頎": "颀", "蕪": "芜", "爥": "𪹳", "轤": "轳", "剎": "刹", "萬": "万", "鯒": "鲬", "蟻": "蚁", "鄶": "郐", "痮": "𪽪", "躘": "𨀁", "鴴": "鸻", "鴆": "鸩", "曉": "晓", "齾": "𫜰", "鯤": "鲲", "蠔": "蚝", "鮰": "𫚔", "毿": "毵", "瘓": "痪", "筍": "笋", "軻": "轲", "蔔": "卜", "麷": "𫜑", "紟": "𫄛", "攤": "摊", "綖": "𫄧", "潿": "涠", "墲": "𪢸", "齬": "龉", "鉆": "钻", "緊": "紧", "額": "额", "繞": "绕", "綏": "绥", "鮺": "鲝", "劚": "㔉", "摟": "搂", "鋠": "𫓵", "綄": "𬘫", "籙": "箓", "媰": "㛀", "註": "注", "轍": "辙", "閉": "闭", "銪": "铕", "鬩": "阋", "駼": "𬳿", "虛": "虚", "鎙": "𫔈", "殢": "𣨼", "凱": "凯", "黌": "黉", "襉": "裥", "騱": "𫘬", "嶈": "𡺃", "閆": "闫", "輊": "轾", "贊": "赞", "嗩": "唢", "鯝": "鲴", "營": "营", "鱢": "𫚫", "牽": "牵", "鄩": "𬩽", "穭": "穞", "榦": "干", "唓": "𪠳", "計": "计", "鮿": "𫚚", "鷗": "鸥", "貗": "𫎌", "絳": "绛", "萊": "莱", "兒": "儿", "撾": "挝", "鷺": "鹭", "訃": "讣", "睜": "睁", "鋒": "锋", "蠟": "蜡", "嫗": "妪", "鳶": "鸢", "躝": "𨅬", "嶠": "峤", "兌": "兑", "龕": "龛", "鵁": "䴔", "鐿": "镱", "譭": "毁", "視": "视", "須": "须", "灙": "𣺼", "鬹": "鬶", "殨": "㱮", "鐃": "铙", "訩": "讻", "掛": "挂", "鱇": "𩾌", "硯": "砚", "訝": "讶", "躊": "踌", "詮": "诠", "爖": "𤇭", "灃": "沣", "嶗": "崂", "旂": "旗", "嵗": "岁", "彥": "彦", "詆": "诋", "縶": "絷", "譑": "𫍤", "贉": "𫎫", "鬮": "阄", "線": "线", "牆": "墙", "鶠": "𬸘", "灤": "滦", "詠": "咏", "誆": "诓", "脣": "唇", "場": "场", "猌": "𪺽", "颯": "飒", "櫞": "橼", "賙": "赒", "綉": "绣", "鱷": "鳄", "懟": "怼", "柵": "栅", "騁": "骋", "幫": "帮", "騑": "𬴂", "鐝": "镢", "襤": "褴", "盡": "尽", "猻": "狲", "輢": "𫐎", "鵊": "𫛥", "帳": "帐", "錛": "锛", "鍥": "锲", "搖": "摇", "緓": "绬", "戇": "戆", "諶": "谌", "磽": "硗", "齶": "腭", "誠": "诚", "癮": "瘾", "闊": "阔", "灍": "𫞝", "輖": "𫐏", "鯁": "鲠", "鶼": "鹣", "餬": "糊", "盧": "卢", "鮓": "鲊", "長": "长", "癧": "疬", "濁": "浊", "鰏": "鲾", "楊": "杨", "憫": "悯", "極": "极", "暐": "𬀩", "薈": "荟", "讕": "谰", "慘": "惨", "蕝": "𫈵", "鍔": "锷", "嚦": "呖", "睏": "困", "鐪": "𫓺", "瀋": "沈", "秈": "籼", "虉": "𬟁", "顃": "𩖖", "鉤": "钩", "圍": "围", "詀": "𧮪", "蕓": "芸", "嚶": "嘤", "曖": "暧", "斅": "𢽾", "濃": "浓", "龐": "庞", "氾": "泛", "樂": "乐", "饘": "𫗴", "飶": "𫗣", "頴": "颕", "鬧": "闹", "籜": "箨", "齪": "龊", "藺": "蔺", "編": "编", "釨": "𫓦", "鳴": "鸣", "櫱": "蘖", "侖": "仑", "掃": "扫", "鐐": "镣", "俓": "𠇹", "堚": "𪣒", "總": "总", "囀": "啭", "軿": "𫐌", "鴨": "鸭", "賾": "赜", "絃": "弦", "贇": "赟", "壋": "垱", "鉬": "钼", "鴮": "𫛦", "頫": "𫖯", "壪": "塆", "紛": "纷", "顗": "𫖮", "糞": "粪", "輯": "辑", "髮": "发", "禡": "祃", "鸛": "鹳", "參": "参", "誺": "𫍧", "窪": "洼", "鏗": "铿", "鏡": "镜", "巖": "岩", "摋": "𢫬", "稅": "税", "縞": "缟", "灡": "㳕", "書": "书", "霼": "𪵣", "鄺": "邝", "熚": "𤇹", "謐": "谧", "陸": "陆", "錏": "铔", "郟": "郏", "辭": "辞", "驍": "骁", "縵": "缦", "壘": "垒", "醖": "酝", "揮": "挥", "鮟": "𩽾", "賓": "宾", "潯": "浔", "暘": "旸", "馮": "冯", "鈅": "钥", "鱖": "鳜", "癆": "痨", "黃": "黄", "優": "优", "崬": "岽", "鰱": "鲢", "襓": "𫋹", "絕": "绝", "幘": "帻", "蒔": "莳", "礮": "𪿫", "儷": "俪", "漣": "涟", "鮀": "𬶍", "皁": "皂", "曨": "昽", "靆": "叇", "聳": "耸", "綳": "绷", "綢": "绸", "銀": "银", "儸": "㑩", "鱉": "鳖", "陘": "陉", "緯": "纬", "賦": "赋", "獃": "呆", "顓": "颛", "諷": "讽", "鸌": "鹱", "頦": "颏", "徠": "徕", "緲": "缈", "淶": "涞", "錂": "𨱋", "鄴": "邺", "鼴": "鼹", "齷": "龌", "鳼": "𪉃", "鋅": "锌", "鏚": "𬭭", "氌": "氇", "穩": "稳", "湧": "涌", "觶": "觯", "澬": "𫞚", "鴽": "𫛪", "適": "适", "緣": "缘", "朥": "𦛨", "虜": "虏", "賴": "赖", "約": "约", "鸊": "䴙", "劌": "刿", "靈": "灵", "搵": "揾", "鋨": "锇", "遡": "溯", "鯪": "鲮", "埨": "𫭢", "鳳": "凤", "詵": "诜", "鑱": "镵", "頰": "颊", "甌": "瓯", "摐": "𪭢", "遷": "迁", "軟": "软", "籲": "吁", "夢": "梦", "錡": "锜", "兩": "两", "鴇": "鸨", "飵": "𫗢", "鰍": "鳅", "騞": "𬴃", "銁": "𫓲", "濼": "泺", "訥": "讷", "鐩": "𬭼", "枴": "拐", "鍇": "锴", "嬇": "𫝬", "況": "况", "彎": "弯", "冪": "幂", "詫": "诧", "謎": "谜", "鎦": "镏", "謗": "谤", "員": "员", "偽": "伪", "銹": "锈", "維": "维", "閾": "阈", "鴣": "鸪", "鷨": "𪉊", "駱": "骆", "嶹": "𫝵", "駶": "𩧺", "嚳": "喾", "羵": "𫅗", "頵": "𫖳", "嫋": "袅", "鱝": "鲼", "慺": "㥪", "竄": "窜", "鉦": "钲", "淥": "渌", "頒": "颁", "靦": "腼", "軾": "轼", "脈": "脉", "靚": "靓", "耬": "耧", "鉋": "铇", "燭": "烛", "軲": "轱", "鶬": "鸧", "鋣": "铘", "鮫": "鲛", "縗": "缞", "鈹": "铍", "鋯": "锆", "毀": "毁", "鈷": "钴", "餞": "饯", "瑪": "玛", "錨": "锚", "簹": "筜", "糧": "粮", "覯": "觏", "賣": "卖", "鋸": "锯", "蹕": "跸", "繂": "𫄴", "喫": "吃", "艤": "舣", "經": "经", "龍": "龙", "輨": "𫐑", "楓": "枫", "憊": "惫", "鮝": "鲞", "磚": "砖", "鵧": "𫛨", "後": "后", "騪": "𩨄", "朮": "术", "螻": "蝼", "謭": "谫", "鄰": "邻", "騠": "𫘨", "還": "还", "熂": "𪸕", "鬱": "郁", "礬": "矾", "鄖": "郧", "埬": "𪣆", "賟": "𧹖", "螄": "蛳", "換": "换", "鎯": "𨱍", "銅": "铜", "紃": "𬘓", "農": "农", "訟": "讼", "絥": "𫄢", "籬": "篱", "顴": "颧", "躍": "跃", "襴": "襕", "酇": "酂", "薘": "荙", "鐒": "铹", "猶": "犹", "紂": "纣", "燒": "烧", "禪": "禅", "東": "东", "韓": "韩", "壢": "坜", "樳": "桪", "階": "阶", "謯": "𫍹", "櫨": "栌", "嶔": "嵚", "眾": "众", "漁": "渔", "説": "说", "齏": "齑", "閻": "阎", "浿": "𬇙", "綎": "𬘩", "赬": "赪", "殺": "杀", "鋶": "锍", "鋟": "锓", "鉻": "铬", "鴷": "䴕", "餚": "肴", "塗": "涂", "顫": "颤", "肅": "肃", "們": "们", "躕": "蹰", "鯆": "𫚙", "謱": "𫍴", "壚": "垆", "騎": "骑", "櫠": "𪲮", "將": "将", "擓": "㧟", "縎": "𦈔", "璡": "琎", "鮸": "𩾃", "嫺": "娴", "捲": "卷", "檸": "柠", "嬌": "娇", "槤": "梿", "辮": "辫", "設": "设", "鎡": "镃", "鍺": "锗", "勵": "励", "凈": "净", "鏐": "镠", "鐨": "镄", "飲": "饮", "茲": "兹", "掚": "𪭵", "繸": "䍁", "瑣": "琐", "榘": "矩", "紀": "纪", "腡": "脶", "縹": "缥", "緷": "𦈉", "鶄": "䴖", "餿": "馊", "洩": "泄", "劏": "㓥", "採": "采", "鷚": "鹨", "蒼": "苍", "鯽": "鲫", "鱗": "鳞", "舖": "铺", "鍩": "锘", "韍": "韨", "倲": "㑈", "礒": "𥐟", "磑": "硙", "雛": "雏", "騊": "𫘦", "殼": "壳", "緗": "缃", "齼": "𬺓", "魥": "𩽹", "菕": "𰰨", "貓": "猫", "鵒": "鹆", "闃": "阒", "贑": "𫎬", "誦": "诵", "謆": "𫍸", "鷙": "鸷", "稏": "䅉", "飫": "饫", "誳": "𫍮", "澇": "涝", "餾": "馏", "鐸": "铎", "窮": "穷", "嚥": "咽", "鏷": "镤", "奐": "奂", "鑣": "镳", "鰆": "䲠", "鏃": "镞", "題": "题", "謊": "谎", "絰": "绖", "鈋": "𨱂", "絝": "绔", "殭": "僵", "銫": "铯", "蒍": "𫇭", "樁": "桩", "練": "练", "剋": "克", "瀕": "濒", "鋹": "𬬮", "奮": "奋", "騝": "𩨃", "紖": "纼", "釋": "释", "喬": "乔", "鈽": "钸", "婡": "𫝫", "壈": "𡒄", "嗶": "哔", "藶": "苈", "癘": "疠", "楨": "桢", "熅": "煴", "嚮": "向", "樹": "树", "簽": "签", "軏": "𫐄", "稜": "棱", "鈀": "钯", "紺": "绀", "孆": "𫝭", "貢": "贡", "瀝": "沥", "躚": "跹", "閈": "闬", "輕": "轻", "銓": "铨", "噯": "嗳", "諥": "𫍳", "盤": "盘", "銜": "衔", "鯔": "鲻", "閭": "闾", "碼": "码", "麫": "面", "讞": "谳", "犢": "犊", "鏺": "䥽", "疊": "叠", "榮": "荣", "纊": "纩", "崗": "岗", "劃": "划", "暢": "畅", "櫓": "橹", "撥": "拨", "燶": "㶶", "釙": "钋", "憸": "𪫺", "灄": "滠", "擊": "击", "漊": "溇", "鴳": "𫛩", "憶": "忆", "偵": "侦", "戧": "戗", "櫪": "枥", "褻": "亵", "瑻": "𪻲", "嘍": "喽", "魴": "鲂", "滻": "浐", "繯": "缳", "鋂": "𰾄", "饃": "馍", "籛": "篯", "較": "较", "樞": "枢", "釟": "𫓥", "紲": "绁", "崑": "昆", "鉿": "铪", "鏟": "铲", "頤": "颐", "帶": "带", "淵": "渊", "騷": "骚", "鉠": "𫓭", "覎": "觃", "鈥": "钬", "殞": "殒", "硤": "硖", "塤": "埙", "墜": "坠", "瞤": "𥆧", "廕": "荫", "軸": "轴", "澆": "浇", "閞": "𫔰", "嶨": "峃", "鶪": "䴗", "厠": "厕", "蘿": "萝", "錙": "锱", "纖": "纤", "釕": "钌", "剛": "刚", "鵜": "鹈", "詭": "诡", "廁": "厕", "匯": "汇", "順": "顺", "駞": "𫘞", "賠": "赔", "鬥": "斗", "蔦": "茑", "則": "则", "樸": "朴", "輅": "辂", "轄": "辖", "鈲": "𨱃", "詝": "𬣞", "葒": "荭", "蟳": "𫊻", "鍛": "锻", "潚": "㴋", "摶": "抟", "備": "备", "紮": "扎", "黿": "鼋", "鸗": "𫛟", "稟": "禀", "鐺": "铛", "隴": "陇", "純": "纯", "獅": "狮", "剾": "𠛅", "騶": "驺", "蕆": "蒇", "鎍": "𫔅", "纜": "缆", "絛": "绦", "籠": "笼", "鷉": "䴘", "鷄": "鸡", "鰣": "鲥", "絞": "绞", "飥": "饦", "層": "层", "領": "领", "賑": "赈", "壇": "坛", "鍅": "钫", "諛": "谀", "鎞": "𫔇", "績": "绩", "篋": "箧", "櫛": "栉", "馳": "驰", "塊": "块", "賁": "贲", "嶽": "岳", "廣": "广", "撝": "㧑", "浹": "浃", "禍": "祸", "鸝": "鹂", "棡": "㭎", "弳": "弪", "僑": "侨", "婭": "娅", "諮": "咨", "鑊": "镬", "纍": "累", "鏆": "𨱌", "馴": "驯", "箇": "个", "譨": "𫍦", "崙": "仑", "鈃": "钘", "熱": "热", "憚": "惮", "顣": "𫖹", "蘄": "蕲", "荊": "荆", "竚": "𥩟", "竊": "窃", "誒": "诶", "籪": "簖", "煇": "𪸩", "賚": "赉", "緩": "缓", "櫍": "𬃊", "譂": "𫟠", "闐": "阗", "諧": "谐", "涇": "泾", "齩": "𫜪", "蕘": "荛", "誨": "诲", "機": "机", "訊": "讯", "欑": "𪴙", "隸": "隶", "夾": "夹", "導": "导", "謠": "谣", "鮭": "鲑", "悵": "怅", "鋌": "铤", "鯷": "鳀", "駟": "驷", "門": "门", "黽": "黾", "賝": "𫎩", "鏌": "镆", "鋗": "𫓶", "襇": "裥", "櫝": "椟", "閩": "闽", "幓": "㡎", "築": "筑", "爺": "爷", "鏨": "錾", "釧": "钏", "鶩": "鹜", "簂": "𫂆", "襏": "袯", "韠": "𫖒", "蘀": "萚", "朧": "胧", "蝕": "蚀", "鐋": "铴", "攄": "摅", "遠": "远", "徹": "彻", "竱": "𫁟", "妝": "妆", "幩": "𪩸", "澐": "沄", "懨": "恹", "淚": "泪", "駕": "驾", "蕒": "荬", "儘": "尽", "蟣": "虮", "寶": "宝", "敓": "敚", "腸": "肠", "犖": "荦", "議": "议", "皸": "皲", "沖": "冲", "祕": "秘", "蘢": "茏", "倫": "伦", "鵯": "鹎", "鐓": "镦", "鉸": "铰", "啓": "启", "閝": "𫠂", "洶": "汹", "漬": "渍", "頃": "顷", "齗": "龂", "鵡": "鹉", "強": "强", "潙": "沩", "詣": "诣", "過": "过", "噞": "𪡋", "鍀": "锝", "韻": "韵", "颰": "𩙥", "嬣": "𪥰", "摺": "折", "壗": "𡋤", "瀟": "潇", "鴀": "𫛜", "櫅": "𪲎", "餎": "饹", "鐽": "𫟼", "骯": "肮", "鍠": "锽", "變": "变", "惡": "恶", "櫳": "栊", "謹": "谨", "蘟": "𦻕", "麲": "𪎉", "蒞": "莅", "嗇": "啬", "蔯": "𫈟", "煥": "焕", "嬸": "婶", "燻": "熏", "鈑": "钣", "兗": "兖", "諯": "𫍱", "絶": "绝", "腪": "𣍯", "罰": "罚", "憢": "𢙒", "鑲": "镶", "濛": "蒙", "話": "话", "財": "财", "曏": "向", "曥": "𣆐", "兇": "凶", "畫": "画", "熡": "𤋏", "綞": "缍", "氣": "气", "騉": "𫘥", "諺": "谚", "錟": "锬", "鰵": "鳘", "熓": "𤆡", "頠": "𬱟", "噓": "嘘", "齟": "龃", "籃": "篮", "脛": "胫", "嶺": "岭", "閂": "闩", "蠣": "蛎", "颶": "飓", "陝": "陕", "躡": "蹑", "闡": "阐", "璾": "𫞦", "鯇": "鲩", "疇": "畴", "縧": "绦", "轎": "轿", "糰": "团", "撊": "𪭾", "攔": "拦", "駃": "𫘝", "翬": "翚", "飀": "飗", "綸": "纶", "補": "补", "陽": "阳", "昇": "升", "鐙": "镫", "囪": "囱", "堝": "埚", "謔": "谑", "葝": "𫈎", "餉": "饷", "勱": "劢", "鈇": "𫓧", "諦": "谛", "琿": "珲", "縬": "𦈚", "煙": "烟", "鴞": "鸮", "鰺": "鲹", "爲": "为", "統": "统", "餜": "馃", "頂": "顶", "臉": "脸", "駓": "𬳵", "悞": "悮", "懲": "惩", "鷯": "鹩", "鉢": "钵", "諭": "谕", "鶹": "鹠", "勛": "勋", "謂": "谓", "頁": "页", "劇": "剧", "佇": "伫", "鷲": "鹫", "緋": "绯", "宮": "宫", "汙": "污", "觴": "觞", "噹": "当", "葷": "荤", "湞": "浈", "瀲": "潋", "貺": "贶", "遶": "绕", "騧": "䯄", "驚": "惊", "縋": "缒", "喲": "哟", "驦": "骦", "饁": "馌", "殰": "㱩", "噚": "㖊", "譖": "谮", "騟": "𩨈", "嬰": "婴", "滬": "沪", "誾": "訚", "輛": "辆", "紹": "绍", "問": "问", "瘲": "疭", "櫧": "槠", "憒": "愦", "駔": "驵", "孎": "𡠟", "爇": "𦶟", "騃": "𫘤", "韞": "韫", "轊": "𫐕", "硃": "朱", "鯉": "鲤", "湊": "凑", "瀰": "弥", "纕": "𬙋", "篠": "筿", "禦": "御", "巊": "𪩎", "瘺": "瘘", "聶": "聂", "鎸": "镌", "鈮": "铌", "構": "构", "糝": "糁", "懸": "悬", "釅": "酽", "檟": "槚", "餺": "馎", "勁": "劲", "覲": "觐", "愴": "怆", "邐": "逦", "虧": "亏", "磾": "䃅", "鈞": "钧", "亙": "亘", "儲": "储", "螞": "蚂", "剗": "刬", "魦": "𫚌", "遱": "𫐷", "蹠": "跖", "黲": "黪", "碭": "砀", "驋": "𩧯", "緬": "缅", "協": "协", "噸": "吨", "闉": "𬮱", "爍": "烁", "鎇": "镅", "侶": "侣", "贅": "赘", "鵑": "鹃", "魢": "鱾", "瓄": "𪻨", "鵬": "鹏", "鐫": "镌", "飴": "饴", "澾": "㳠", "減": "减", "壼": "壸", "鮑": "鲍", "鄳": "𫑡", "賄": "贿", "贍": "赡", "蓴": "莼", "鉈": "铊", "濕": "湿", "貟": "贠", "騅": "骓", "躪": "躏", "艦": "舰", "埡": "垭", "鳬": "凫", "爐": "炉", "騖": "骛", "獱": "㺍", "曄": "晔", "監": "监", "鷳": "鹇", "靨": "靥", "鋥": "锃", "湯": "汤", "瘋": "疯", "餛": "馄", "駩": "𩧴", "鸚": "鹦", "諓": "𬣡", "紗": "纱", "禎": "祯", "鴿": "鸽", "贗": "赝", "輩": "辈", "灝": "灏", "鮯": "𫚗", "癲": "癫", "鈰": "铈", "蕎": "荞", "礪": "砺", "顛": "颠", "屩": "𪨗", "鰛": "鳁", "鉅": "巨", "厙": "厍", "鳥": "鸟", "週": "周", "囃": "𠱞", "袷": "夹", "瑒": "玚", "釀": "酿", "艱": "艰", "巹": "卺", "嘵": "哓", "滎": "荥", "澱": "淀", "愜": "惬", "暉": "晖", "鷐": "𫜀", "囅": "冁", "雖": "虽", "峴": "岘", "鶚": "鹗", "鎩": "铩", "濱": "滨", "鑀": "𰾭", "蕷": "蓣", "轐": "𫐗", "軹": "轵", "餔": "𫗦", "捱": "挨", "驌": "骕", "媽": "妈", "貸": "贷", "鷟": "𬸦", "晉": "晋", "塹": "堑", "訪": "访", "懀": "𢙓", "鎶": "鿔", "鈸": "钹", "寧": "宁", "綽": "绰", "驨": "𫘱", "璦": "瑷", "鋼": "钢", "輈": "辀", "鴯": "鸸", "觸": "触", "瀦": "潴", "醫": "医", "矚": "瞩", "鮃": "鲆", "檢": "检", "綧": "𬘯", "誑": "诳", "鱯": "鳠", "鮚": "鲒", "錀": "𬬭", "詒": "诒", "漍": "𬇹", "訛": "讹", "饅": "馒", "頗": "颇", "絅": "䌹", "鰮": "鳁", "錄": "录", "鯧": "鲳", "瑩": "莹", "踴": "踊", "齔": "龀", "藥": "药", "寫": "写", "鮮": "鲜", "嘜": "唛", "濤": "涛", "報": "报", "瘧": "疟", "規": "规", "帥": "帅", "瀆": "渎", "際": "际", "齕": "龁", "諡": "谥", "璕": "𬍤", "嘓": "啯", "時": "时", "騼": "𫠋", "閥": "阀", "缽": "钵", "緻": "致", "糺": "𫄙", "磯": "矶", "鶇": "鸫", "耮": "耢", "鉊": "𬬿", "閡": "阂", "躑": "踯", "鰨": "鳎", "倀": "伥", "鯗": "鲞", "邇": "迩", "飩": "饨", "鋱": "铽", "槫": "𣏢", "覡": "觋", "銏": "𫟶", "鯾": "𫚣", "簞": "箪", "輼": "辒", "屢": "屡", "擫": "𢬍", "蠾": "𧑏", "頹": "颓", "騤": "骙", "鈧": "钪", "閏": "闰", "勝": "胜", "裏": "里", "鳷": "𫛛", "睞": "睐", "獄": "狱", "榿": "桤", "軝": "𬨂", "軫": "轸", "鰊": "𬶠", "檣": "樯", "膚": "肤", "轗": "𫐘", "鑉": "𫠁", "嬪": "嫔", "臠": "脔", "諱": "讳", "鎚": "锤", "鸋": "𫛢", "鏝": "镘", "諒": "谅", "誫": "𫍨", "驥": "骥", "魟": "𫚉", "欓": "𣗋", "應": "应", "環": "环", "謚": "谥", "鴃": "𫛞", "確": "确", "潰": "溃", "麴": "曲", "檵": "𪲛", "範": "范", "蔥": "葱", "鉷": "𫟹", "緮": "𫄭", "貍": "狸", "馱": "驮", "藍": "蓝", "貝": "贝", "膃": "腽", "寬": "宽", "軍": "军", "孾": "𪧀", "鷦": "鹪", "聽": "听", "贏": "赢", "廡": "庑", "紞": "𬘘", "頊": "顼", "聯": "联", "挩": "捝", "槨": "椁", "翹": "翘", "髕": "髌", "縮": "缩", "闖": "闯", "鵠": "鹄", "輝": "辉", "騾": "骡", "戲": "戏", "轅": "辕", "鎢": "钨", "鵫": "𫛱", "臺": "台", "紼": "绋", "癒": "愈", "鱭": "鲚", "綟": "𫄫", "鈾": "铀", "鮍": "鲏", "瑤": "瑶", "鼕": "冬", "論": "论", "鑌": "镔", "懣": "懑", "敎": "教", "莢": "荚", "瓅": "𬍛", "皟": "𤾀", "鯱": "𩾇", "蹌": "跄", "瓚": "瓒", "嶘": "𡺄", "滙": "汇", "驀": "蓦", "郵": "邮", "嵐": "岚", "屆": "届", "蛺": "蛱", "倈": "俫", "醬": "酱", "轣": "𫐆", "鮣": "䲟", "漲": "涨", "嘪": "𪡃", "訌": "讧", "迴": "回", "齎": "赍", "銻": "锑", "稱": "称", "閍": "𨸂", "穡": "穑", "橯": "𣓿", "搗": "捣", "覘": "觇", "縟": "缛", "癇": "痫", "務": "务", "騜": "𫘩", "囈": "呓", "復": "复", "瓊": "琼", "鸑": "𬸚", "孿": "孪", "驪": "骊", "釷": "钍", "醶": "𫑷", "僕": "仆", "錚": "铮", "鍍": "镀", "闋": "阕", "蛻": "蜕", "畼": "𪽈", "嚴": "严", "魨": "鲀", "觀": "观", "稈": "秆", "脩": "修", "襀": "𫌀", "擬": "拟", "與": "与", "賧": "赕", "興": "兴", "駉": "𬳶", "嘗": "尝", "評": "评", "欘": "𣚚", "煱": "㶽", "瘂": "痖", "體": "体", "攣": "挛", "蠑": "蝾", "鉔": "𫓬", "歿": "殁", "獊": "𪺷", "樺": "桦", "嚲": "亸", "緦": "缌", "呂": "吕", "贜": "赃", "髏": "髅", "豐": "丰", "撲": "扑", "綯": "绹", "錳": "锰", "軺": "轺", "勸": "劝", "蕢": "蒉", "泝": "溯", "傴": "伛", "矯": "矫", "酈": "郦", "癢": "痒", "瓕": "𤦀", "鎭": "镇", "礙": "碍", "錫": "锡", "鄧": "邓", "諣": "𫍩", "舊": "旧", "斷": "断", "豵": "𫎆", "駤": "𫘠", "讖": "谶", "顏": "颜", "軼": "轶", "藹": "蔼", "緰": "𦈕", "貲": "赀", "滾": "滚", "貯": "贮", "鷊": "鹝", "鱟": "鲎", "鰦": "𫚤", "霑": "沾", "篘": "𥬠", "瀨": "濑", "諏": "诹", "縸": "𫄲", "頜": "颌", "櫬": "榇", "魷": "鱿", "詛": "诅", "檉": "柽", "譸": "诪", "鏾": "𫔌", "靜": "静", "質": "质", "魵": "𫚍", "壽": "寿", "鰹": "鲣", "滲": "渗", "騔": "𩨀", "馭": "驭", "磣": "碜", "脹": "胀", "滄": "沧", "圞": "𪢮", "誇": "夸", "鉕": "钷", "鏞": "镛", "雞": "鸡", "嘯": "啸", "掆": "㧏", "衆": "众", "繢": "缋", "隻": "只", "鎈": "𫟿", "螮": "䗖", "僱": "雇", "鰤": "𫚕", "紘": "纮", "數": "数", "終": "终", "異": "异", "賽": "赛", "幗": "帼", "擲": "掷", "羣": "群", "覹": "𫌭", "鵪": "鹌", "寵": "宠", "嶢": "峣", "蟲": "虫", "袞": "衮", "鎄": "锿", "鐮": "镰", "懷": "怀", "豈": "岂", "螿": "螀", "驕": "骄", "轢": "轹", "囒": "𪢠", "鐳": "镭", "診": "诊", "棶": "梾", "蔄": "𬜬", "嚇": "吓", "巘": "𪩘", "膠": "胶", "嫵": "妩", "録": "录", "詬": "诟", "剄": "刭", "簀": "箦", "鄲": "郸", "瀂": "澛", "頏": "颃", "悽": "凄", "犧": "牺", "鞦": "秋", "撳": "揿", "儔": "俦", "凜": "凛", "萴": "荝", "釐": "厘", "鯄": "𩾁", "餫": "𫗥", "魽": "𫠐", "廬": "庐", "儐": "傧", "懺": "忏", "動": "动", "鏏": "𬭬", "鯫": "鲰", "敗": "败", "纁": "𫄸", "諄": "谆", "聖": "圣", "萵": "莴", "厴": "厣", "綃": "绡", "匭": "匦", "譏": "讥", "職": "职", "餘": "余", "寠": "𪧘", "歷": "历", "魛": "鱽", "冊": "册", "綈": "绨", "罎": "坛", "鈛": "𫓨", "墊": "垫", "廎": "庼", "箏": "筝", "錦": "锦", "嚀": "咛", "齒": "齿", "噦": "哕", "餵": "喂", "馹": "驲", "騚": "𩨊", "欞": "棂", "叄": "叁", "誥": "诰", "飛": "飞", "諑": "诼", "縫": "缝", "韋": "韦", "資": "资", "誡": "诫", "傑": "杰", "鉧": "𬭁", "儼": "俨", "紱": "绂", "鷅": "𫛽", "硜": "硁", "棧": "栈", "鱘": "鲟", "騰": "腾", "閌": "闶", "鳾": "䴓", "黶": "黡", "廩": "廪", "駢": "骈", "礐": "𬒈", "篸": "𥮾", "蠅": "蝇", "繚": "缭", "熾": "炽", "鍶": "锶", "屨": "屦", "貿": "贸", "錘": "锤", "腫": "肿", "訣": "诀", "棖": "枨", "儭": "𠋆", "豎": "竖", "廝": "厮", "歟": "欤", "緤": "𫄬", "攆": "撵", "窶": "窭", "鯬": "𫚞", "籟": "籁", "纈": "缬", "駝": "驼", "識": "识", "鱲": "𫚭", "籔": "䉤", "鰑": "𫚊", "齣": "出", "鐶": "镮", "滸": "浒", "癩": "癞", "碕": "埼", "齭": "𫜭", "廳": "厅", "蓋": "盖", "齴": "𫜮", "繟": "𦈎", "轉": "转", "糴": "籴", "鱔": "鳝", "測": "测", "鵂": "鸺", "諉": "诿", "專": "专", "審": "审", "隉": "陧", "鮊": "鲌", "緘": "缄", "鉀": "钾", "齰": "𫜬", "漢": "汉", "檜": "桧", "鷸": "鹬", "鬠": "𫘽", "曠": "旷", "驄": "骢", "鏻": "𬭸", "決": "决", "旣": "既", "騭": "骘", "鐯": "䦃", "鈉": "钠", "圇": "囵", "罌": "罂", "鶯": "莺", "謫": "谪", "鍼": "针", "並": "并", "鱀": "𬶨", "鎛": "镈", "錩": "锠", "蘚": "藓", "鏘": "锵", "嬈": "娆", "緶": "缏", "緙": "缂", "誅": "诛", "鈐": "钤", "薌": "芗", "鵝": "鹅", "饉": "馑", "嚐": "尝", "誶": "谇", "畝": "亩", "傢": "家", "邏": "逻", "鯡": "鲱", "塸": "𫭟", "侷": "局", "離": "离", "擱": "搁", "訁": "讠", "爃": "𫞡", "鶱": "𬸣", "皚": "皑", "鷹": "鹰", "誰": "谁", "灒": "𪷽", "鎖": "锁", "鵐": "鹀", "鐎": "𨱓", "電": "电", "鑴": "𫔔", "贄": "贽", "卻": "却", "孄": "𫝮", "樿": "椫", "蘞": "蔹", "饢": "馕", "碽": "䂵", "擄": "掳", "蘊": "蕴", "禰": "祢", "輻": "辐", "錢": "钱", "餡": "馅", "綝": "𬘭", "閼": "阏", "嬡": "嫒", "櫫": "橥", "鮪": "鲔", "繪": "绘", "飼": "饲", "瘞": "瘗", "蹤": "踪", "鑿": "凿", "礱": "砻", "籩": "笾", "羥": "羟", "綫": "线", "譊": "𫍢", "繼": "继", "齊": "齐", "輶": "𬨎", "鍃": "锪", "鑪": "𬬻", "綑": "捆", "橈": "桡", "諲": "𬤇", "倆": "俩", "氫": "氢", "壜": "坛", "戀": "恋", "鮆": "𫚖", "譆": "𫍻", "縐": "绉", "產": "产", "漸": "渐", "顱": "颅", "聰": "聪", "嶸": "嵘", "災": "灾", "詡": "诩", "懼": "惧", "訒": "讱", "醣": "糖", "靂": "雳", "譾": "谫", "鮤": "𫚓", "墰": "坛", "噁": "恶", "錤": "𫓹", "眞": "真", "誋": "𫍪", "擡": "抬", "鋏": "铗", "蹣": "蹒", "瓏": "珑", "擷": "撷", "鵷": "鹓", "鴕": "鸵", "蟄": "蛰", "鍬": "锹", "欖": "榄", "齯": "𫠜", "渾": "浑", "廈": "厦", "頇": "顸", "羅": "罗", "鉽": "𫟸", "曆": "历", "戩": "戬", "餈": "糍", "馬": "马", "亂": "乱", "鳧": "凫", "碙": "𥐻", "樓": "楼", "醲": "𬪩", "喎": "㖞", "嘮": "唠", "滯": "滞", "蒐": "搜", "樧": "榝", "軤": "轷", "蠁": "蚃", "繓": "𦈛", "鰩": "鳐", "齜": "龇", "婁": "娄", "橫": "横", "諍": "诤", "璯": "㻅", "鮐": "鲐", "紜": "纭", "嘽": "啴", "蹔": "𫏐", "蕭": "萧", "艫": "舻", "買": "买", "趙": "赵", "塚": "冢", "鱚": "𬶮", "項": "项", "邊": "边", "諾": "诺", "倉": "仓", "菸": "烟", "懌": "怿", "釔": "钇", "澤": "泽", "蕩": "荡", "譎": "谲", "豶": "豮", "縣": "县", "贛": "赣", "薔": "蔷", "禿": "秃", "態": "态", "銖": "铢", "軋": "轧", "痙": "痉", "纗": "𫄹", "紓": "纾", "鈗": "𫟵", "聞": "闻", "韛": "𫖔", "鋭": "锐", "貳": "贰", "譽": "誉", "鴉": "鸦", "彄": "𫸩", "鐔": "镡", "絲": "丝", "臚": "胪", "課": "课", "綾": "绫", "銬": "铐", "詓": "𫍜", "纇": "颣", "膾": "脍", "這": "这", "獁": "犸", "愾": "忾", "節": "节", "蔭": "荫", "鎪": "锼", "豔": "艳", "鱸": "鲈", "鑭": "镧", "濆": "𣸣", "證": "证", "殤": "殇", "驙": "𫘰", "勣": "𪟝", "舉": "举", "驁": "骜", "擁": "拥", "穌": "稣", "鶒": "𫛶", "魚": "鱼", "墠": "𫮃", "狀": "状", "葦": "苇", "槓": "杠", "諫": "谏", "見": "见", "鐠": "镨", "嫿": "婳", "撧": "𪮖", "椲": "㭏", "儂": "侬", "賜": "赐", "銍": "铚", "軛": "轭", "隯": "陦", "飄": "飘", "嶼": "屿", "濾": "滤", "鏦": "𫓩", "脫": "脱", "繾": "缱", "贔": "赑", "噲": "哙", "頑": "顽", "繃": "绷", "語": "语", "鐥": "䦅", "鐦": "锎", "瘮": "瘆", "樠": "𣗊", "麪": "面", "琱": "雕", "蠙": "𧏖", "塵": "尘", "騫": "骞", "鉾": "𫓴", "嶇": "岖", "儺": "傩", "讜": "谠", "謡": "谣", "熌": "𤇄", "訂": "订", "棗": "枣", "誚": "诮", "氂": "牦", "峯": "峰", "賡": "赓", "緟": "𫟆", "謅": "诌", "區": "区", "訕": "讪", "鍭": "𬭤", "彃": "𪪼", "籤": "签", "縕": "缊", "晛": "𬀪", "擠": "挤", "瞘": "眍", "龜": "龟", "奧": "奥", "賢": "贤", "鐧": "锏", "嚛": "𪠸", "岡": "冈", "鑞": "镴", "瘱": "𪽷", "芻": "刍", "簑": "蓑", "溝": "沟", "閗": "𫔯", "銼": "锉", "間": "间", "徿": "𪫌", "釃": "酾", "嵼": "𡶴", "餑": "饽", "僅": "仅", "鍁": "锨", "鎂": "镁", "僞": "伪", "灑": "洒", "殫": "殚", "謬": "谬", "齧": "啮", "賊": "贼", "襠": "裆", "麵": "面", "輜": "辎", "檁": "檩", "網": "网", "澫": "𬇕", "誴": "𫟡", "絙": "𫄠", "詗": "诇", "魺": "鲄", "鞝": "绱", "鷤": "𫛴", "癭": "瘿", "瞜": "䁖", "尋": "寻", "締": "缔", "鱒": "鳟", "愻": "𢙏", "嘆": "叹", "類": "类", "鷭": "𬸪", "沒": "没", "莖": "茎", "譟": "噪", "嵽": "𫶇", "轠": "𫐙", "繽": "缤", "傖": "伧", "樣": "样", "試": "试", "歡": "欢", "瑲": "玱", "饟": "𫗵", "痠": "酸", "鴰": "鸹", "蟯": "蛲", "趲": "趱", "挾": "挟", "釁": "衅", "鱆": "𫠒", "颼": "飕", "鋤": "锄", "攜": "携", "單": "单", "囑": "嘱", "狽": "狈", "綣": "绻", "熒": "荧", "達": "达", "畵": "画", "飭": "饬", "鷿": "𬸯", "憑": "凭", "鐈": "𫓱", "點": "点", "緒": "绪", "鱠": "鲙", "窯": "窑", "鷩": "𫜁", "曊": "𪰶", "殯": "殡", "險": "险", "譴": "谴", "獩": "𤞃", "顙": "颡", "讓": "让", "爛": "烂", "瞶": "瞆", "溫": "温", "鍵": "键", "滌": "涤", "豬": "猪", "鱄": "𫚋", "癬": "癣", "鯀": "鲧", "簍": "篓", "鞽": "鞒", "窵": "窎", "鰒": "鳆", "簢": "𫂃", "偑": "㐽", "鹽": "盐", "歎": "叹", "鎝": "𨱏", "鎳": "镍", "飦": "𫗞", "廧": "𪪞", "璉": "琏", "麼": "么", "譯": "译", "莧": "苋", "詷": "𫍣", "麳": "𪎌", "彫": "雕", "瑽": "𪻐", "钁": "镢", "嚧": "𠰷", "隨": "随", "驅": "驱", "嘰": "叽", "鯖": "鲭", "綵": "彩", "鐵": "铁", "輇": "辁", "儁": "俊", "飈": "飚", "嘔": "呕", "欏": "椤", "薊": "蓟", "俥": "伡", "衚": "胡", "儉": "俭", "綁": "绑", "颾": "𩙫", "毊": "𪵑", "車": "车", "傳": "传", "鑒": "鉴", "暫": "暂", "攝": "摄", "戔": "戋", "揚": "扬", "皺": "皱", "鮜": "鲘", "軀": "躯", "驢": "驴", "掄": "抡", "蘭": "兰", "鍈": "锳", "諂": "谄", "釓": "钆", "販": "贩", "聵": "聩", "璗": "𬍡", "綋": "𫟄", "贋": "赝", "覈": "核", "廟": "庙", "嚙": "啮", "雋": "隽", "劉": "刘", "紙": "纸", "頲": "颋", "髖": "髋", "緸": "𦈑", "綰": "绾", "踰": "逾", "薑": "姜", "執": "执", "凍": "冻", "璿": "璇", "諤": "谔", "饋": "馈", "覛": "𫌪", "鵲": "鹊", "鍋": "锅", "綴": "缀", "誘": "诱", "錝": "𫓽", "謉": "𫍷", "賤": "贱", "對": "对", "絆": "绊", "競": "竞", "訏": "𬣙", "鷓": "鹧", "釵": "钗", "諳": "谙", "劄": "札", "勢": "势", "詿": "诖", "鮄": "𫚒", "輒": "辄", "綠": "绿", "鉚": "铆", "饑": "饥", "銶": "𨱇", "貞": "贞", "親": "亲", "鍤": "锸", "佔": "占", "蹳": "𫏆", "輦": "辇", "葤": "荮", "齦": "龈", "懾": "慑", "霽": "霁", "罃": "䓨", "軜": "𫐇", "騏": "骐", "鎰": "镒", "鰁": "鳈", "歲": "岁", "凙": "𪞝", "幬": "帱", "駊": "𫘟", "閃": "闪", "獰": "狞", "矉": "𪾸", "傭": "佣", "憲": "宪", "灘": "滩", "閣": "阁", "標": "标", "弒": "弑", "軕": "𫐅", "濫": "滥", "準": "准", "罈": "坛", "顥": "颢", "團": "团", "攋": "𪮶", "頔": "𬱖", "縍": "𫄰", "餏": "饻", "喚": "唤", "鈈": "钚", "艷": "艳", "鍮": "𨱎", "潤": "润", "係": "系", "櫥": "橱", "蝀": "𬟽", "壯": "壮", "濄": "㳡", "喪": "丧", "輷": "𫐒", "冑": "胄", "慤": "悫", "鰫": "𫚦", "澦": "滪", "篩": "筛", "筴": "䇲", "紆": "纡", "挱": "挲", "鐼": "𫔁", "掗": "挜", "晝": "昼", "噝": "咝", "棊": "棋", "處": "处", "學": "学", "誤": "误", "璊": "𫞩", "討": "讨", "牀": "床", "鵃": "鸼", "睍": "𪾢", "懞": "蒙", "眥": "眦", "攬": "揽", "戱": "戯", "邁": "迈", "繹": "绎", "巗": "𪨷", "擽": "㧰", "鄆": "郓", "癡": "痴", "跡": "迹", "唄": "呗", "澗": "涧", "檻": "槛", "澀": "涩", "俔": "伣", "驛": "驿", "蟬": "蝉", "竇": "窦", "擯": "摈", "銩": "铥", "鮵": "𫚛", "匱": "匮", "餸": "𩠌", "釳": "𨰿", "覓": "觅", "擼": "撸", "玁": "𤞤", "繿": "䍀", "鷣": "𫜃", "靝": "靔", "孫": "孙", "溼": "湿", "媼": "媪", "來": "来", "羋": "芈", "緹": "缇", "磠": "硵", "撓": "挠", "撟": "挢", "鑔": "镲", "嵾": "㟥", "撐": "撑", "卹": "恤", "詁": "诂", "驊": "骅", "綇": "𦈋", "煢": "茕", "囉": "啰", "載": "载", "擺": "摆", "碸": "砜", "綀": "𦈌", "響": "响", "鏑": "镝", "鉞": "钺", "殲": "歼", "腖": "胨", "饌": "馔", "風": "风", "師": "师", "瀘": "泸", "勻": "匀", "華": "华", "騸": "骟", "億": "亿", "釾": "䥺", "轆": "辘", "韝": "鞲", "飢": "饥", "羨": "羡", "蹺": "跷", "窩": "窝", "鱂": "鳉", "窺": "窥", "懇": "恳", "鮦": "鲖", "儀": "仪", "撈": "捞", "憐": "怜", "鮡": "𬶐", "駁": "驳", "鴥": "𫛣", "闍": "阇", "驓": "𫘯", "饈": "馐", "閔": "闵", "僨": "偾", "鴛": "鸳", "獎": "奖", "幟": "帜", "賕": "赇", "熉": "𤈶", "鑾": "銮", "聹": "聍", "虯": "虬", "篤": "笃", "盞": "盏", "欄": "栏", "陳": "陈", "緇": "缁", "纆": "𬙊", "隤": "𬯎", "孻": "𡥧", "鰶": "𬶭", "屬": "属", "顂": "𩓋", "巋": "岿", "濧": "㳔", "嗆": "呛", "權": "权", "淪": "沦", "鹼": "碱", "桿": "杆", "鵩": "𫛳", "犛": "牦", "飠": "饣", "繭": "茧", "輮": "𫐓", "躥": "蹿", "曬": "晒", "傷": "伤", "褘": "袆", "駐": "驻", "蔘": "参", "敵": "敌", "鍆": "钔", "颱": "台", "傘": "伞", "嘩": "哗", "擟": "𪭧", "瀃": "𣽷", "鎣": "蓥", "頭": "头", "梘": "枧", "彌": "弥", "紋": "纹", "擇": "择", "紝": "纴", "瀏": "浏", "緼": "缊", "鶻": "鹘", "鰜": "鳒", "饒": "饶", "聻": "𫆏", "颸": "飔", "貼": "贴", "讒": "谗", "獮": "狝", "嶁": "嵝", "鍘": "铡", "熰": "𬉼", "鰷": "鲦", "証": "证", "櫃": "柜", "貙": "䝙", "啢": "唡", "鰉": "鳇", "賬": "账", "簡": "简", "誹": "诽", "盪": "荡", "鰽": "𫚧", "組": "组", "齡": "龄", "齲": "龋", "閶": "阊", "閵": "𫔴", "奩": "奁", "覽": "览", "鑥": "镥", "渢": "沨", "軑": "轪", "鋮": "铖", "惱": "恼", "薹": "苔", "摯": "挚", "欽": "钦", "薟": "莶", "鉝": "𫟷", "腦": "脑", "鰌": "䲡", "皰": "疱", "萇": "苌", "謄": "誊", "記": "记", "頻": "频", "髒": "脏", "賃": "赁", "鏥": "𫔊", "鈔": "钞", "紈": "纨", "紿": "绐", "綌": "绤", "瑋": "玮", "孋": "㛤", "燬": "毁", "鱨": "鲿", "紅": "红", "軒": "轩", "嚨": "咙", "縛": "缚", "閹": "阉", "蝦": "虾", "猙": "狰", "續": "续", "鵾": "鹍", "綺": "绮", "鈡": "钟", "誼": "谊", "姦": "奸", "絨": "绒", "堊": "垩", "鋰": "锂", "驗": "验", "擔": "担", "遊": "游", "鋃": "锒", "貶": "贬", "繒": "缯", "認": "认", "繷": "𫄣", "吳": "吴", "蝟": "猬", "擾": "扰", "駎": "𩧨", "癟": "瘪", "鯛": "鲷", "釿": "𬬱", "獫": "猃", "閘": "闸", "勩": "勚", "餦": "𫗠", "鮳": "鲓", "韃": "鞑", "鰠": "鳋", "嗹": "𪡏", "屓": "屃", "愷": "恺", "習": "习", "鵮": "鹐", "蹟": "迹", "遺": "遗", "飾": "饰", "幀": "帧", "斂": "敛", "鸘": "鹴", "輟": "辍", "僂": "偻", "讌": "䜩", "鰾": "鳔", "闞": "阚", "襘": "𫋻", "贓": "赃", "藷": "𫉄", "鸂": "㶉", "鴒": "鸰", "霢": "霡", "術": "术", "壓": "压", "輳": "辏", "懶": "懒", "據": "据", "頓": "顿", "蔿": "𫇭", "楇": "𣒌", "韆": "千", "頸": "颈", "蠀": "𧏗", "駿": "骏", "壟": "垄", "曇": "昙", "騍": "骒", "噅": "𠯠", "鷽": "鸴", "扞": "捍", "嬦": "𫝩", "鏤": "镂", "錕": "锟", "闌": "阑", "櫸": "榉", "硨": "砗", "綡": "𫟅", "縝": "缜", "棟": "栋", "淩": "凌", "埰": "采", "脥": "𣍰", "噥": "哝", "銊": "𫓰", "調": "调", "鶗": "𫛸", "盨": "𪾔", "獲": "获", "颷": "𩙪", "謀": "谋", "幾": "几", "壩": "坝", "鶊": "鹒", "請": "请", "慮": "虑", "霧": "雾", "幹": "干", "驂": "骖", "轀": "辒", "棄": "弃", "鐏": "𨱔", "趕": "赶", "張": "张", "謨": "谟", "釚": "𫟲", "斬": "斩", "銣": "铷", "禮": "礼", "瞞": "瞒", "韁": "缰", "捫": "扪", "讋": "詟", "鈺": "钰", "紳": "绅", "膢": "𦝼", "貧": "贫", "襰": "𧝝", "灣": "湾", "麗": "丽", "黴": "霉", "崢": "峥", "開": "开", "鄉": "乡", "嘸": "呒", "獸": "兽", "銨": "铵", "蘺": "蓠", "韜": "韬", "鷫": "鹔", "裝": "装", "鏽": "锈", "慫": "怂", "璝": "𪻺", "藎": "荩", "鰧": "䲢", "濟": "济", "錞": "𬭚", "闕": "阙", "諸": "诸", "衛": "卫", "鄔": "邬", "偉": "伟", "莊": "庄", "鏇": "旋", "鉗": "钳", "慄": "栗", "違": "违", "紵": "纻", "鯿": "鳊", "襝": "裣", "飿": "饳", "鏍": "镙", "瀉": "泻", "藝": "艺", "縳": "䌸", "啞": "哑", "號": "号", "絹": "绢", "颭": "飐", "査": "查", "雜": "杂", "滿": "满", "軔": "轫", "鞏": "巩", "璼": "𫞨", "碩": "硕", "鬍": "胡", "塏": "垲", "鈖": "𫟴", "囁": "嗫", "噠": "哒", "蟂": "𫋇", "襪": "袜", "燀": "𬊤", "銳": "锐", "槧": "椠", "纓": "缨", "臥": "卧", "業": "业", "蟎": "螨", "驏": "骣", "譜": "谱", "駒": "驹", "礫": "砾", "琺": "珐", "撫": "抚", "薩": "萨", "廚": "厨", "閎": "闳", "鐍": "𫔎", "饜": "餍", "産": "产", "樅": "枞", "譁": "哗", "鴅": "𫛝", "蘋": "苹", "鈕": "钮", "葉": "叶", "陞": "升", "欒": "栾", "膞": "䏝", "籌": "筹", "鯰": "鲶", "餒": "馁", "紐": "纽", "藭": "䓖", "購": "购", "蠱": "蛊", "儣": "𠆲", "燙": "烫", "谿": "溪", "薦": "荐", "瘡": "疮", "悅": "悦", "繳": "缴", "餓": "饿", "鑠": "铄", "鉺": "铒", "蕁": "荨", "槼": "椝", "釗": "钊", "嗎": "吗", "澩": "泶", "糉": "粽", "闓": "闿", "斆": "敩", "縈": "萦", "襵": "𫌇", "顧": "顾", "嘖": "啧", "繡": "绣", "臍": "脐", "鱺": "鲡", "霣": "𫕥", "從": "从", "錶": "表", "蒓": "莼", "墶": "垯", "塿": "𪣻", "癤": "疖", "鴦": "鸯", "痾": "疴", "緞": "缎", "綻": "绽", "勞": "劳", "鈎": "钩", "摳": "抠", "鉮": "𬬹", "盜": "盗", "錐": "锥", "鋁": "铝", "餱": "糇", "織": "织", "錠": "锭", "軗": "𨐅", "賵": "赗", "繆": "缪", "蕕": "莸", "娛": "娱", "閽": "阍", "鑼": "锣", "紡": "纺", "惻": "恻", "黷": "黩", "賫": "赍", "誂": "𫍥", "詪": "𬣳", "禕": "祎", "蹻": "𫏋", "灧": "滟", "烴": "烃", "顬": "颥", "氬": "氩", "椏": "桠", "錮": "锢", "擋": "挡", "鷷": "𫜄", "鶖": "鹙", "潛": "潜", "脅": "胁", "鮁": "鲅", "樤": "𣔌", "貪": "贪", "贈": "赠", "摑": "掴", "渦": "涡", "鈠": "𨱁", "欍": "𣐤", "廢": "废", "遲": "迟", "覷": "觑", "慚": "惭", "麩": "麸", "鰓": "鳃", "諼": "谖", "顒": "颙", "鋙": "铻", "鵏": "𬷕", "瀾": "澜", "鵓": "鹁", "銛": "铦", "颻": "飖", "爄": "𤇃", "榲": "榅", "別": "别", "願": "愿", "瘻": "瘘", "輥": "辊", "瓔": "璎", "钂": "镋", "駪": "𬳽", "鴐": "𫛤", "儻": "傥", "箚": "札", "駫": "𫘡", "剷": "铲", "駭": "骇", "諢": "诨", "頮": "颒", "園": "园", "彙": "汇", "撿": "捡", "瘍": "疡", "飽": "饱", "爭": "争", "鋉": "𨱈", "鮒": "鲋", "飆": "飙", "鯢": "鲵", "鰳": "鳓", "賭": "赌", "孇": "𪥫", "誣": "诬", "鯨": "鲸", "隑": "𬮿", "臏": "膑", "汎": "泛", "駑": "驽", "燉": "炖", "鷀": "鹚", "輓": "挽", "併": "并", "結": "结", "貽": "贻", "攏": "拢", "翫": "玩", "剝": "剥", "殮": "殓", "頷": "颔", "餌": "饵", "鉁": "𨱅", "攪": "搅", "軉": "𨉗", "鉉": "铉", "鷂": "鹞", "鯶": "𩽼", "遜": "逊", "綹": "绺", "謝": "谢", "鎊": "镑", "覼": "𫌨", "訶": "诃", "閿": "阌", "劍": "剑", "颮": "飑", "輔": "辅", "悶": "闷", "鯻": "𬶟", "錜": "𫓻", "嚌": "哜", "繨": "𫄤", "錸": "铼", "潕": "𣲘", "熗": "炝", "捨": "舍", "醃": "腌", "墳": "坟", "詞": "词", "會": "会", "閲": "阅", "勑": "𠡠", "鈴": "铃", "鋇": "钡", "滷": "卤", "彈": "弹", "嬋": "婵", "鷁": "鹢", "襯": "衬", "翽": "翙", "薵": "䓓", "聾": "聋", "鳽": "𫛚", "龑": "䶮", "闤": "阛", "燈": "灯", "紕": "纰", "躂": "跶", "鷥": "鸶", "顰": "颦", "於": "于", "孃": "娘", "厭": "厌", "縺": "𦈐", "嶄": "崭", "闒": "阘", "灕": "漓", "暈": "晕", "費": "费", "囂": "嚣", "濚": "溁", "詔": "诏", "聲": "声", "氭": "𣱝", "筆": "笔", "鴲": "𪉆", "夥": "伙", "針": "针", "隱": "隐", "瀧": "泷", "餃": "饺", "涗": "涚", "負": "负", "讎": "雠", "煒": "炜", "給": "给", "逕": "径", "奪": "夺", "塋": "茔", "頍": "𫠆", "轇": "𫐖", "梔": "栀", "輸": "输", "複": "复", "樫": "㭴", "鵰": "雕", "纚": "𫄥", "靧": "𫖃", "馯": "𫘛", "乾": "干", "鴟": "鸱", "懤": "㤽", "蠍": "蝎", "魘": "魇", "鋩": "铓", "颳": "刮", "錁": "锞", "內": "内", "璽": "玺", "陣": "阵", "鳩": "鸠", "拋": "抛", "鱮": "𫚈", "顔": "颜", "訴": "诉", "癰": "痈", "鏢": "镖", "檔": "档", "摜": "掼", "貫": "贯", "託": "托", "謙": "谦", "紉": "纫", "屍": "尸", "義": "义", "鎓": "𬭩", "驟": "骤", "頡": "颉", "閫": "阃", "賈": "贾", "鬢": "鬓", "畢": "毕", "釩": "钒", "誄": "诔", "縑": "缣", "纔": "才", "趨": "趋", "艣": "𫇛", "雙": "双", "欐": "𪲔", "蠨": "蟏", "媈": "𫝨", "餅": "饼", "紬": "䌷", "錯": "错", "讅": "谉", "闑": "𫔶", "撣": "掸", "鵚": "𪉍", "鶦": "𫛷", "鹵": "卤", "癥": "症", "贖": "赎", "躎": "䟢", "嶮": "崄", "訖": "讫", "鑄": "铸", "檭": "𣘴", "縱": "纵", "褲": "裤", "櫻": "樱", "壙": "圹", "閐": "𨸃", "繐": "𰬸", "錼": "镎", "講": "讲", "夠": "够", "墮": "堕", "賒": "赊", "頌": "颂", "餶": "馉", "製": "制", "銑": "铣", "飋": "𫗋", "甕": "瓮", "糾": "纠", "獷": "犷", "鱤": "鳡", "鶘": "鹕", "鮅": "𫚑", "烏": "乌", "鴝": "鸲", "龓": "𫜲", "俬": "私", "廞": "𫷷", "闢": "辟", "縰": "𫄳", "鬚": "须", "嗚": "呜", "塒": "埘", "薆": "𫉁", "躒": "跞", "徑": "径", "鉑": "铂", "諜": "谍", "歐": "欧", "吶": "呐", "褸": "褛", "鈦": "钛", "鰂": "鲗", "賀": "贺", "釹": "钕", "簣": "篑", "饞": "馋", "鼂": "鼌", "躓": "踬", "敘": "叙", "進": "进", "寢": "寝", "傾": "倾", "梲": "棁", "孌": "娈", "鎷": "𨰾", "褌": "裈", "蓆": "席", "鬨": "哄", "鍚": "钖", "糹": "纟", "錆": "锖", "墻": "墙", "駡": "骂", "覦": "觎", "漵": "溆", "釲": "𫟳", "篔": "筼", "麥": "麦", "選": "选", "詰": "诘", "賻": "赙", "為": "为", "斕": "斓", "縷": "缕", "絡": "络", "鄟": "𫑘", "璣": "玑", "鉛": "铅", "顅": "𫖶", "峽": "峡", "鱅": "鳙", "覬": "觊", "閱": "阅", "幝": "𪩷", "詊": "𫟟", "攙": "搀", "蝸": "蜗", "獻": "献", "饠": "𫗩", "級": "级", "癉": "瘅", "籮": "箩", "鰻": "鳗", "磧": "碛", "滅": "灭", "絧": "𫄡", "卽": "即", "發": "发", "燦": "灿", "騵": "𫘪", "輞": "辋", "潑": "泼", "璸": "瑸", "贚": "𫎦", "竅": "窍", "釺": "钎", "恆": "恒", "鶲": "鹟", "島": "岛", "慟": "恸", "燾": "焘", "褳": "裢", "顳": "颞", "銱": "铞", "鯊": "鲨", "醟": "蒏", "躦": "躜", "鸞": "鸾", "釤": "钐", "厲": "厉", "難": "难", "預": "预", "訜": "𫍛", "鋝": "锊", "殻": "壳", "顢": "颟", "蒭": "𫇴", "燜": "焖", "唸": "念", "價": "价", "嗰": "𠮶", "銈": "𫓯", "鹹": "咸", "鸇": "鹯", "橢": "椭", "罷": "罢", "鱧": "鳢", "覥": "觍", "饊": "馓", "馼": "𫘜", "鈁": "钫", "餧": "𫗪", "熲": "颎", "戰": "战", "渙": "涣", "詩": "诗", "罵": "骂", "種": "种", "獪": "狯", "嗊": "唝", "獨": "独", "轂": "毂", "撏": "挦", "齮": "𬺈", "櫟": "栎", "韙": "韪", "綿": "绵", "慼": "戚", "膕": "腘", "鎌": "镰", "潔": "洁", "鍊": "炼", "娙": "𫰛", "輋": "𪨶", "櫚": "榈", "婦": "妇", "釘": "钉", "愛": "爱", "魎": "魉", "欅": "榉", "崍": "崃", "嬙": "嫱", "鶰": "𫛫", "粵": "粤", "奼": "姹", "縭": "缡", "鎵": "镓", "庫": "库", "銠": "铑", "積": "积", "膹": "𪱥", "錇": "锫", "擰": "拧", "餼": "饩", "靉": "叆", "潁": "颍", "詐": "诈", "剴": "剀", "溈": "沩", "麬": "𤿲", "鏹": "镪", "慪": "怄", "亞": "亚", "側": "侧", "叢": "丛", "鱈": "鳕", "蟶": "蛏", "鮋": "鲉", "勳": "勋", "澠": "渑", "燖": "𬊈", "養": "养", "餗": "𫗧", "齠": "龆", "梜": "𬂩", "惲": "恽", "鼉": "鼍", "彔": "录", "鍄": "𨱉", "桱": "𣐕", "堯": "尧", "閑": "闲", "鵟": "𫛭", "濘": "泞", "謖": "谡", "懍": "懔", "攛": "撺", "潣": "𫞗", "絎": "绗", "氈": "毡", "鏵": "铧", "顎": "颚", "療": "疗", "繮": "缰", "薺": "荠", "陰": "阴", "篢": "𬕂", "劊": "刽", "僥": "侥", "運": "运", "鰲": "鳌", "彲": "彨", "創": "创", "韚": "𫠅", "圖": "图", "鋦": "锔", "緑": "绿", "礎": "础", "賺": "赚", "說": "说", "哯": "𠯟", "嫻": "娴", "礦": "矿", "攖": "撄", "鶴": "鹤", "臟": "脏", "棲": "栖", "驫": "骉", "鰼": "鳛", "鈣": "钙", "現": "现", "繈": "𫄶", "譙": "谯", "鉍": "铋", "儕": "侪", "鮈": "𬶋", "鯕": "鲯", "覺": "觉", "絢": "绚", "垻": "坝", "鞾": "𫖇", "舘": "馆", "彆": "别", "墾": "垦", "毆": "殴", "牴": "抵", "騄": "𫘧", "濿": "𪵱", "無": "无", "燁": "烨", "賞": "赏", "鎘": "镉", "債": "债", "膽": "胆", "祿": "禄", "騙": "骗", "藴": "蕴", "鶓": "鹋", "穫": "获", "蘇": "苏", "嘺": "𪡀", "臨": "临", "銦": "铟", "揯": "搄", "倖": "幸", "損": "损", "黨": "党", "鰭": "鳍", "騌": "骔", "柺": "拐", "鐘": "钟", "諞": "谝", "鶭": "𫛯", "鎮": "镇", "淺": "浅", "掙": "挣", "詢": "询", "諝": "谞", "贐": "赆", "珼": "𫞥", "鶌": "𫛵", "銘": "铭", "慳": "悭", "詑": "𫍡", "嬻": "𪥿", "軷": "𫐈", "矓": "眬", "實": "实", "鴔": "𫛡", "圓": "圆", "館": "馆", "緡": "缗", "鷖": "鹥", "纏": "缠", "擴": "扩", "鋐": "𬭎", "隕": "陨", "蠶": "蚕", "詖": "诐", "鉳": "锫", "軨": "𫐉", "葯": "药", "啟": "启", "檯": "台", "囌": "苏", "塢": "坞", "鶉": "鹑", "隊": "队", "蠦": "𫊮", "蜆": "蚬", "蕽": "𫇽", "躋": "跻", "騮": "骝", "榪": "杩", "嬤": "嬷", "責": "责", "腎": "肾", "輄": "𨐈", "輾": "辗", "鈯": "𨱄", "鍰": "锾", "獺": "獭", "闇": "暗", "憹": "𢙐", "驎": "𬴊", "綪": "𬘬", "儈": "侩", "膿": "脓", "鑷": "镊", "瀇": "㲿", "鴜": "𪉈", "騴": "𫘫", "欇": "𪳍", "靄": "霭", "鱣": "鳣", "鰐": "鳄", "槍": "枪", "詳": "详", "貴": "贵", "饗": "飨", "蕳": "𫈉", "癱": "瘫", "煉": "炼", "媧": "娲", "鈒": "钑", "糲": "粝", "覿": "觌", "訐": "讦", "璫": "珰", "鈳": "钶", "纘": "缵", "鶺": "鹡", "鰟": "鳑", "衕": "同", "螢": "萤", "衝": "冲", "幃": "帏", "穠": "秾", "鍒": "𫔄", "顯": "显", "姍": "姗", "驤": "骧", "弔": "吊", "韌": "韧", "獼": "猕", "瀅": "滢", "釣": "钓", "鰥": "鳏", "蟈": "蝈", "鍾": "钟", "鶿": "鹚", "穢": "秽", "剮": "剐", "氳": "氲", "鰃": "鳂", "灩": "滟", "閬": "阆", "堖": "垴", "貰": "贳", "頽": "颓", "懎": "𢠁", "蒕": "蒀", "嘳": "𪡞", "虆": "蔂", "駚": "𩧫", "襗": "𫋷", "釒": "钅", "鮎": "鲇", "儎": "傤", "謳": "讴", "厤": "历", "嬃": "媭", "彿": "佛", "繬": "𫄱", "煩": "烦", "蝨": "虱", "蓀": "荪", "謁": "谒", "穇": "䅟", "讚": "赞", "緍": "𦈏", "僉": "佥", "譫": "谵", "駸": "骎", "篳": "筚", "斸": "𣃁", "駛": "驶", "瀠": "潆", "徵": "征", "鯴": "鲺", "鰕": "𫚥", "糶": "粜", "嚕": "噜", "誕": "诞", "鎿": "镎", "濜": "浕", "闥": "闼", "狹": "狭", "納": "纳", "鏉": "𨱒", "緝": "缉", "淒": "凄", "鸕": "鸬", "苧": "苎", "當": "当", "謏": "𫍲", "憮": "怃", "襖": "袄", "餄": "饸", "簾": "帘", "顆": "颗", "檮": "梼", "辦": "办", "紇": "纥", "軌": "轨", "閨": "闺", "臗": "𣎑", "鉥": "𬬸", "餕": "馂", "颺": "飏", "絺": "𫄨", "溮": "浉", "藪": "薮", "銚": "铫", "穎": "颖", "菴": "庵", "鴗": "𫁡", "駙": "驸", "籋": "𥬞", "繕": "缮", "撻": "挞", "巰": "巯", "蠆": "虿", "綐": "䌼", "搶": "抢", "禱": "祷", "廄": "厩", "縲": "缧", "嚽": "𪢕", "訨": "𫟞", "丟": "丢", "溳": "涢", "潷": "滗", "國": "国", "綬": "绶", "釦": "扣", "簫": "箫", "躉": "趸", "騂": "骍", "該": "该", "壺": "壶", "擣": "捣", "齘": "𬹼", "鑰": "钥", "訑": "𫍙", "憤": "愤", "個": "个", "薴": "苧", "慾": "欲", "臘": "腊", "蔣": "蒋", "騻": "𫘭", "鹺": "鹾", "眝": "𪾣", "憂": "忧", "絁": "𫄟", "鏈": "链", "梟": "枭", "飱": "飧", "鄒": "邹", "貨": "货", "盃": "杯", "遙": "遥", "蟜": "𫊸", "鈿": "钿", "鍉": "𫔂", "筧": "笕", "醱": "酦", "閤": "合", "錽": "𫓸", "刪": "删", "謸": "𫍵", "襲": "袭", "繅": "缫", "傯": "偬", "輬": "辌", "醞": "酝", "訢": "䜣", "澅": "𣶩", "闆": "板", "轔": "辚", "咼": "呙", "謾": "谩", "礄": "硚", "蔞": "蒌", "龔": "龚", "飣": "饤", "搧": "扇", "繩": "绳", "轡": "辔", "檳": "槟", "鷔": "𪉑", "爧": "𫞠", "堅": "坚", "遞": "递", "縯": "𬙂", "巒": "峦", "蠻": "蛮", "鉭": "钽", "讀": "读", "羆": "罴", "賅": "赅", "奬": "奖", "蓮": "莲", "鰋": "𫚢", "譞": "𫍽", "澮": "浍", "玀": "猡", "蘆": "芦", "慍": "愠", "瓛": "𤩽", "辯": "辩", "槶": "椢", "鶥": "鹛", "鴻": "鸿", "彠": "彟", "俠": "侠", "僤": "𫢸", "佈": "布", "鈆": "𫓪", "壎": "埙", "駘": "骀", "縊": "缢", "湋": "𣲗", "闠": "阓", "樑": "梁", "擻": "擞", "醜": "丑", "漚": "沤", "鋪": "铺"};
+
+    const customPhrases = [
+      ['直昇機', '直升机'], ['直升機', '直升机'], ['電變', '电调'], ['機隊', '机队'], ['選單', '菜单'],
+      ['日誌', '日志'], ['電池', '电池'], ['開關', '开关'], ['語音', '语音'], ['解鎖', '解锁'],
+      ['遙測', '遥测'], ['轉速', '转速'], ['電壓', '电压'], ['電流', '电流'], ['溫度', '温度'],
+      ['圖表', '图表'], ['曲線', '曲线'], ['設定', '设置'], ['計時器', '计时器'], ['搖桿', '摇杆'],
+      ['光圈', '光圈'], ['機型', '机型'], ['電機', '电机'], ['燃油機', '燃油机'], ['渦輪', '涡轮'],
+      ['噴射', '喷射'], ['架次', '架次'], ['次數', '次数'], ['歸零', '归零'], ['清零', '清零'],
+      ['重置', '重置'], ['門檻', '门槛'], ['警示', '警示'], ['警告', '警告'], ['低電', '低电'],
+      ['沒電', '没电'], ['定速', '定速'], ['停懸', '悬停'], ['螺距', '螺距'], ['舵機', '舵机'],
+      ['陀螺儀', '陀螺仪'], ['飛控', '飞控'], ['記憶卡', '内存卡'], ['資料夾', '文件夹'],
+      ['說明', '说明'], ['繁體中文', '简体中文'], ['繁中', '简中'], ['遙控器', '遥控器'],
+      ['畫面', '画面'], ['螢幕', '屏幕'], ['檔案', '文件'], ['資料', '数据'], ['紀錄', '记录'],
+      ['通電', '通电'], ['斷電', '断电'], ['充飽', '充满'], ['單芯', '单节'], ['總表', '总表'],
+      ['點擊', '点击'], ['按鈕', '按钮'], ['產品簡介', '产品简介'], ['核心亮點', '核心亮点'],
+      ['黑盒子', '黑盒子'], ['高階', '高阶'], ['全彩', '全彩'], ['儀表板', '仪表板'],
+      ['調機', '调机'], ['排錯', '排错'], ['管理', '管理'], ['狀態', '状态']
+    ];
+
+    function toSimp(text) {
+      if (!text) return text;
+      let res = text;
+      for (let i = 0; i < customPhrases.length; i++) {
+        res = res.split(customPhrases[i][0]).join(customPhrases[i][1]);
       }
+      let out = '';
+      for (let i = 0; i < res.length; i++) {
+        let ch = res[i];
+        out += T2S_DICT[ch] || ch;
+      }
+      return out;
+    }
+
+    function walkNodes(node, callback) {
+      if (!node) return;
+      if (node.nodeType === 3) {
+        callback(node);
+      } else {
+        const children = node.childNodes;
+        if (children) {
+          for (let i = 0; i < children.length; i++) {
+            walkNodes(children[i], callback);
+          }
+        }
+      }
+    }
+
+    function setLanguage(lang) {
+      currentLang = lang;
+      const body = document.body;
+
+      const btnTW = document.getElementById('btnLangTW');
+      const btnCN = document.getElementById('btnLangCN');
+      const btnEN = document.getElementById('btnLangEN');
+      if (btnTW) btnTW.className = 'lang-choice-btn' + (lang === 'tw' ? ' active' : '');
+      if (btnCN) btnCN.className = 'lang-choice-btn' + (lang === 'cn' ? ' active' : '');
+      if (btnEN) btnEN.className = 'lang-choice-btn' + (lang === 'en' ? ' active' : '');
+
+      // Dynamic language image switching
+      document.querySelectorAll('.lang-dynamic-img').forEach(img => {
+        if (lang === 'cn') {
+          img.src = img.getAttribute('data-src-cn') || img.src;
+        } else if (lang === 'en') {
+          img.src = img.getAttribute('data-src-en') || img.src;
+        } else {
+          img.src = img.getAttribute('data-src-tw') || img.src;
+        }
+      });
+
+      if (lang === 'en') {
+        body.classList.add('lang-en-mode');
+        return;
+      }
+
+      body.classList.remove('lang-en-mode');
+
+      const zhElements = document.querySelectorAll('.lang-zh');
+      zhElements.forEach(el => {
+        walkNodes(el, function(node) {
+          if (node._origText === undefined) {
+            node._origText = node.nodeValue;
+          }
+          if (lang === 'cn') {
+            node.nodeValue = toSimp(node._origText);
+          } else {
+            node.nodeValue = node._origText;
+          }
+        });
+      });
+    }
+
+    function toggleLanguage() {
+      if (currentLang === 'en') setLanguage('tw');
+      else setLanguage('en');
     }
 
     function showSection(id, shouldScroll = true) {
@@ -3392,7 +3881,6 @@ save</pre>
       }
     }
 
-    // Alias for existing onclick handlers
     function scrollToSection(id) {
       const searchInput = document.getElementById('searchInput');
       if (searchInput && searchInput.value) {
@@ -3407,7 +3895,8 @@ save</pre>
         const sec = document.getElementById(chapter.id);
         if (!sec) return;
 
-        // 1. Breadcrumb bar at top of chapter
+        if (sec.querySelector('.chapter-header-bar')) return;
+
         const prevChap = index > 0 ? chapterList[index - 1] : null;
         const nextChap = index < chapterList.length - 1 ? chapterList[index + 1] : null;
 
@@ -3431,39 +3920,50 @@ save</pre>
         `;
         sec.insertBefore(headerBar, sec.firstChild);
 
-        // 2. Navigation Footer at bottom of chapter
-        const footerBar = document.createElement('div');
-        footerBar.className = 'chapter-nav-footer';
+        const navFooter = document.createElement('div');
+        navFooter.className = 'chapter-nav-footer';
 
-        const prevBtnHtml = prevChap
-          ? `<button class="chapter-nav-btn" onclick="scrollToSection('${prevChap.id}')">
-               ⬅️ <span class="lang-zh">上一章：${prevChap.zh}</span><span class="lang-en">Prev: ${prevChap.en}</span>
-             </button>`
-          : `<button class="chapter-nav-btn" disabled>
-               ⬅️ <span class="lang-zh">第一章 (頂端)</span><span class="lang-en">First Chapter</span>
-             </button>`;
+        let leftBtnHtml = '';
+        if (prevChap) {
+          leftBtnHtml = `
+            <button class="chapter-nav-btn" onclick="scrollToSection('${prevChap.id}')">
+              <span class="lang-zh">⬅️ 上一章：${prevChap.zh}</span>
+              <span class="lang-en">⬅️ Prev: ${prevChap.en}</span>
+            </button>
+          `;
+        } else {
+          leftBtnHtml = `
+            <button class="chapter-nav-btn" disabled style="opacity: 0.3; cursor: not-allowed;">
+              <span class="lang-zh">⬅️ 已是第一章</span>
+              <span class="lang-en">⬅️ First Chapter</span>
+            </button>
+          `;
+        }
 
-        const nextBtnHtml = nextChap
-          ? `<button class="chapter-nav-btn" onclick="scrollToSection('${nextChap.id}')">
-               <span class="lang-zh">下一章：${nextChap.zh}</span><span class="lang-en">Next: ${nextChap.en}</span> ➡️
-             </button>`
-          : `<button class="chapter-nav-btn" onclick="scrollToSection('topic-overview')">
-               🔄 <span class="lang-zh">回到第一章 (開始)</span><span class="lang-en">Back to First Chapter</span>
-             </button>`;
+        let rightBtnHtml = '';
+        if (nextChap) {
+          rightBtnHtml = `
+            <button class="chapter-nav-btn primary" onclick="scrollToSection('${nextChap.id}')">
+              <span class="lang-zh">下一章：${nextChap.zh} ➡️</span>
+              <span class="lang-en">Next: ${nextChap.en} ➡️</span>
+            </button>
+          `;
+        } else {
+          rightBtnHtml = `
+            <button class="chapter-nav-btn primary" onclick="scrollToSection('topic-overview')">
+              <span class="lang-zh">🔝 返回第一章總覽</span>
+              <span class="lang-en">🔝 Back to Overview</span>
+            </button>
+          `;
+        }
 
-        footerBar.innerHTML = `
-          ${prevBtnHtml}
-          <button class="chapter-nav-btn" style="border-color: var(--accent-blue);" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
-            🔝 <span class="lang-zh">回到頂端</span><span class="lang-en">Top</span>
-          </button>
-          ${nextBtnHtml}
-        `;
-        sec.appendChild(footerBar);
+        navFooter.innerHTML = leftBtnHtml + rightBtnHtml;
+        sec.appendChild(navFooter);
       });
     }
 
     function filterContent() {
-      const query = document.getElementById('searchInput').value.toLowerCase().trim();
+      const query = document.getElementById('searchInput').value.trim().toLowerCase();
       const statusBar = document.getElementById('searchStatusBar');
       const statusText = document.getElementById('searchStatusText');
 
@@ -3475,33 +3975,25 @@ save</pre>
       if (statusBar) statusBar.style.display = 'flex';
 
       let matchCount = 0;
-      chapterList.forEach(chapter => {
-        const sec = document.getElementById(chapter.id);
-        if (!sec) return;
-        const elements = sec.querySelectorAll('.card, tr, .alert, p, li, .topic-sub-title, h3');
+
+      document.querySelectorAll('.section').forEach(sec => {
+        sec.classList.add('active');
         let secHasMatch = false;
 
-        elements.forEach(el => {
+        sec.querySelectorAll('.card, tr, .alert, p, li').forEach(el => {
           const text = el.innerText.toLowerCase();
           if (text.includes(query)) {
             el.style.display = '';
             secHasMatch = true;
-            if (el.classList.contains('card') || el.tagName === 'TR' || el.classList.contains('alert') || el.tagName === 'P') {
-              matchCount++;
-            }
+            matchCount++;
           } else {
-            // Only hide leaf or container items like cards, table rows, alerts, paragraphs, lists
-            if (el.classList.contains('card') || el.tagName === 'TR' || el.classList.contains('alert') || el.tagName === 'P' || el.tagName === 'LI') {
-              el.style.display = 'none';
-            }
+            el.style.display = 'none';
           }
         });
 
-        if (secHasMatch) {
-          sec.classList.add('active');
-        } else {
-          sec.classList.remove('active');
-        }
+        sec.querySelectorAll('h2, h3, .section-title, .topic-sub-title').forEach(h => {
+          h.style.display = secHasMatch ? '' : 'none';
+        });
       });
 
       if (statusText) {
@@ -3515,17 +4007,14 @@ save</pre>
       const statusBar = document.getElementById('searchStatusBar');
       if (statusBar) statusBar.style.display = 'none';
 
-      // Restore all hidden elements inside sections
-      document.querySelectorAll('.card, tr, .alert, p, li, .topic-sub-title, h3').forEach(el => el.style.display = '');
+      document.querySelectorAll('.card, tr, .alert, p, li, .topic-sub-title, h3, h2, .section-title').forEach(el => el.style.display = '');
 
-      // Return strictly to active single section
       showSection(activeSectionId, false);
     }
 
     // Initialize on page load
     window.addEventListener('DOMContentLoaded', () => {
-      currentLang = 'zh';
-      document.body.classList.remove('lang-en-mode');
+      setLanguage('tw');
       initChapterNavigation();
       const hash = window.location.hash.replace('#', '');
       if (hash && chapterList.some(c => c.id === hash)) {

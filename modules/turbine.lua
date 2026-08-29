@@ -19,18 +19,25 @@ local function draw(w, ctx)
   local ecu_code = tonumber(sensor(16)) or 0        -- ECU State (FM)
 
   -- ECU State Mapping
-  local ecu_text = "OFF"
+  local ecu_key = "ecu_off"
   local ecu_color = C.dim
-  if ecu_code == 0 then ecu_text = "READY"; ecu_color = C.white
-  elseif ecu_code == 1 then ecu_text = "IGNITION"; ecu_color = C.orange
-  elseif ecu_code == 2 then ecu_text = "STARTER"; ecu_color = C.blue
-  elseif ecu_code == 3 then ecu_text = "RUNNING"; ecu_color = C.green
-  elseif ecu_code == 4 then ecu_text = "COOLING"; ecu_color = C.cyan
+  if ecu_code == 0 then ecu_key = "ecu_ready"; ecu_color = C.white
+  elseif ecu_code == 1 then ecu_key = "ecu_ignition"; ecu_color = C.orange
+  elseif ecu_code == 2 then ecu_key = "ecu_starter"; ecu_color = C.blue
+  elseif ecu_code == 3 then ecu_key = "ecu_running"; ecu_color = C.green
+  elseif ecu_code == 4 then ecu_key = "ecu_cooling"; ecu_color = C.cyan
   end
+
+  local fallback_texts = {
+    ecu_off = "OFF", ecu_ready = "READY", ecu_ignition = "IGNITION",
+    ecu_starter = "STARTER", ecu_running = "RUNNING", ecu_cooling = "COOLING", ecu_error = "ERROR"
+  }
+  local ecu_hdr = (ctx.T and ctx.T("ecu_status_hdr")) or "ECU STATUS: "
+  local ecu_text = (ctx.T and ctx.T(ecu_key)) or fallback_texts[ecu_key] or "OFF"
 
   -- Top Status: Centered ECU State
   if not is_trn then lcd.drawFilledRectangle(X(295), Y(245), W(495), H(32), C.panel2) end
-  text(542, 248, "ECU STATUS: " .. ecu_text, CENTER + f_0, ecu_color)
+  text(542, 248, ecu_hdr .. ecu_text, CENTER + f_0, ecu_color)
   if not is_trn then lcd.drawLine(X(295), Y(277), X(790), Y(277), SOLID, C.blue) end
 
   -- Reusable Horizontal Bar Function for EICAS Glass Cockpit Aesthetic
