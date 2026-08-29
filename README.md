@@ -1,6 +1,11 @@
 # RBCT Helicopter Dashboard Widget
 
 **Author / 作者**: 雷恩 / Ryan Kuo
+
+> ⚠️ **免責聲明 (Disclaimer)**：使用此小工具與相關資訊需自行承擔飛行風險。本工具僅供輔助監控參考，飛手仍須隨時注意飛行安全與現場環境。
+> 
+> ⚠️ **Disclaimer**: You are using this widget and information at your own risk. This telemetry widget is for reference only; pilots are solely responsible for flight safety and operation.
+
 ### Standard UI (預設標準介面)
 ![Standard UI](Pic/Standard%20UI.jpg?v=1.0.8)
 
@@ -148,6 +153,8 @@
 ---
 
 ## 🇺🇸 English Documentation
+
+> ⚠️ **DISCLAIMER**: You are using this widget and information at your own risk. This telemetry widget is for reference only; pilots are solely responsible for flight safety and operation.
 
 **RBCT** is a helicopter dashboard telemetry widget crafted for EdgeTX, featuring multi-resolution auto-adaptation to perfectly fit full-color touchscreens such as RadioMaster TX16S MK3 (800x480), TX16S MKII (480x272), and TX15 MAX (480x320). It provides a comprehensive and intuitive flight telemetry monitoring interface.
 
