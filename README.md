@@ -29,13 +29,13 @@
 ![Menu UI](Pic/Standard%20UI_tw.jpg?v=1.0.8)
 
 ### Flight session stats UI (觸控子畫面)
-![Menu UI](Pic/Flight%20session%20stats.jpg?v=1.0.8)
+![Menu UI](Pic/Flight%20session%20stats.png?v=1.0.8)
 
 ### Battery Health (多語系主畫面)
-![Menu UI](Pic/Battery%20Health.jpg?v=1.0.8)
+![Menu UI](Pic/Battery%20Health.png?v=1.0.8)
 
 ### Headspeed (多語系主畫面)
-![Menu UI](Pic/Headspeed.jpg?v=1.0.8)
+![Menu UI](Pic/Headspeed.png?v=1.0.8)
 
 (English below)
 
