@@ -28,6 +28,15 @@
 ### Multilingual UI (多語系主畫面)
 ![Menu UI](Pic/Standard%20UI_tw.jpg?v=1.0.8)
 
+### Flight session stats UI (觸控子畫面)
+![Menu UI](Pic/Flight%20session%20stats.jpg?v=1.0.8)
+
+### Battery Health (多語系主畫面)
+![Menu UI](Pic/Battery%20Health.jpg?v=1.0.8)
+
+### Headspeed (多語系主畫面)
+![Menu UI](Pic/Headspeed.jpg?v=1.0.8)
+
 (English below)
 
 **RBCT** 是一個專為 EdgeTX 開發的直昇機儀表板小工具 (Widget)，支援多種螢幕解析度自動適應，完美適配 RadioMaster TX16S MK3 (800x480)、TX16S MKII (480x272) 以及 TX15 MAX (480x320) 等全彩觸控螢幕。提供完整、直覺的飛行數據監控介面。
