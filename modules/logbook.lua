@@ -183,6 +183,9 @@ local function drawLogbook(w, ctx)
 
         if is_active then
           lcd.drawFilledRectangle(X(20), py, W(760), H(50), C.panel2)
+          lcd.drawRectangle(X(20), py, W(760), H(50), C.blue)
+        elseif i % 2 == 1 then
+          lcd.drawFilledRectangle(X(20), py, W(760), H(50), C.panel)
         end
 
         local color = is_active and C.green or C.white
@@ -233,6 +236,11 @@ local function drawLogbook(w, ctx)
     local count = math.min(max_rows, #(entries_to_draw or {}))
     for i = 1, count do
       local py = Y(92 + (i - 1) * 32)
+
+      if i % 2 == 1 then
+        lcd.drawFilledRectangle(X(20), Y(88 + (i - 1) * 32), W(760), H(30), C.panel)
+      end
+
       local parts = entries_to_draw[i]
       if type(parts) == "table" and #parts >= 8 then
         local amp_str = parts[4]
