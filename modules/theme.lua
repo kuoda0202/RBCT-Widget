@@ -19,18 +19,14 @@ local function update(w, ctx)
   local state = w._theme_state
   
   local should_be_hivis = state.is_hivis
-  if should_be_hivis then
-    if type(val) == "number" and val < 90 then
-      should_be_hivis = false
-    elseif type(val) == "boolean" and not val then
+  if type(val) == "number" then
+    if val == 1 or val == 2 or val > 50 then
+      should_be_hivis = true
+    elseif val <= 25 then
       should_be_hivis = false
     end
-  else
-    if type(val) == "number" and val > 150 then
-      should_be_hivis = true
-    elseif type(val) == "boolean" and val then
-      should_be_hivis = true
-    end
+  elseif type(val) == "boolean" then
+    should_be_hivis = val
   end
   
   if should_be_hivis and not state.is_hivis then

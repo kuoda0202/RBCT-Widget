@@ -339,21 +339,22 @@ local function applyDynamicTheme(w, arm_on)
   local is_light_sens_active = false
   if light_sens_src and light_sens_src ~= 0 then
     local s_val = getValue(light_sens_src)
+    w._last_s_val = s_val
     if type(s_val) == "boolean" then
       is_light_sens_active = s_val
       w._light_active = s_val
     elseif type(s_val) == "number" then
+      -- 支援 EdgeTX 所有開關模式與類比光感：
+      -- 1. 開關輸出 0 / 1 / 2 (UP / MID / DOWN)
+      -- 2. 開關輸出 -1024 / 0 / +1024
+      -- 3. 類比光感應器 0 ~ 1024 (或 0 ~ 100%)
       local cur_state = w._light_active or false
-      if cur_state then
-        -- 遲滯下限：光線降到 90 以下才切回原主題，避免臨界頻繁閃爍
-        if s_val < 90 then
-          cur_state = false
-        end
-      else
-        -- 觸發上限：光線達到 150 以上即切換為 LCD 高反差主題（檯燈/亮室內/戶外陽光均靈敏觸發）
-        if s_val > 150 then
-          cur_state = true
-        end
+      if s_val == 1 or s_val == 2 then
+        cur_state = true
+      elseif s_val > 50 then
+        cur_state = true
+      elseif s_val <= 25 then
+        cur_state = false
       end
       w._light_active = cur_state
       is_light_sens_active = cur_state
@@ -362,19 +363,8 @@ local function applyDynamicTheme(w, arm_on)
     w._light_active = false
   end
 
-  -- 解鎖保護：飛行解鎖中鎖定當前色彩主題，避免穿過樹蔭或雲層陰影時畫面色彩突變
-  if arm_on then
-    if w._theme_locked_idx ~= nil then
-      t_val = w._theme_locked_idx
-    else
-      if is_light_sens_active then t_val = 11 end
-      w._theme_locked_idx = t_val
-    end
-  else
-    w._theme_locked_idx = nil
-    if is_light_sens_active then
-      t_val = 11 -- Force LCD theme under strong ambient light switch
-    end
+  if is_light_sens_active then
+    t_val = 11 -- Force LCD theme under strong ambient light or assigned switch
   end
 
   w.active_theme_idx = t_val
