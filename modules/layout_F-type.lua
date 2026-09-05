@@ -260,8 +260,8 @@ local function draw(w, data, ctx)
     local l_str = tostring(l_val)
     if type(l_val) == "boolean" then l_str = l_val and "ON" or "OFF" end
     local l_txt = "LGT: " .. l_str
-    lcd.drawText(X(192), Y(46), bat_tag, f_sml + C_DIM)
-    lcd.drawText(X(306), Y(46), l_txt, f_sml + l_col)
+    lcd.drawText(X(180), Y(46), l_txt, f_sml + l_col)
+    lcd.drawText(X(248), Y(46), bat_tag, f_sml + C_DIM)
   else
     lcd.drawText(X(248), Y(46), bat_tag, CENTER + f_sml + C_DIM)
   end

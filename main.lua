@@ -1173,21 +1173,23 @@ local function drawDashboard(w, data, ctx)
     end
     text(145, 412, capa_text, CENTER + f_sml, C.dim)
   end
-  local bat_info_str = VERSION
-  if w.last_bat_idx and w.last_bat_idx > 0 then
-    if w.fleet_stats and w.fleet_stats[w.last_bat_idx] then
-      local st = w.fleet_stats[w.last_bat_idx]
-      bat_info_str = string.format("%s | BAT %d (%d/%dc)", VERSION, w.last_bat_idx, st.today_count or 0, st.lifetime_cycles or 0)
-    else
-      bat_info_str = VERSION .. " | BAT " .. w.last_bat_idx
-    end
+  local bat_idx = (w.last_bat_idx and w.last_bat_idx > 0) and w.last_bat_idx or 1
+  local bat_tag = "BAT " .. tostring(bat_idx)
+  if w.fleet_stats and w.fleet_stats[bat_idx] then
+    local st = w.fleet_stats[bat_idx]
+    bat_tag = string.format("BAT %d (%d/%dc)", bat_idx, st.today_count or 0, st.lifetime_cycles or 0)
   end
-  if w._last_s_val ~= nil then
-    local l_str = tostring(w._last_s_val)
-    if type(w._last_s_val) == "boolean" then l_str = w._last_s_val and "ON" or "OFF" end
-    bat_info_str = bat_info_str .. string.format(" | LGT: %s", l_str)
+
+  local l_val = w._last_s_val
+  if l_val ~= nil then
+    local l_str = tostring(l_val)
+    if type(l_val) == "boolean" then l_str = l_val and "ON" or "OFF" end
+    local l_col = (w._light_active or w.active_theme_idx == 11) and (C.cyan or C.green) or C.dim
+    text(70, 434, "LGT: " .. l_str, CENTER + f_sml, l_col)
+    text(195, 434, bat_tag, CENTER + f_sml, C.dim)
+  else
+    text(145, 434, VERSION .. " | " .. bat_tag, CENTER + f_sml, C.dim)
   end
-  text(145, 434, bat_info_str, CENTER + f_sml, C.dim)
 
   -- 4. Right Top Panel (RPM Card)
   panel(X(295), Y(70), W(495), H(160), is_trn, is_transp)
