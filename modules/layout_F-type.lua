@@ -254,17 +254,7 @@ local function draw(w, data, ctx)
   end
   lcd.drawText(X(248), Y(16), ver_str, CENTER + f_sml + C_DIM)
 
-  local l_val = data.light_val or (w and w._last_s_val)
-  if l_val ~= nil then
-    local l_col = (data.light_active) and C_CYAN or C_DIM
-    local l_str = tostring(l_val)
-    if type(l_val) == "boolean" then l_str = l_val and "ON" or "OFF" end
-    local l_txt = "LGT: " .. l_str
-    lcd.drawText(X(180), Y(46), l_txt, f_sml + l_col)
-    lcd.drawText(X(248), Y(46), bat_tag, f_sml + C_DIM)
-  else
-    lcd.drawText(X(248), Y(46), bat_tag, CENTER + f_sml + C_DIM)
-  end
+  lcd.drawText(X(248), Y(46), bat_tag, CENTER + f_sml + C_DIM)
 
   -- (B) Top Center: MODEL 01 (Bold) & RadioMaster Logo & BANK 1
   local m_name = (data.modelName and data.modelName ~= "") and data.modelName or "MODEL 01"
@@ -284,6 +274,13 @@ local function draw(w, data, ctx)
   local lx = X(400) - math.floor(logo_w / 2)
   local ly = is_sml_radio and Y(24) or Y(41)
   drawRmLogo(lcd, lx, ly, C_TEXT, is_sml_radio, f_mid)
+
+  -- Real-time Light Sensor / Switch Indicator (Directly to the left of TX Battery bx=684)
+  local l_val = data.light_val or (w and w._last_s_val)
+  local l_str = (l_val ~= nil) and tostring(l_val) or "---"
+  if type(l_val) == "boolean" then l_str = l_val and "ON" or "OFF" end
+  local l_col = (data.light_active or (w and w.active_theme_idx == 11)) and C_CYAN or C_DIM
+  lcd.drawText(X(659), Y(22), "LGT: " .. l_str, RIGHT + f_sml + l_col)
 
   -- (C) Top Right: TX Battery Level (Large Segmented Green Grid) & Voltage
   local tx_v = data.txVoltage or 0

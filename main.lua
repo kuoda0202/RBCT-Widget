@@ -349,11 +349,9 @@ local function applyDynamicTheme(w, arm_on)
       -- 2. 開關輸出 -1024 / 0 / +1024
       -- 3. 類比光感應器 0 ~ 1024 (或 0 ~ 100%)
       local cur_state = w._light_active or false
-      if s_val == 1 or s_val == 2 then
+      if s_val == 1 or s_val == 2 or s_val >= 900 then
         cur_state = true
-      elseif s_val > 10 then
-        cur_state = true
-      elseif s_val <= 4 then
+      elseif s_val <= 850 then
         cur_state = false
       end
       w._light_active = cur_state
@@ -1038,6 +1036,19 @@ local function drawDashboard(w, data, ctx)
     text(14, 12, m_name, f_mid, C.white)
     text(400, 6, data.timer, CENTER + f_dbl, data.timerColor)
 
+    -- Real-time Light Sensor / Switch Indicator (Directly in top-right area, left of TX battery)
+    local l_val = w._last_s_val
+    local l_str = (l_val ~= nil) and tostring(l_val) or "---"
+    if type(l_val) == "boolean" then l_str = l_val and "ON" or "OFF" end
+    local is_lcd = (w.active_theme_idx == 11)
+    local l_col = C.dim
+    if is_lcd then
+      l_col = C.black
+    elseif w._light_active then
+      l_col = C.cyan or C.green
+    end
+    text(615, 18, "LGT: " .. l_str, RIGHT + f_sml, l_col)
+
     -- Transmitter Battery Gauge (Enlarged Capsule with Center Voltage)
     local tx_v = data.txVoltage or 0
     local tx_min, tx_max = 6.0, 8.4
@@ -1179,17 +1190,7 @@ local function drawDashboard(w, data, ctx)
     local st = w.fleet_stats[bat_idx]
     bat_tag = string.format("BAT %d (%d/%dc)", bat_idx, st.today_count or 0, st.lifetime_cycles or 0)
   end
-
-  local l_val = w._last_s_val
-  if l_val ~= nil then
-    local l_str = tostring(l_val)
-    if type(l_val) == "boolean" then l_str = l_val and "ON" or "OFF" end
-    local l_col = (w._light_active or w.active_theme_idx == 11) and (C.cyan or C.green) or C.dim
-    text(70, 434, "LGT: " .. l_str, CENTER + f_sml, l_col)
-    text(195, 434, bat_tag, CENTER + f_sml, C.dim)
-  else
-    text(145, 434, VERSION .. " | " .. bat_tag, CENTER + f_sml, C.dim)
-  end
+  text(145, 434, VERSION .. " | " .. bat_tag, CENTER + f_sml, C.dim)
 
   -- 4. Right Top Panel (RPM Card)
   panel(X(295), Y(70), W(495), H(160), is_trn, is_transp)
