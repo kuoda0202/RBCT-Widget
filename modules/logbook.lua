@@ -145,7 +145,7 @@ local function computeChartScales(data)
 end
 
 local function drawLogbook(w, ctx)
-  local lcd, C, f_mid, f_sml = ctx.lcd, ctx.C, ctx.f_mid, ctx.f_sml
+  local lcd, C, f_mid, f_sml, f_0 = ctx.lcd, ctx.C, ctx.f_mid, ctx.f_sml, ctx.f_0 or 0
   local x, y, sw, sh = ctx.x, ctx.y, ctx.sw, ctx.sh
   local X, Y, W, H = ctx.X, ctx.Y, ctx.W, ctx.H
   local CENTER = ctx.CENTER or rawget(_G, "CENTER") or rawget(_G, "CENTERED") or 2
@@ -160,45 +160,116 @@ local function drawLogbook(w, ctx)
   -- TAB 2: BATTERY FLEET MANAGER
   -- =========================================================================
   if w.logbook_tab == 2 then
-    if not w.fleet_data then loadFleetData(w, ctx) end
+    local fleet = w.fleet_stats or ctx.fleet_stats or w.fleet_data
+    if not fleet or #fleet == 0 then
+      if loadFleetData then loadFleetData(w, ctx) end
+      fleet = w.fleet_stats or ctx.fleet_stats or w.fleet_data or {}
+    end
+
     lcd.drawText(X(400), Y(16), T("fleet_mgr"), CENTER + f_mid + C.white)
 
     local activeBatIdx = w.last_bat_idx or 0
 
     lcd.drawLine(X(20), Y(50), X(780), Y(50), SOLID, C.panel2)
-    local cols = { 100, 250, 400, 550, 700 }
+    local cols = { 65, 175, 290, 395, 500, 605, 715 }
     lcd.drawText(X(cols[1]), Y(58), T("tbl_bat_num"), CENTER + f_sml + C.dim)
-    lcd.drawText(X(cols[2]), Y(58), T("tbl_cycles"), CENTER + f_sml + C.dim)
-    lcd.drawText(X(cols[3]), Y(58), T("tbl_min_v"), CENTER + f_sml + C.dim)
-    lcd.drawText(X(cols[4]), Y(58), T("tbl_max_t"), CENTER + f_sml + C.dim)
-    lcd.drawText(X(cols[5]), Y(58), T("tbl_avg_dur"), CENTER + f_sml + C.dim)
+    lcd.drawText(X(cols[2]), Y(58), T("tbl_status"), CENTER + f_sml + C.dim)
+    lcd.drawText(X(cols[3]), Y(58), T("tbl_today_tot"), CENTER + f_sml + C.dim)
+    lcd.drawText(X(cols[4]), Y(58), T("tbl_min_v"), CENTER + f_sml + C.dim)
+    lcd.drawText(X(cols[5]), Y(58), T("tbl_max_t"), CENTER + f_sml + C.dim)
+    lcd.drawText(X(cols[6]), Y(58), T("tbl_avg_dur"), CENTER + f_sml + C.dim)
+    lcd.drawText(X(cols[7]), Y(58), T("tbl_last_mah"), CENTER + f_sml + C.dim)
     lcd.drawLine(X(20), Y(86), X(780), Y(86), SOLID, C.panel2)
 
-    local fleet = w.fleet_data or {}
-    for i = 1, math.min(6, #fleet) do
-      local data = fleet[i]
-      if data then
-        local py = Y(90 + (i - 1) * 55)
-        local is_active = (i == activeBatIdx)
+    for i = 1, 6 do
+      local data = fleet[i] or { id = i, today_count = 0, lifetime_cycles = 0, status = "NONE", min_v = "-", max_t = "-", avg_dur = "-", last_mah = 0 }
+      local py = Y(90 + (i - 1) * 55)
+      local is_active = (i == activeBatIdx)
 
-        if is_active then
-          lcd.drawFilledRectangle(X(20), py, W(760), H(50), C.panel2)
-          lcd.drawRectangle(X(20), py, W(760), H(50), C.blue)
-        elseif i % 2 == 1 then
-          lcd.drawFilledRectangle(X(20), py, W(760), H(50), C.panel)
+      if is_active then
+        lcd.drawFilledRectangle(X(20), py, W(760), H(50), C.panel2)
+        lcd.drawRectangle(X(20), py, W(760), H(50), C.blue)
+      elseif i % 2 == 1 then
+        lcd.drawFilledRectangle(X(20), py, W(760), H(50), C.panel)
+      end
+
+      local color = is_active and C.green or C.white
+      lcd.drawText(X(cols[1]), py + H(14), "BAT " .. i, CENTER + f_0 + color)
+
+      local st = data.status or "NONE"
+      local st_text, st_color = T("st_unused"), C.dim
+      local is_filled_dot = false
+      if st == "READY" then
+        st_text, st_color = T("st_ready"), C.green
+        is_filled_dot = true
+      elseif st == "FLOWN" then
+        st_text, st_color = T("st_flown"), C.red
+        is_filled_dot = true
+      elseif st == "STORAGE" then
+        st_text, st_color = T("st_storage"), C.yellow
+        is_filled_dot = true
+      else
+        st_text, st_color = T("st_unused"), C.dim
+        is_filled_dot = false
+      end
+
+      -- Vector dot indicator + left-aligned label (Perfect gap & optical vertical centering)
+      local dot_x = X(130)
+      local dot_y = py + H(26)
+      local dot_r = math.max(2, H(4))
+      if is_filled_dot then
+        lcd.drawFilledCircle(dot_x, dot_y, dot_r, st_color)
+      else
+        lcd.drawCircle(dot_x, dot_y, dot_r, st_color)
+      end
+      lcd.drawText(X(150), py + H(14), st_text, f_0 + st_color)
+
+      local cyc_str = string.format("%d / %dc", data.today_count or 0, data.lifetime_cycles or 0)
+      lcd.drawText(X(cols[3]), py + H(14), cyc_str, CENTER + f_0 + C.white)
+
+      local mv_num = tonumber(data.min_v)
+      local mv_col = (mv_num and mv_num < 3.5) and C.red or C.white
+      lcd.drawText(X(cols[4]), py + H(14), (data.min_v ~= "-" and (data.min_v .. "V") or "-"), CENTER + f_0 + mv_col)
+      lcd.drawText(X(cols[5]), py + H(14), (data.max_t ~= "-" and (data.max_t .. "°C") or "-"), CENTER + f_0 + C.white)
+      lcd.drawText(X(cols[6]), py + H(14), data.avg_dur or "-", CENTER + f_0 + C.white)
+
+      local mah_val = tonumber(data.last_mah) or 0
+      local mah_str = (mah_val > 0) and (tostring(mah_val) .. "mAh") or "-"
+      lcd.drawText(X(cols[7]), py + H(14), mah_str, CENTER + f_0 + C.white)
+    end
+
+    -- Tab 2 Bottom Summary Footer Bar
+    local tot_today_flights = 0
+    local tot_today_dur_s = 0
+    local tot_today_mah = 0
+
+    for i = 1, 6 do
+      local d = fleet[i]
+      if d then
+        local c = d.today_count or 0
+        tot_today_flights = tot_today_flights + c
+        if c > 0 and d.avg_dur and d.avg_dur ~= "-" then
+          local m, s = string.match(d.avg_dur, "(%d+):(%d+)")
+          if m and s then
+            tot_today_dur_s = tot_today_dur_s + (tonumber(m) * 60 + tonumber(s)) * c
+          end
         end
-
-        local color = is_active and C.green or C.white
-        lcd.drawText(X(cols[1]), py + H(14), "BAT " .. i, CENTER + f_mid + color)
-        lcd.drawText(X(cols[2]), py + H(14), tostring(data.cycles), CENTER + f_mid + C.white)
-
-        local mv_num = tonumber(data.min_v)
-        local mv_col = (mv_num and mv_num < 3.5) and C.red or C.white
-        lcd.drawText(X(cols[3]), py + H(14), data.min_v .. (data.min_v ~= "-" and "V" or ""), CENTER + f_mid + mv_col)
-        lcd.drawText(X(cols[4]), py + H(14), data.max_t .. (data.max_t ~= "-" and "°C" or ""), CENTER + f_mid + C.white)
-        lcd.drawText(X(cols[5]), py + H(14), data.avg_dur, CENTER + f_mid + C.white)
+        if c > 0 and (d.last_mah or 0) > 0 then
+          tot_today_mah = tot_today_mah + (d.last_mah * c)
+        end
       end
     end
+
+    local sum_dur_str = string.format("%02d:%02d", math.floor(tot_today_dur_s / 60), tot_today_dur_s % 60)
+    local sum_mah_str = (tot_today_mah > 0) and string.format("%.0f mAh", tot_today_mah) or "- mAh"
+    local sum_fmt = T("fleet_sum_today") or "Today fleet: %d Flights | Flight time: %s | Energy: %s"
+    local sum_text = string.format(sum_fmt, tot_today_flights, sum_dur_str, sum_mah_str)
+
+    local f_bar_y = Y(424)
+    local f_bar_h = H(46)
+    lcd.drawFilledRectangle(X(20), f_bar_y, W(760), f_bar_h, C.panel)
+    lcd.drawRectangle(X(20), f_bar_y, W(760), f_bar_h, C.blue)
+    lcd.drawText(X(400), f_bar_y + H(14), sum_text, CENTER + f_sml + C.white)
 
   -- =========================================================================
   -- TAB 1: FLIGHT LOGBOOK & COMPACT PERFORMANCE CHART
@@ -232,17 +303,24 @@ local function drawLogbook(w, ctx)
       }
     end
 
-    local max_rows = (sh < 300) and 2 or 4
+    local max_rows = (sh < 300) and 3 or 5
     local count = math.min(max_rows, #(entries_to_draw or {}))
+    local row_step = (max_rows == 5) and 27 or 30
+    local sel_idx = w.selected_chart_idx or 1
     for i = 1, count do
-      local py = Y(92 + (i - 1) * 32)
+      local py = Y(90 + (i - 1) * row_step)
+      local is_selected = (i == sel_idx)
 
-      if i % 2 == 1 then
-        lcd.drawFilledRectangle(X(20), Y(88 + (i - 1) * 32), W(760), H(30), C.panel)
+      if is_selected then
+        lcd.drawFilledRectangle(X(20), Y(88 + (i - 1) * row_step), W(760), H(row_step - 2), C.panel2)
+        lcd.drawRectangle(X(20), Y(88 + (i - 1) * row_step), W(760), H(row_step - 2), C.blue)
+      elseif i % 2 == 1 then
+        lcd.drawFilledRectangle(X(20), Y(88 + (i - 1) * row_step), W(760), H(row_step - 2), C.panel)
       end
 
       local parts = entries_to_draw[i]
       if type(parts) == "table" and #parts >= 8 then
+        local row_color = is_selected and C.green or C.white
         local amp_str = parts[4]
         local a_num = tonumber(parts[4])
         if a_num then amp_str = string.format("%.1f", a_num) end
@@ -255,7 +333,7 @@ local function drawLogbook(w, ctx)
           pwr_str = string.format("%.0fW", pwr_val)
         end
 
-        lcd.drawText(X(cols[1]), py, parts[1], CENTER + f_sml + C.white)
+        lcd.drawText(X(cols[1]), py, parts[1], CENTER + f_sml + row_color)
         lcd.drawText(X(cols[2]), py, parts[2], CENTER + f_sml + C.white)
         lcd.drawText(X(cols[3]), py, parts[3], CENTER + f_sml + C.white)
         lcd.drawText(X(cols[4]), py, amp_str, CENTER + f_sml + C.white)
@@ -272,7 +350,8 @@ local function drawLogbook(w, ctx)
     end
 
     -- Chart Title & Legends
-    lcd.drawText(X(20), Y(230), T("last_chart"), f_sml + C.white)
+    local chart_title = (sel_idx and sel_idx > 1) and (T("hist_chart") .. " (#" .. sel_idx .. ")") or (T("last_chart") .. " (#1)")
+    lcd.drawText(X(20), Y(230), chart_title, f_sml + C.white)
 
     lcd.drawFilledRectangle(X(290), Y(235), W(10), H(10), C.green)
     lcd.drawText(X(308), Y(230), T("pop_leg_rpm"), f_sml + C.white)

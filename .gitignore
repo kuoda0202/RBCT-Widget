@@ -1,6 +1,21 @@
-# EdgeTX compiled bytecode
+# Bytecode & compile cache
 *.luac
 
-# OS metadata
+# Local sync & scratch scripts
+*.bat
+*.ps1
+*.py
+
+# AI Agent rule & guidelines (Excluded from GitHub)
+AGENTS.md
+.agents/
+dev_tools/
+
+# OS & IDE temporary files
 .DS_Store
 Thumbs.db
+*.tmp
+*.bak
+
+# Runtime battery fleet logs
+fleet_*.txt

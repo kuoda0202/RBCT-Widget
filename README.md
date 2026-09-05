@@ -7,40 +7,43 @@
 > ⚠️ **Disclaimer**: You are using this widget and information at your own risk. This telemetry widget is for reference only; pilots are solely responsible for flight safety and operation.
 
 ### Standard UI (預設標準介面)
-![Standard UI](Pic/Standard%20UI.jpg?v=1.0.8)
+![Standard UI](doc_images/Standard%20UI.jpg?v=1.0.8)
 
 ### Clean UI (半透背景模式)
-![Clean UI](Pic/Clean%20UI.jpg?v=1.0.8)
+![Clean UI](doc_images/Clean%20UI.jpg?v=1.0.8)
 
 ### Transparent UI (TRN 全透無框模式)
-![Transparent UI](Pic/Transparent%20UI.jpg?v=1.0.8)
+![Transparent UI](doc_images/Transparent%20UI.jpg?v=1.0.8)
 
 ### Nitro UI (燃油引擎專屬模式)
-![Nitro UI](Pic/Nitro%20UI.jpg?v=1.0.8)
+![Nitro UI](doc_images/Nitro%20UI.jpg?v=1.0.8)
 
 ### Turbine UI (渦輪噴射專屬模式)
-![Turbine UI](Pic/Turbine%20UI.jpg?v=1.0.8)
+![Turbine UI](doc_images/Turbine%20UI.jpg?v=1.0.8)
 
 ### Battery Fleet Manager UI (機隊電池管理總表)
-![Battery Fleet Manager UI](Pic/Battery%20UI.jpg?v=1.0.8)
+![Battery Fleet Manager UI](doc_images/Battery%20UI.jpg?v=1.0.8)
+
+### Battery Profile & Manager UI (單包電池專屬管理彈窗)
+![Battery Profile UI](doc_images/Battery%20life%20UI.jpg?v=1.0.9)
 
 ### Logbook & Chart UI (飛行日誌與曲線圖表)
-![Logbook UI](Pic/Logbook%20UI.jpg?v=1.0.8)
+![Logbook UI](doc_images/Logbook%20UI.jpg?v=1.0.8)
 
 ### Multilingual Widget Settings Menu (小工具設定選單)
-![Menu UI](Pic/Menu%20UI.jpg?v=1.0.8)
+![Menu UI](doc_images/Menu%20UI.jpg?v=1.0.8)
 
 ### Multilingual UI (多語系主畫面)
-![Menu UI](Pic/Standard%20UI_tw.jpg?v=1.0.8)
+![Menu UI](doc_images/Standard%20UI_tw.jpg?v=1.0.8)
 
 ### Flight session stats UI (觸控子畫面)
-![Menu UI](Pic/Flight%20session%20stats.png?v=1.0.8)
+![Menu UI](doc_images/Flight%20session%20stats.png?v=1.0.8)
 
 ### Battery Health (觸控子畫面)
-![Menu UI](Pic/Battery%20Health.png?v=1.0.8)
+![Menu UI](doc_images/Battery%20Health.png?v=1.0.8)
 
 ### Headspeed (觸控子畫面)
-![Menu UI](Pic/Headspeed.png?v=1.0.8)
+![Menu UI](doc_images/Headspeed.png?v=1.0.8)
 
 (English below)
 
@@ -49,7 +52,7 @@
 ## 🌟 核心功能
 
 *   **飛行日誌與 5 色曲線分析圖 (Logbook & Chart Analyzer)**：透過實體開關 (Logbook Sw) 一鍵叫出，提供：
-    *   **9 欄歷史數據表格**：自動記錄近期航班極值（起飛時間 RTC、飛行時長、最高轉速 MAX RPM、最高電流 MAX A、最高功率 MAX PWR、最低電壓 MIN V、最低接收 MIN 1RSS、電變最高溫 MAX TMP、已消耗 mAh）。
+    *   **9 欄歷史數據表格**：自動記錄近期航班極值（起飛時間 RTC、飛行時長、最高轉速 MAX RPM、最高電流 MAX A、最高功率 MAX PWR、最低電壓 MIN V、最低接收 MIN 1RSS、電變最高溫 MAX TMP、已消耗量 mAh）。
     *   **最新一次飛行 5 色動態曲線圖**：綠線 RPM、橘線 電壓、紅線 電流、藍線 BEC、黃線 溫度，呈現劇烈 3D 動作時的電壓陡降與掉轉現象，降落上鎖 (DISARM) 自動存檔關機不遺失！
 *   **機隊電池管理總表 (Battery Fleet Manager)**：自動獨立追蹤每包電池 (BAT 1 ~ BAT 6) 的循環次數、歷史最低電壓、電變最高溫 (MAX ESC TMP) 與平均航程。
 *   **自動飛行次數計數器 (Flight Counter)**：獨立追蹤每台機型的「今日飛行次數 (Today)」與「歷史總飛行次數 (Total)」，皆以純文字檔儲存於 SD 卡，支援手動編輯。
@@ -58,7 +61,7 @@
 *   **主旋翼轉速監控 (Headspeed)**：即時顯示目前轉速 (RPM)，並記錄飛行過程中的最高 (max) 與最低 (min) 轉速。
 *   **定速狀態指示 (Governor)**：提供醒目直覺的定速開啟/關閉 (ON/OFF) 狀態圖示。
 *   **特技模式通道對映(Banks)**：根據您設定的遙控器開關或通道，動態顯示當前使用的 FBL 停懸段數 (Bank)。
-*   **多套儀表板主題配色**：內建 11 種高對比主題色彩 (Red, Orange, Yellow, Green, Blue, Cyan, Violet, Black, TRN 全透明, Pink, LCD 高反差)，可依個人喜好自由切換，支援透明背景與磨砂顯示**：
+*   **多套儀表板主題配色**：內建 12 種高對比主題 (Red, Orange, Yellow, Green, Blue, Cyan, Violet, Black, TRN 全透明, Pink, LCD 高反差, F-type)，可依個人喜好自由切換，支援透明背景與磨砂顯示**：
 *   **搖桿光圈控制**：搖桿 RGB 光圈控制，支援 9 種顏色與關閉選項。
 *   **動態模型圖片**：自動讀取位於 `/IMAGES` 或 `/WIDGETS/RBCT/modelImage/` 的模型圖片。若無圖片則自動載入預設圖。
 *   **飛行計時器整合**：於儀表板顯眼處同步顯示所選的遙控器計時器。
@@ -82,7 +85,20 @@
 
 ## 📝 版本更新歷程 (Release Notes)
 
-### v1.0.8 (目前最新版)
+### v1.0.9 (目前最新版)
+* **功能新增**：**F-type 專屬儀表主題** - 新增深藍灰航空儀表版面與獨立模組。
+* **錯誤修復**：**三機型模型縮圖與全 UI 響應式修復** 模型圖片依實體卡片像素等比縮放與雙向置中；完整支援 TX16S MK3 (800x480)、TX16S MKII (480x272) 與 TX15 MAX (480x320)，並修正 480px 螢幕誤用大型字型的問題。
+* **功能新增**：**機隊電池專屬檔案與快捷管理儀表板 (Battery Profile & Manager)** - 點擊機隊電池總表 (Tab 2) 的任意電池行 (BAT 1 ~ BAT 6)，即可秒開專屬的【BAT X 電池資訊】卡片視窗！
+  * **4 大歷史極值指標卡**：精確呈現該電池的今日/總計循環次數、歷史最低電壓、電變最高溫 (MAX TMP)、單次消耗電量 (mAh) 與平均時長 (AVG DUR)，採標準字型置中排版，永不爆框。
+  * **4 顆即時狀態切換按鈕**：直接點擊【🟢 待飛 / 🔴 已飛 / 🟡 儲存 / ⚪ 未用】，即時變更狀態標籤與燈號顏色，並自動同步儲存至 SD 卡。
+  * **高頻管理快捷操作**：提供【🔄 本日次數清零】與【🚀 設為當前電池】實體觸控按鈕，換電紀錄迅速俐落。
+  * **實時遙測健康診斷**：下方整合專屬診斷面板，即時呈現壓降 (Voltage Sag)、預測內阻 (Pack IR)、電池百分比與 600px 寬高解析放電折線圖。
+* **功能新增**：**機隊電池管理 2.0 (Battery Fleet Manager 2.0)** - 導入專屬輕量里程表檔案 (`fleet_<機型>.txt`，固定 150 Bytes)，解除舊版 10 次限制，支援 50~500+ 次永久循環壽命累計；Tab 2 總表新增【🟢 待飛 / 🔴 已飛 / 🟡 儲存 / ⚪ 未用】立體化狀態指示燈與單趟耗電 (mAh)，底部常駐**今日機隊飛行總結條**（即時彙總今日總架次、總滯空時長、總消耗電量），主畫面與上電橫幅直接顯示當前電池役期標籤 (如 `BAT 1 (0/38c)`)。
+* **功能新增**：**多趟歷史曲線回放 (Multi-Flight History)** - 突破單一曲線限制，自動滾動儲存最近 5 趟飛行 5 色動態遙測折線圖（轉速、電壓、電流、BEC、溫度），支援點擊日誌表格任意歷史行即時切換回放與多電池對比。
+* **介面優化**：**螢幕解析度動態適應 (Screen-Adaptive Depth)** - TX16S MK3 (800x480) 跑車旗艦大螢幕滿版展開 5 行完整歷史數據並全行支援觸控點選；TX16S MKII (480x272) 與 TX15 MAX (480x320) 自動適配為 2~3 行，保持字體清晰不擁擠。
+* **介面優化**：**日誌當前選中行高亮聚焦** - 選定之航班整列以 `C.panel2` 面板底色搭配 `C.blue` 藍色聚焦外框與綠色起飛時間標示，圖表標題同步即時更新為 `最新一次飛行曲線圖 (#1)` 或 `歷史飛行曲線圖 (#2..#5)`。
+
+### v1.0.8
 * **功能新增**：**三語系 UI 即時切換，支援 `自動 (Auto)`、`英文 (English)`、`中文 (TW)`、`中文 (CN)`，且與語音播報完全獨立運作。
 * **防護升級**：**飛行架次嚴格三重防呆鎖** - 偵測到直升機通電連線 (`Vbat >= 5.0V` 或 `BEC >= 3.5V`) 且有效解鎖 >15 秒或轉速 >400 RPM 才計次；遙控器未連線直升機或工作台除錯絕不誤計次。
 * **功能新增**：**渦輪噴射直昇機模式支援** - 即時監控 `EGT` 尾氣溫度（超溫大紅字警報）、`CORE RPM` 100k+ 超高核心轉速、`FUEL %` 油量百分比與低油位語音提醒、以及 `ECU STATE` 即時狀態碼（OFF / START / RUN / COOL / ERROR）。
@@ -170,7 +186,7 @@
 *   **Rotor Headspeed Monitoring**: Displays live RPM and records maximum (max) and minimum (min) headspeed throughout the flight.
 *   **Governor Status Indicator**: Provides prominent and intuitive Governor ON/OFF status icons.
 *   **Flight Mode / Bank Channel Mapping**: Dynamically displays the active FBL bank / profile based on your configured radio switch or channel.
-*   **Multiple Dashboard Color Themes**: Built-in 11 high-contrast color themes (Red, Orange, Yellow, Green, Blue, Cyan, Violet, Black, TRN full transparency, Pink, LCD high contrast), freely switchable with support for transparent background and frosted glass effects.
+*   **Multiple Dashboard Color Themes**: Built-in 12 high-contrast color themes (Red, Orange, Yellow, Green, Blue, Cyan, Violet, Black, TRN full transparency, Pink, LCD high contrast, F-type), freely switchable with support for transparent background and frosted glass effects.
 *   **Gimbal Stick LED Control**: Gimbal RGB LED ring control with 9 colors and OFF mode.
 *   **Dynamic Craft Model Pictures**: Automatically loads model pictures from `/IMAGES/` or `/WIDGETS/RBCT/modelImage/`. Loads a default image if no matching image is found.
 *   **Flight Timer Integration**: Prominently displays the selected radio timer on the dashboard.
@@ -194,7 +210,20 @@ To customize the helicopter picture on the dashboard:
 
 ## 📝 Release Notes & Version History
 
-### v1.0.8 (Current Release)
+### v1.0.9 (Current Release)
+* **New Feature**: **F-type Dedicated Instrument Theme** - Added a slate-blue aviation dashboard layout and independent module.
+* **Bug Fix**: **Three-Radio Model Thumbnail & Full-UI Responsive Fix** - Model pictures are scaled proportionally to physical card pixels and 2D centered; fully supports TX16S MK3 (800x480), TX16S MKII (480x272), and TX15 MAX (480x320), and fixes the issue where 480px screens mistakenly used oversized fonts.
+* **New Feature**: **Dedicated Battery Profile & Quick Manager Modal (Battery Profile & Manager)** - Tap any battery row (BAT 1 ~ BAT 6) in the Battery Fleet Manager table (Tab 2) to instantly open the dedicated [BAT X Info] card modal!
+  * **4 Historical Metric Cards**: Accurately displays Today/Total cycle counts, lowest historical voltage, max ESC temperature (MAX TMP), single-flight consumed capacity (mAh), and average duration (AVG DUR), formatted with centered standard fonts that never overflow.
+  * **4 Instant Status Toggle Buttons**: Directly tap [🟢 Ready / 🔴 Flown / 🟡 Storage / ⚪ Unused] to instantly switch the status tag and LED indicator color, auto-saved to SD card.
+  * **High-Frequency Quick Actions**: Physical touch buttons for [🔄 Reset Today] and [🚀 Set Active Battery] for swift battery swaps and logging.
+  * **Real-Time Telemetry Health Diagnostics**: Bottom integrated diagnostic panel displays Voltage Sag, estimated Pack IR, battery percentage, and a 600px wide high-resolution discharge curve.
+* **New Feature**: **Battery Fleet Manager 2.0** - Introduces a dedicated lightweight odometer file (`fleet_<craft>.txt`, strictly fixed at 150 Bytes), removing the legacy 10-flight cap to support 50~500+ lifetime cycles; Tab 2 fleet table adds [🟢 Ready / 🔴 Flown / 🟡 Storage / ⚪ Unused] 3D status indicator LEDs and single-flight consumption (mAh); permanently features a **Daily Fleet Summary Bar** at the bottom (live summary of today's total flights, total air time, and total consumed energy); the main screen and power-on banner directly display the active battery status tag (e.g. `BAT 1 (0/38c)`).
+* **New Feature**: **Multi-Flight History Curve Playback (Multi-Flight History)** - Breaks through the single-curve barrier by automatically rolling and storing 5-color dynamic telemetry curves (RPM, Voltage, Current, BEC, Temp) for the last 5 flights; tap any history row in the Logbook table to switch playback and compare across batteries instantly.
+* **UI Optimization**: **Screen-Adaptive Depth** - TX16S MK3 (800x480) flagship screen unfolds 5 full rows of flight history data with full-row touch interaction; TX16S MKII (480x272) and TX15 MAX (480x320) adapt to 2~3 rows, keeping fonts crisp and uncluttered.
+* **UI Optimization**: **Active Selected Row Highlight** - Highlights the selected flight row with `C.panel2` background, `C.blue` focus border, and green takeoff timestamp; dynamically updates the chart title to `LATEST FLIGHT CHART (#1)` or `FLIGHT CHART (#2..#5)`.
+
+### v1.0.8
 * **New Feature**: **Tri-Language UI Real-Time Switcher** - Supports `Auto`, `English`, `Chinese (TW)`, and `Chinese (CN)`, operating completely independently from voice alerts.
 * **Safety Upgrade**: **Triple-Shield Flight Count Protection** - Counts flights only when heli telemetry connection is detected (`Vbat >= 5.0V` or `BEC >= 3.5V`) and armed for >15s or rotor RPM >400. Powered-off radio bench debugging will never false-count.
 * **New Feature**: **Turbine Jet Helicopter Mode Support** - Real-time monitoring of `EGT` exhaust gas temperature (large red over-temp warning), `CORE RPM` 100k+ high core speed, `FUEL %` fuel percentage with low fuel voice alerts, and `ECU STATE` live status codes (OFF / START / RUN / COOL / ERROR).

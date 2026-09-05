@@ -3,7 +3,7 @@
 -- Model picture order: Rotorflight Craft Name (/modelImage or /IMAGES),
 -- EdgeTX model name (/modelImage or /IMAGES), Model Setup bitmap, then default.png.
 local NAME = "RBCT"
-local VERSION = "v1.0.8"
+local VERSION = "v1.0.9"
 
 -- Keep this list byte-for-byte compatible with standard telemetry. The order is
 -- deliberately arranged to ensure standard telemetry setup works here.
@@ -57,7 +57,7 @@ local is_cn = (lang == "cn")
 local is_zh = (is_tw or is_cn)
 
 local options_tw = {
-  { "UI 主題", CHOICE, 5, { "Red", "Orange", "Yellow", "Green", "Blue", "Cyan", "Violet", "Black", "TRN", "Pink", "LCD" } },
+  { "UI 主題", CHOICE, 5, { "Red", "Orange", "Yellow", "Green", "Blue", "Cyan", "Violet", "Black", "TRN", "Pink", "LCD", "F-type" } },
   { "背景 (BG)", BOOL, 0 },
   { "搖桿燈開關", BOOL, 0 },
   { "搖桿燈顏色", CHOICE, 5, { "Red", "Orange", "Yellow", "Green", "Blue", "Cyan", "Violet", "Pink", "Rainbow" } },
@@ -82,7 +82,7 @@ local options_tw = {
 }
 
 local options_cn = {
-  { "UI 主题", CHOICE, 5, { "Red", "Orange", "Yellow", "Green", "Blue", "Cyan", "Violet", "Black", "TRN", "Pink", "LCD" } },
+  { "UI 主题", CHOICE, 5, { "Red", "Orange", "Yellow", "Green", "Blue", "Cyan", "Violet", "Black", "TRN", "Pink", "LCD", "F-type" } },
   { "背景 (BG)", BOOL, 0 },
   { "摇杆灯开关", BOOL, 0 },
   { "摇杆灯颜色", CHOICE, 5, { "Red", "Orange", "Yellow", "Green", "Blue", "Cyan", "Violet", "Pink", "Rainbow" } },
@@ -107,7 +107,7 @@ local options_cn = {
 }
 
 local options_en = {
-  { "Theme", CHOICE, 5, { "Red", "Orange", "Yellow", "Green", "Blue", "Cyan", "Violet", "Black", "TRN", "Pink", "LCD" } },
+  { "Theme", CHOICE, 5, { "Red", "Orange", "Yellow", "Green", "Blue", "Cyan", "Violet", "Black", "TRN", "Pink", "LCD", "F-type" } },
   { "Transp BG", BOOL, 0 },
   { "DispLED", BOOL, 0 },
   { "LED Color", CHOICE, 5, { "Red", "Orange", "Yellow", "Green", "Blue", "Cyan", "Violet", "Pink", "Rainbow" } },
@@ -197,113 +197,8 @@ local function getOption(w, key)
 end
 
 -- =========================================================================
--- UI Multi-Language Translation Dictionary (Auto / EN / TW / CN)
+-- Module Loader & Dynamic Cache Engine
 -- =========================================================================
-local UI_TEXT = {
-  today_lbl    = { en = "Today: ",   tw = "本日: ",   cn = "本日: " },
-  total_lbl    = { en = "Total: ",   tw = "總計: ",   cn = "总计: " },
-  rpm_lbl      = { en = "RPM",       tw = "轉速 / 分鐘", cn = "转速 / 分钟" },
-  gov_lbl      = { en = "GOV",       tw = "定速",     cn = "定速" },
-  status       = { en = "STATUS",   tw = "狀態",     cn = "状态" },
-  armed        = { en = "ARMED",    tw = "已解鎖",   cn = "已解锁" },
-  safe         = { en = "SAFE",     tw = "鎖定",     cn = "锁定" },
-  rescue       = { en = "RESCUE!",  tw = "救援!",    cn = "救援!" },
-  head_spd_max = { en = "Head SPD max  %.0f", tw = "主旋翼最高  %.0f", cn = "主旋翼最高  %.0f" },
-  tail_spd_max = { en = "TAIL %.0f / max %.0f", tw = "尾旋翼 %.0f / 最高 %.0f", cn = "尾旋翼 %.0f / 最高 %.0f" },
-  min_spd      = { en = "min   %.0f", tw = "最低   %.0f", cn = "最低   %.0f" },
-  mcu_temp     = { en = "MCU TEMP  %.0f °C", tw = "飛控溫度  %.0f °C", cn = "飞控温度  %.0f °C" },
-  turbine_jet  = { en = "TURBINE JET", tw = "TURBINE 模式", cn = "TURBINE 模式" },
-  nitro_eng    = { en = "NITRO ENGINE", tw = "發動機模式", cn = "发动机模式" },
-  ecu_bat      = { en = "ECU BAT  %.1fV", tw = "ECU 電池  %.1fV", cn = "ECU 电池  %.1fV" },
-  rx_pack      = { en = "RX PACK  %.1fV", tw = "接收電池  %.1fV", cn = "接收电池  %.1fV" },
-  battery_fmt  = { en = "BATTERY  %dS  %.1fV", tw = "主電池  %dS  %.1fV", cn = "主电池  %dS  %.1fV" },
-  used_mah     = { en = "%.0f mAh used", tw = "已消耗 %.0f mAh", cn = "已消耗 %.0f mAh" },
-  peak_pwr_w   = { en = " - max %.0fW", tw = " - 最高 %.0fW", cn = " - 最高 %.0fW" },
-  peak_pwr_kw  = { en = " - max %.1fkW", tw = " - 最高 %.1fkW", cn = " - 最高 %.1fkW" },
-  no_data      = { en = "NO DATA",  tw = "無遙測信號", cn = "无遥测信号" },
-  
-  -- Electric card columns
-  col_amps     = { en = "AMPS",     tw = "電流",     cn = "电流" },
-  col_cell     = { en = "Cell",     tw = "單電電壓", cn = "单节电压" },
-  col_bec      = { en = "BEC",      tw = "接收電壓", cn = "接收电压" },
-  col_esc_t    = { en = "ESC Temp", tw = "電變溫度", cn = "电调温度" },
-  sub_max_a    = { en = "max %.1fA", tw = "最高 %.1fA", cn = "最高 %.1fA" },
-  sub_min_v    = { en = "min %.2fV", tw = "最低 %.2fV", cn = "最低 %.2fV" },
-  sub_min_bec  = { en = "min %.1fV", tw = "最低 %.1fV", cn = "最低 %.1fV" },
-  sub_max_t    = { en = "max %.0f°C", tw = "最高 %.0f°C", cn = "最高 %.0f°C" },
-
-  -- Nitro / Turbine modules
-  engine_temp  = { en = "ENGINE TEMP", tw = "發動機溫度", cn = "发动机温度" },
-  rx_pack_title= { en = "RX PACK", tw = "接收電池", cn = "接收电池" },
-  sub_min_v_rx = { en = "min %.1fV", tw = "最低 %.1fV", cn = "最低 %.1fV" },
-  ecu_status_hdr = { en = "ECU STATUS: ", tw = "ECU 狀態: ", cn = "ECU 状态: " },
-  ecu_off        = { en = "OFF",      tw = "關閉",    cn = "关闭" },
-  ecu_ready      = { en = "READY",    tw = "準備",    cn = "准备" },
-  ecu_ignition   = { en = "IGNITION", tw = "點火",    cn = "点火" },
-  ecu_starter    = { en = "STARTER",  tw = "啟動",    cn = "启动" },
-  ecu_running    = { en = "RUNNING",  tw = "運轉",    cn = "运转" },
-  ecu_cooling    = { en = "COOLING",  tw = "降溫",    cn = "降温" },
-  ecu_error      = { en = "ERROR",    tw = "異常",    cn = "异常" },
-  
-  -- Popups
-  pop_bat_hlth = { en = "BATTERY HEALTH", tw = "電池狀態", cn = "电池状态" },
-  pop_capacity = { en = "CAPACITY %d%%", tw = "電量 %d%%", cn = "电量 %d%%" },
-  pop_sag_lbl  = { en = "Voltage Sag:", tw = "最大壓降:", cn = "最大压降:" },
-  pop_ir_lbl   = { en = "Pack IR (Est):", tw = "預測 IR:", cn = "预测 IR:" },
-  pop_trend    = { en = "DISCHARGE TREND", tw = "放電曲線", cn = "放电曲线" },
-  pop_insuf    = { en = "Insufficient data", tw = "無放電記錄", cn = "无放电记录" },
-  pop_tap_cls  = { en = "Tap anywhere to close", tw = "點按任意位置關閉", cn = "点按任意位置关闭" },
-  pop_chart    = { en = "HEADSPEED & POWER CHART", tw = "轉速與飛行曲線", cn = "转速与飞行曲线" },
-  pop_no_crv   = { en = "No flight curve recorded yet", tw = "無飛行曲線記錄", cn = "无飞行曲线记录" },
-  pop_leg_rpm  = { en = "RPM",      tw = "轉速",     cn = "转速" },
-  pop_leg_volt = { en = "VOLT",     tw = "電壓",     cn = "电压" },
-  pop_leg_amps = { en = "AMPS",     tw = "電流",     cn = "电流" },
-  pop_leg_bec  = { en = "BEC",      tw = "接收",     cn = "接收" },
-  pop_leg_temp = { en = "TEMP",     tw = "溫度",     cn = "温度" },
-  pop_peak_fmt = { en = "PEAK: %.0f RPM | %.1f A%s | %.0f°C   MIN: %.1f V | %.1f V BEC", tw = "最高: %.0f RPM | %.1f A%s | %.0f°C   最低: %.1f V | %.1f V 接收", cn = "最高: %.0f RPM | %.1f A%s | %.0f°C   最低: %.1f V | %.1f V 接收" },
-  pop_rotor_dyn= { en = "TIP: %.0f G | SPEED: %.0f km/h | PULL: %.0f kg", tw = "旋翼: %.0f G | 速度: %.0f km/h | 負載: %.0f kg", cn = "旋翼: %.0f G | 速度: %.0f km/h | 负载: %.0f kg" },
-  pop_rotor_idle={ en = "ROTOR DYNAMICS: STANDBY (0 RPM)", tw = "旋翼動態: 等待中 (0 RPM)", cn = "旋翼动态: 等待中 (0 RPM)" },
-  pop_stat_hdr = { en = "FLIGHT SESSION STATS", tw = "飛行統計",   cn = "飞行统计" },
-  pop_today    = { en = "TODAY", tw = "本日",       cn = "本日" },
-  pop_total    = { en = "LIFETIME TOTAL", tw = "總計", cn = "总计" },
-  pop_rst_btn  = { en = "RESET TODAY", tw = "本日清零", cn = "本日清零" },
-  pop_rst_tot  = { en = "RESET TOTAL", tw = "總計清零", cn = "总计清零" },
-  pop_btn_cls  = { en = "Tap anywhere to close", tw = "點按任意位置關閉", cn = "点按任意位置关闭" },
-
-  -- Logbook & Battery Fleet Table
-  fleet_mgr    = { en = "BATTERY FLEET MANAGER", tw = "電池管理總表", cn = "电池管理总表" },
-  logbook_title= { en = "FLIGHT LOGBOOK", tw = "飛行日誌", cn = "飞行日志" },
-  last_chart   = { en = "LATEST FLIGHT CHART", tw = "最新一次飛行曲線圖", cn = "最新一次飞行曲线图" },
-  no_flight_data= { en = "- NO FLIGHT DATA YET -", tw = "- 暫無飛行日誌 -", cn = "- 暂无飞行日志 -" },
-  tbl_bat_num  = { en = "BAT #",    tw = "電池",     cn = "电池" },
-  tbl_cycles   = { en = "CYCLES",   tw = "循環",     cn = "循环" },
-  tbl_min_v    = { en = "MIN VOLT", tw = "最低電壓", cn = "最低电压" },
-  tbl_max_t    = { en = "MAX ESC TMP", tw = "電變最高溫", cn = "电调最高温" },
-  tbl_avg_dur  = { en = "AVG DUR",  tw = "平均時間", cn = "平均时间" },
-  hdr_time     = { en = "TIME",     tw = "起飛時間", cn = "起飞时间" },
-  hdr_dur      = { en = "DUR",      tw = "飛行時長", cn = "飞行时长" },
-  hdr_max_rpm  = { en = "MAX RPM",  tw = "最高轉速", cn = "最高转速" },
-  hdr_max_a    = { en = "MAX A",    tw = "最高電流", cn = "最高电流" },
-  hdr_max_pwr  = { en = "MAX W",    tw = "最高功率", cn = "最高功率" },
-  hdr_min_v    = { en = "MIN V",    tw = "最低電壓", cn = "最低电压" },
-  hdr_min_bec  = { en = "MIN BEC",  tw = "最低接收", cn = "最低接收" },
-  hdr_max_tmp  = { en = "MAX TMP",  tw = "最高溫度", cn = "最高温度" },
-  hdr_mah      = { en = "mAh",      tw = "已消耗",   cn = "已消耗" }
-}
-
-local function getUiLang(w)
-  local opt = getOption(w, "UI Lang")
-  if opt == 2 or opt == "English" or opt == "英文" then return "en" end
-  return detectLanguage()
-end
-
-local function T(w, key)
-  local item = UI_TEXT[key]
-  if not item then return key end
-  local l = (w and w.ui_lang) or getUiLang(w)
-  return item[l] or item.en or item.tw or key
-end
-
 local basePath = "/WIDGETS/RBCT"
 local w_last_mod_err = ""
 
@@ -344,6 +239,38 @@ local function loadModule(name)
   return nil
 end
 
+-- =========================================================================
+-- UI Multi-Language Translation Bridge (modules/i18n.lua)
+-- =========================================================================
+local i18n_mod = nil
+local function getI18n()
+  if not i18n_mod then
+    i18n_mod = loadModule("i18n")
+    if i18n_mod and not i18n_mod._initialized then
+      i18n_mod.init({
+        detectLanguage = detectLanguage,
+        getOption = getOption
+      })
+    end
+  end
+  return i18n_mod
+end
+
+local function getUiLang(w)
+  local m = getI18n()
+  if m and m.getUiLang then return m.getUiLang(w) end
+  local opt = getOption(w, "UI Lang")
+  if opt == 2 or opt == "English" or opt == "英文" then return "en" end
+  return detectLanguage()
+end
+
+local function T(w, key)
+  local m = getI18n()
+  if m and m.T then return m.T(w, key) end
+  return key
+end
+
+
 local C = {
   bg = lcd.RGB(7, 22, 72), blue = lcd.RGB(0, 126, 255),
   panel = lcd.RGB(15, 48, 122), panel2 = lcd.RGB(22, 61, 143),
@@ -377,7 +304,9 @@ local theme_names_map = {
   ["black"] = 8,
   ["trn"] = 9,
   ["pink"] = 10,
-  ["lcd"] = 11
+  ["lcd"] = 11,
+  ["f-type"] = 12, ["ftype"] = 12,
+  ["japan"] = 12 -- backward compatibility with previously saved text values
 }
 
 local function parseThemeIndex(val)
@@ -394,7 +323,7 @@ local function parseThemeIndex(val)
 
   if type(val) == "number" then
     local n = math.floor(val)
-    if n >= 1 and n <= 11 then
+    if n >= 1 and n <= 12 then
       return n
     elseif n == 0 then
       return 1
@@ -498,6 +427,13 @@ local function applyDynamicTheme(w, arm_on)
     C.panel2 = lcd.RGB(175, 185, 170)
     C.white = lcd.RGB(10, 15, 10)
     C.dim = lcd.RGB(50, 60, 50)
+  elseif t_val == 12 then -- 12: F-type (Slate Navy)
+    C.bg = lcd.RGB(35, 45, 58)
+    C.blue = lcd.RGB(50, 185, 245)
+    C.panel = lcd.RGB(48, 62, 78)
+    C.panel2 = lcd.RGB(72, 98, 128)
+    C.white = lcd.RGB(235, 245, 255)
+    C.dim = lcd.RGB(145, 170, 195)
   else
     C.bg = lcd.RGB(7, 22, 72)
     C.blue = lcd.RGB(0, 126, 255)
@@ -654,12 +590,18 @@ local function resolveModelImagePath()
   return nil
 end
 
-local function loadModelImage()
+local function loadModelImage(sx, sy, viewport_w, viewport_h, logical_max_w, logical_max_h)
+  sx = (sx and sx > 0) and sx or 1
+  sy = (sy and sy > 0) and sy or 1
+  logical_max_w = logical_max_w or 240
+  logical_max_h = logical_max_h or 140
   local craft = getCraftName()
   local info = (model and model.getInfo) and model.getInfo() or nil
   local model_name = info and info.name or ""
   local bitmap_name = info and info.bitmap or ""
-  local key = craft .. "|" .. model_name .. "|" .. bitmap_name
+  local key = craft .. "|" .. model_name .. "|" .. bitmap_name .. "|" ..
+    tostring(viewport_w or 800) .. "x" .. tostring(viewport_h or 480) .. "|" ..
+    tostring(logical_max_w) .. "x" .. tostring(logical_max_h)
 
   if loaded_model_key == key and heli_pic ~= nil then return end
 
@@ -670,177 +612,153 @@ local function loadModelImage()
   heli_draw_y = 74
 
   local target_path = resolveModelImagePath()
-  if target_path and bitmap and bitmap.open then
-    local ok, img = pcall(bitmap.open, target_path)
+  local bitmap_open_api = nil
+  if Bitmap and Bitmap.open then bitmap_open_api = Bitmap
+  elseif bitmap and bitmap.open then bitmap_open_api = bitmap end
+  if target_path and bitmap_open_api then
+    local ok, img = pcall(bitmap_open_api.open, target_path)
     if ok and img then
       heli_pic = img
-      if bitmap.getSize then
-        local w, h = bitmap.getSize(img)
+      local bitmap_size_api = nil
+      if Bitmap and Bitmap.getSize then bitmap_size_api = Bitmap
+      elseif bitmap and bitmap.getSize then bitmap_size_api = bitmap end
+      if bitmap_size_api then
+        local w, h = bitmap_size_api.getSize(img)
         if w and h and w > 0 and h > 0 then
-          local max_w, max_h = 240, 140
+          -- Bitmap pixels are not transformed by the dashboard's X/Y helpers.
+          -- Convert the logical 800x480 image bounds to physical pixels first,
+          -- which keeps TX15-class 480x320 screens inside the same model card.
+          local max_w = math.max(1, math.floor(logical_max_w * sx))
+          local max_h = math.max(1, math.floor(logical_max_h * sy))
           local scale_w = (max_w / w) * 100
           local scale_h = (max_h / h) * 100
           heli_scale = math.min(100, math.floor(math.min(scale_w, scale_h)))
           local final_w = math.floor(w * (heli_scale / 100))
           local final_h = math.floor(h * (heli_scale / 100))
-          heli_draw_x = 10 + math.floor((270 - final_w) / 2)
-          heli_draw_y = 70 + math.floor((145 - final_h) / 2)
+          -- Resize once at load time for faster repeated drawing and exact
+          -- physical dimensions on every supported RadioMaster display.
+          local bitmap_api = nil
+          if Bitmap and Bitmap.resize then
+            bitmap_api = Bitmap
+          elseif bitmap and bitmap.resize then
+            bitmap_api = bitmap
+          end
+          if heli_scale < 100 and bitmap_api and bitmap_api.resize then
+            local resized_ok, resized = pcall(bitmap_api.resize, img, final_w, final_h)
+            if resized_ok and resized then
+              heli_pic = resized
+              heli_scale = 100
+            end
+          end
+          local final_logical_w = final_w / sx
+          local final_logical_h = final_h / sy
+          heli_draw_x = 10 + math.floor((270 - final_logical_w) / 2)
+          heli_draw_y = 70 + math.floor((145 - final_logical_h) / 2)
         end
       end
     end
   end
 end
 
+local function getStorage()
+  local sm = loadModule("storage")
+  if sm and not sm._initialized then
+    sm.init({
+      basePath = basePath,
+      getCraftName = getCraftName,
+      getOption = getOption,
+      loadModule = loadModule
+    })
+  end
+  return sm
+end
+
 local function sanitizeFilename(name)
+  local sm = getStorage()
+  if sm and sm.sanitizeFilename then return sm.sanitizeFilename(name) end
   if not name or name == "" then return "default" end
   local clean = string.gsub(name, "[^%w%-_]", "_")
   return string.sub(clean, 1, 24)
 end
 
 local function getActiveBatIndex(w)
-  local bat_mod = loadModule("battery")
-  if bat_mod and bat_mod.getBatIndex then
-    local bat_src = getOption(w, "Bat Track")
-    local val = bat_src and (bat_src ~= 0) and getValue(bat_src) or nil
-    return bat_mod.getBatIndex(val)
-  end
+  local sm = getStorage()
+  if sm and sm.getActiveBatIndex then return sm.getActiveBatIndex(w) end
   return 0
 end
 
 local function getLogFilePath(w)
-  local craft = getCraftName()
-  return basePath .. "/log_" .. sanitizeFilename(craft) .. ".txt"
+  local sm = getStorage()
+  if sm and sm.getLogFilePath then return sm.getLogFilePath(w) end
+  return basePath .. "/log_" .. sanitizeFilename(getCraftName()) .. ".txt"
 end
 
 local function getLogbookFilePath(w)
-  local craft = getCraftName()
-  local bat_idx = getActiveBatIndex(w)
-  if bat_idx and bat_idx > 0 then
-    return basePath .. "/logbook_" .. sanitizeFilename(craft) .. "_bat" .. bat_idx .. ".txt"
-  end
-  return basePath .. "/logbook_" .. sanitizeFilename(craft) .. ".txt"
+  local sm = getStorage()
+  if sm and sm.getLogbookFilePath then return sm.getLogbookFilePath(w) end
+  return basePath .. "/logbook_" .. sanitizeFilename(getCraftName()) .. ".txt"
+end
+
+local function getFleetFilePath(w)
+  local sm = getStorage()
+  if sm and sm.getFleetFilePath then return sm.getFleetFilePath(w) end
+  return basePath .. "/fleet_" .. sanitizeFilename(getCraftName()) .. ".txt"
 end
 
 local function getChartFilePath(w)
-  local craft = getCraftName()
-  local bat_idx = getActiveBatIndex(w)
-  if bat_idx and bat_idx > 0 then
-    return basePath .. "/chart_" .. sanitizeFilename(craft) .. "_bat" .. bat_idx .. ".txt"
-  end
-  return basePath .. "/chart_" .. sanitizeFilename(craft) .. ".txt"
+  local sm = getStorage()
+  if sm and sm.getChartFilePath then return sm.getChartFilePath(w) end
+  return basePath .. "/chart_" .. sanitizeFilename(getCraftName()) .. ".txt"
+end
+
+local function loadFleetData(w)
+  local sm = getStorage()
+  if sm and sm.loadFleetData then sm.loadFleetData(w) end
+end
+
+local function saveFleetData(w)
+  local sm = getStorage()
+  if sm and sm.saveFleetData then sm.saveFleetData(w) end
+end
+
+local function updateBatteryStatusOnVoltage(w, bat_idx, vcel, vbat)
+  local sm = getStorage()
+  if sm and sm.updateBatteryStatusOnVoltage then sm.updateBatteryStatusOnVoltage(w, bat_idx, vcel, vbat) end
 end
 
 local function loadFlightLog(w)
-  w.flight_count = 0
-  w.lifetime_count = 0
-  local path = getLogFilePath(w)
-  if not (fstat and fstat(path)) then return end
-
-  local f = io.open(path, "r")
-  if f then
-    local content = io.read(f, 256) or ""
-    io.close(f)
-    if content ~= "" then
-      local d, c, l = string.match(content, "([%d%-]+),(%d+),(%d+)")
-      if d and c and l then
-        w.last_date = d
-        w.flight_count = tonumber(c) or 0
-        w.lifetime_count = tonumber(l) or 0
-      end
-    end
-  end
+  local sm = getStorage()
+  if sm and sm.loadFlightLog then sm.loadFlightLog(w) end
 end
 
 local function saveFlightLog(w)
-  local path = getLogFilePath(w)
-  local dt = getDateTime()
-  local today = string.format("%04d-%02d-%02d", dt.year or 2000, dt.mon or 1, dt.day or 1)
-  local f = io.open(path, "w")
-  if f then
-    io.write(f, string.format("%s,%d,%d\n", today, w.flight_count or 0, w.lifetime_count or 0))
-    io.close(f)
-  end
+  local sm = getStorage()
+  if sm and sm.saveFlightLog then sm.saveFlightLog(w) end
 end
 
 local function loadLogbook(w)
-  w.log_entries = {}
-  local path = getLogbookFilePath(w)
-  if not (fstat and fstat(path)) then return end
-  local f = io.open(path, "r")
-  if f then
-    local content = io.read(f, 4096) or ""
-    io.close(f)
-    for line in string.gmatch(content, "[^\r\n]+") do
-      local parts = {}
-      for item in string.gmatch(line, "([^,]+)") do
-        table.insert(parts, item)
-      end
-      if #parts >= 8 then
-        table.insert(w.log_entries, parts)
-      end
-      if #w.log_entries >= 10 then break end
-    end
-  end
+  local sm = getStorage()
+  if sm and sm.loadLogbook then sm.loadLogbook(w) end
 end
 
 local function saveLogbook(w)
-  if not w.log_entries then return end
-  local path = getLogbookFilePath(w)
-  local f = io.open(path, "w")
-  if f then
-    for i = 1, math.min(10, #w.log_entries) do
-      local row = table.concat(w.log_entries[i], ",")
-      io.write(f, row .. "\n")
-    end
-    io.close(f)
-  end
+  local sm = getStorage()
+  if sm and sm.saveLogbook then sm.saveLogbook(w) end
 end
 
-local function loadChartData(w)
-  w.chart_data = {}
-  local path = getChartFilePath(w)
-  if not (fstat and fstat(path)) then return end
-  local f = io.open(path, "r")
-  if f then
-    local content = io.read(f, 8192) or ""
-    io.close(f)
-    for line in string.gmatch(content, "[^\r\n]+") do
-      local v, a, r, b, t = string.match(line, "([%d%.]+),([%d%.]+),([%d%.]+),([%d%.]+),([%d%.]+)")
-      if v and a and r and b and t then
-        table.insert(w.chart_data, {
-          v = tonumber(v) or 0,
-          a = tonumber(a) or 0,
-          r = tonumber(r) or 0,
-          b = tonumber(b) or 0,
-          t = tonumber(t) or 0
-        })
-      end
-      if #w.chart_data >= 200 then break end
-    end
-  end
+local function loadChartData(w, target_idx)
+  local sm = getStorage()
+  if sm and sm.loadChartData then sm.loadChartData(w, target_idx) end
 end
 
 local function saveChartData(w)
-  if not w.chart_data or #w.chart_data < 2 then return end
-  local path = getChartFilePath(w)
-  local f = io.open(path, "w")
-  if f then
-    for i = 1, #w.chart_data do
-      local p = w.chart_data[i]
-      io.write(f, string.format("%.2f,%.1f,%.0f,%.2f,%.0f\n", p.v or 0, p.a or 0, p.r or 0, p.b or 0, p.t or 0))
-    end
-    io.close(f)
-  end
+  local sm = getStorage()
+  if sm and sm.saveChartData then sm.saveChartData(w) end
 end
 
 local function resetActiveBatLog(w)
-  local l_path = getLogbookFilePath(w)
-  local c_path = getChartFilePath(w)
-  w.log_entries = {}
-  w.chart_data = {}
-  local f1 = io.open(l_path, "w"); if f1 then io.close(f1) end
-  local f2 = io.open(c_path, "w"); if f2 then io.close(f2) end
-  if playTone then playTone(1200, 150, 150, 0) end
+  local sm = getStorage()
+  if sm and sm.resetActiveBatLog then sm.resetActiveBatLog(w) end
 end
 
 local function sensor(i)
@@ -1012,9 +930,10 @@ end
 local function drawHeliBitmap(px, py, bmp, scale_pct)
   if not bmp then return end
   if lcd.drawBitmap then
-    local ok = pcall(lcd.drawBitmap, px, py, bmp, scale_pct or 100)
+    -- Official EdgeTX order is bitmap, x, y, scale.
+    local ok = pcall(lcd.drawBitmap, bmp, px, py, scale_pct or 100)
     if not ok then
-      pcall(lcd.drawBitmap, bmp, px, py, scale_pct or 100)
+      pcall(lcd.drawBitmap, px, py, bmp, scale_pct or 100)
     end
   elseif lcd.drawImage then
     pcall(lcd.drawImage, px, py, bmp)
@@ -1025,6 +944,25 @@ end
 -- High-Performance Dashboard Renderer (TX16S MK3 / MKII / TX15 MAX)
 -- =========================================================================
 local function drawDashboard(w, data, ctx)
+  local theme_opt = getOption(w, "Theme")
+  local t_val = parseThemeIndex(theme_opt)
+  if t_val == 12 then
+    local ftype_mod = loadModule("layout_F-type")
+    if ftype_mod and ftype_mod.draw then
+      local ok, err = pcall(ftype_mod.draw, w, data, ctx)
+      if ok then return end
+      lcd.drawFilledRectangle(ctx.x, ctx.y, ctx.sw, ctx.sh, ctx.C.bg)
+      lcd.drawText(ctx.X(400), ctx.Y(80), "F-TYPE RENDER CRASH", ctx.CENTER + ctx.f_mid + ctx.C.red)
+      lcd.drawText(ctx.X(400), ctx.Y(140), tostring(err), ctx.CENTER + ctx.f_sml + ctx.C.white)
+      return
+    else
+      lcd.drawFilledRectangle(ctx.x, ctx.y, ctx.sw, ctx.sh, ctx.C.bg)
+      lcd.drawText(ctx.X(400), ctx.Y(80), "F-TYPE MODULE LOAD FAILED", ctx.CENTER + ctx.f_mid + ctx.C.red)
+      lcd.drawText(ctx.X(400), ctx.Y(140), tostring(w_last_mod_err), ctx.CENTER + ctx.f_sml + ctx.C.white)
+      return
+    end
+  end
+
   local X, Y, W, H = ctx.X, ctx.Y, ctx.W, ctx.H
   local x, y, sw, sh = ctx.x, ctx.y, ctx.sw, ctx.sh
   local f_xxl, f_dbl, f_mid, f_sml, f_0 = ctx.f_xxl, ctx.f_dbl, ctx.f_mid, ctx.f_sml, ctx.f_0
@@ -1036,6 +974,16 @@ local function drawDashboard(w, data, ctx)
       lcd.drawText(X(px) + 1, Y(py) + 1, str, flags + C.black)
     end
     lcd.drawText(X(px), Y(py), str, flags + color)
+  end
+
+  -- Draw text whose position is already expressed in physical screen pixels.
+  -- This is required when positioning separate mixed-size strings using the
+  -- physical widths returned by lcd.sizeText().
+  local function textPhysical(px, py, str, flags, color)
+    if (is_trn or is_transp) and color ~= C.black then
+      lcd.drawText(px + 1, py + 1, str, flags + C.black)
+    end
+    lcd.drawText(px, py, str, flags + color)
   end
 
   -- 1. Full Screen Background & Outer Border
@@ -1052,7 +1000,15 @@ local function drawDashboard(w, data, ctx)
     local BANNER_DUR = 1000
     local elapsed = now_t - w.bat_prompt_timer
     local batStr = (w.last_bat_idx > 0) and ("BAT " .. w.last_bat_idx) or (is_tw and "預設電池" or (is_cn and "默认电池" or "Default BAT"))
+    if w.last_bat_idx > 0 and w.fleet_stats and w.fleet_stats[w.last_bat_idx] then
+      local st = w.fleet_stats[w.last_bat_idx]
+      batStr = string.format("BAT %d (%d/%dc)", w.last_bat_idx, st.today_count or 0, st.lifetime_cycles or 0)
+    end
     local promptTxt = is_tw and ("電池已連線: 將記錄於 " .. batStr .. " (不是請按開關 1~6 切換)") or (is_cn and ("电池已连接: 将记录于 " .. batStr .. " (不是请按开关 1~6 切换)") or ("BATTERY CONNECTED: Logging to " .. batStr .. " (Switch 1~6)"))
+    if sw < 600 then
+      local batShort = (w.last_bat_idx > 0) and ("BAT " .. w.last_bat_idx) or (is_tw and "預設電池" or (is_cn and "默认电池" or "DEFAULT BAT"))
+      promptTxt = is_tw and ("電池連線: " .. batShort) or (is_cn and ("电池连接: " .. batShort) or ("BAT CONNECTED: " .. batShort))
+    end
     local p_w = math.floor(W(636) * (1 - (elapsed / BANNER_DUR)))
     lcd.drawFilledRectangle(X(80), Y(6), W(640), H(38), C.yellow)
     lcd.drawRectangle(X(80), Y(6), W(640), H(38), C.black, 2)
@@ -1108,52 +1064,59 @@ local function drawDashboard(w, data, ctx)
   -- 3. Left Panel (Heli Picture, Flights, GOV, ARM/STATUS, Battery %)
   panel(X(10), Y(70), W(270), H(400), is_trn, is_transp)
 
-  -- Heli Picture
+  -- All supported RadioMaster color radios render model bitmaps.  The image is
+  -- pre-sized when Bitmap.resize is available, otherwise drawBitmap uses its
+  -- documented percentage scale argument.
   if heli_pic then
     drawHeliBitmap(X(heli_draw_x or 25), Y(heli_draw_y or 74), heli_pic, heli_scale)
   end
 
+  local cur_lang = (w and w.ui_lang) or getUiLang(w)
+  local is_cjk = (cur_lang == "tw" or cur_lang == "cn")
+  local cjk_sml = is_cjk and 1 or 0
+  local cjk_mid = is_cjk and 2 or 0
+
   -- Flights counter
-  text(80, 220, T(w, "today_lbl") .. (w.flight_count or 0), CENTER + f_sml, C.white)
-  text(205, 220, T(w, "total_lbl") .. (w.lifetime_count or 0), CENTER + f_sml, C.dim)
+  text(80, 218 + cjk_sml, T(w, "today_lbl") .. (w.flight_count or 0), CENTER + f_sml, C.white)
+  text(205, 218 + cjk_sml, T(w, "total_lbl") .. (w.lifetime_count or 0), CENTER + f_sml, C.dim)
 
-  -- GOV Box
+  -- GOV & STATUS Title Boxes (Upper Enclosed Header Cards)
   if not is_trn then
-    drawBgRect(X(20), Y(240), W(120), H(28), C.panel2, is_transp)
-    lcd.drawRectangle(X(20), Y(240), W(120), H(70), C.blue)
+    drawBgRect(X(20), Y(250), W(120), H(26), C.panel2, is_transp)
+    lcd.drawRectangle(X(20), Y(250), W(120), H(26), C.blue)
+    drawBgRect(X(150), Y(250), W(120), H(26), C.panel2, is_transp)
+    lcd.drawRectangle(X(150), Y(250), W(120), H(26), C.blue)
   end
-  text(80, 245, T(w, "gov_lbl"), CENTER + f_sml, C.white)
-  lcd.drawFilledRectangle(X(20), Y(268), W(120), H(42), data.gov_on and C.green or C.red)
+  text(80, 252 + cjk_sml, T(w, "gov_lbl"), CENTER + f_sml, C.white)
+  text(210, 252 + cjk_sml, T(w, "status"), CENTER + f_sml, C.white)
+
+  -- GOV State Card (Standalone Floating Colored Badge)
+  lcd.drawFilledRectangle(X(20), Y(282), W(120), H(38), data.gov_on and C.green or C.red)
   local gov_txt = data.gov_on and "ON" or "OFF"
-  lcd.drawText(X(80) + 1, Y(274) + 1, gov_txt, CENTER + f_mid + C.black)
-  lcd.drawText(X(80), Y(274), gov_txt, CENTER + f_mid + C.white)
+  lcd.drawText(X(80) + 1, Y(282 + cjk_mid) + 1, gov_txt, CENTER + f_mid + C.black)
+  lcd.drawText(X(80), Y(282 + cjk_mid), gov_txt, CENTER + f_mid + C.white)
 
-  -- STATUS / ARM Box
-  if not is_trn then
-    drawBgRect(X(150), Y(240), W(120), H(28), C.panel2, is_transp)
-    lcd.drawRectangle(X(150), Y(240), W(120), H(70), C.blue)
-  end
-  text(210, 245, T(w, "status"), CENTER + f_sml, C.white)
+  -- STATUS State Card (Standalone Floating Colored Badge)
   if data.rescue_active then
     local flash_on = (math.floor(now_t / 20) % 2) == 0
-    lcd.drawFilledRectangle(X(150), Y(268), W(120), H(42), flash_on and C.red or C.black)
+    lcd.drawFilledRectangle(X(150), Y(282), W(120), H(38), flash_on and C.red or C.black)
     local r_txt = T(w, "rescue")
     if flash_on then
-      lcd.drawText(X(210) + 1, Y(274) + 1, r_txt, CENTER + f_mid + C.black)
-      lcd.drawText(X(210), Y(274), r_txt, CENTER + f_mid + C.white)
+      lcd.drawText(X(210) + 1, Y(282 + cjk_mid) + 1, r_txt, CENTER + f_mid + C.black)
+      lcd.drawText(X(210), Y(282 + cjk_mid), r_txt, CENTER + f_mid + C.white)
     else
-      lcd.drawText(X(210), Y(274), r_txt, CENTER + f_mid + C.red)
+      lcd.drawText(X(210), Y(282 + cjk_mid), r_txt, CENTER + f_mid + C.red)
     end
   else
-    lcd.drawFilledRectangle(X(150), Y(268), W(120), H(42), data.arm_on and C.red or C.green)
+    lcd.drawFilledRectangle(X(150), Y(282), W(120), H(38), data.arm_on and C.red or C.green)
     local arm_txt = data.arm_on and T(w, "armed") or T(w, "safe")
-    lcd.drawText(X(210) + 1, Y(274) + 1, arm_txt, CENTER + f_mid + C.black)
-    lcd.drawText(X(210), Y(274), arm_txt, CENTER + f_mid + C.white)
+    lcd.drawText(X(210) + 1, Y(282 + cjk_mid) + 1, arm_txt, CENTER + f_mid + C.black)
+    lcd.drawText(X(210), Y(282 + cjk_mid), arm_txt, CENTER + f_mid + C.white)
   end
 
   -- Battery % Progress Bar
   if not is_trn then
-    drawBgRect(X(20), Y(320), W(250), H(50), C.panel2, is_transp)
+    drawBgRect(X(20), Y(330), W(250), H(44), C.panel2, is_transp)
   end
   local pct_color = C.red
   if data.bat_pct > 30 then pct_color = C.green
@@ -1161,10 +1124,10 @@ local function drawDashboard(w, data, ctx)
 
   local bar_w = math.max(0, math.min(250, math.floor((data.bat_pct / 100) * 250)))
   if bar_w > 0 then
-    lcd.drawFilledRectangle(X(20), Y(320), W(bar_w), H(50), pct_color)
+    lcd.drawFilledRectangle(X(20), Y(330), W(bar_w), H(44), pct_color)
   end
-  lcd.drawRectangle(X(20), Y(320), W(250), H(50), is_trn and C.black or C.blue)
-  text(145, 329, string.format("%d %%", data.bat_pct), CENTER + f_mid, C.white)
+  lcd.drawRectangle(X(20), Y(330), W(250), H(44), is_trn and C.black or C.blue)
+  text(145, 332, string.format("%d %%", data.bat_pct), CENTER + f_mid, C.white)
 
   -- Battery Summaries
   if data.is_turbine_mode then
@@ -1191,7 +1154,15 @@ local function drawDashboard(w, data, ctx)
     end
     text(145, 412, capa_text, CENTER + f_sml, C.dim)
   end
-  local bat_info_str = (w.last_bat_idx and w.last_bat_idx > 0) and (VERSION .. " | BAT " .. w.last_bat_idx) or VERSION
+  local bat_info_str = VERSION
+  if w.last_bat_idx and w.last_bat_idx > 0 then
+    if w.fleet_stats and w.fleet_stats[w.last_bat_idx] then
+      local st = w.fleet_stats[w.last_bat_idx]
+      bat_info_str = string.format("%s | BAT %d (%d/%dc)", VERSION, w.last_bat_idx, st.today_count or 0, st.lifetime_cycles or 0)
+    else
+      bat_info_str = VERSION .. " | BAT " .. w.last_bat_idx
+    end
+  end
   text(145, 434, bat_info_str, CENTER + f_sml, C.dim)
 
   -- 4. Right Top Panel (RPM Card)
@@ -1242,18 +1213,24 @@ local function drawDashboard(w, data, ctx)
       end
       text(mid_x, 265, colTitles[i], CENTER + f_sml, C.dim)
 
+      local val_color = colors[i]
       local num_str = nums[i]
       local unit_str = units[i]
-      local val_color = colors[i]
 
-      local num_w = lcd.sizeText and select(1, lcd.sizeText(num_str, f_dbl)) or (string.len(num_str) * (sw < 600 and 10 or 17))
-      local unit_w = lcd.sizeText and select(1, lcd.sizeText(unit_str, f_0)) or (string.len(unit_str) * (sw < 600 and 7 or 10))
-
-      local total_w = num_w + 3 + unit_w
-      local start_x = mid_x - math.floor(total_w / 2)
-
-      text(start_x, 301, num_str, f_dbl, val_color)
-      text(start_x + num_w + 3, 319, unit_str, f_0, val_color)
+      -- Large-number/small-unit typography: numbers prominent in f_dbl, units in f_0
+      local num_w = 0
+      local unit_w = 0
+      if lcd.sizeText then
+        num_w = select(1, lcd.sizeText(num_str, f_dbl))
+        unit_w = select(1, lcd.sizeText(unit_str, f_0))
+      else
+        num_w = string.len(num_str) * (sw < 600 and 10 or 17)
+        unit_w = string.len(unit_str) * (sw < 600 and 7 or 10)
+      end
+      local gap = (sw < 600) and 2 or 3
+      local start_px = X(mid_x) - math.floor((num_w + gap + unit_w) / 2)
+      textPhysical(start_px, Y(301), num_str, f_dbl, val_color)
+      textPhysical(start_px + num_w + gap, Y(319), unit_str, f_0, val_color)
       text(mid_x, 362, subs[i], CENTER + f_sml, C.dim)
     end
   end
@@ -1346,25 +1323,39 @@ local function serviceTelemetry(w)
     w.log_loaded = false
     w.fleet_data = nil
   end
+
+  local cur_vcel = volts(sensor(15))
+  if cur_vcel <= 0 and cur_vbat > 0 then
+    local cell_cnt = math.max(1, math.floor(cur_vbat / 4.2 + 0.5))
+    cur_vcel = cur_vbat / cell_cnt
+  end
+  if cur_bat_idx >= 1 and cur_bat_idx <= 6 and not arm_on and cur_vbat >= 5.0 then
+    updateBatteryStatusOnVoltage(w, cur_bat_idx, cur_vcel, cur_vbat)
+  end
+
   w.last_vbat = cur_vbat
   w.last_bat_idx = cur_bat_idx
 
-  -- Logbook switch listener
+  -- Logbook switch listener (Edge-triggered so manual touch opening is NOT instantly overridden!)
   local logSw = getOption(w, "Logbook Sw")
   if logSw and logSw ~= 0 then
     local l_val = getValue(logSw)
-    if type(l_val) == "boolean" then
-      w.show_logbook = l_val
-      w.logbook_tab = 1
-    elseif type(l_val) == "number" then
-      if l_val >= 50 or l_val == 2 then
-        w.show_logbook = true
-        w.logbook_tab = 2
-      elseif (l_val > -50 and l_val < 50) or l_val == 1 then
-        w.show_logbook = true
+    if w.last_log_sw == nil then w.last_log_sw = l_val end
+    if w.last_log_sw ~= l_val then
+      w.last_log_sw = l_val
+      if type(l_val) == "boolean" then
+        w.show_logbook = l_val
         w.logbook_tab = 1
-      else
-        w.show_logbook = false
+      elseif type(l_val) == "number" then
+        if l_val >= 50 or l_val == 2 then
+          w.show_logbook = true
+          w.logbook_tab = 2
+        elseif (l_val > -50 and l_val < 50) or l_val == 1 then
+          w.show_logbook = true
+          w.logbook_tab = 1
+        else
+          w.show_logbook = false
+        end
       end
     end
   end
@@ -1396,6 +1387,7 @@ local function serviceTelemetry(w)
     loadFlightLog(w)
     loadLogbook(w)
     loadChartData(w)
+    loadFleetData(w)
     w.log_loaded = true
   end
 
@@ -1491,6 +1483,31 @@ local function serviceTelemetry(w)
           table.insert(w.log_entries, 1, parts)
           if #w.log_entries > 10 then table.remove(w.log_entries) end
           saveLogbook(w)
+
+          -- Update battery fleet stats
+          local cur_bat = getActiveBatIndex(w) or 1
+          if cur_bat >= 1 and cur_bat <= 6 and w.fleet_stats then
+            local st = w.fleet_stats[cur_bat]
+            if st then
+              st.today_count = (st.today_count or 0) + 1
+              st.lifetime_cycles = (st.lifetime_cycles or 0) + 1
+              st.status = "FLOWN"
+              st.last_mah = tonumber(capa_str) or 0
+              local min_v_num = tonumber(cell_str) or 0
+              if min_v_num > 0 and (st.min_v == "-" or min_v_num < (tonumber(st.min_v) or 999)) then
+                st.min_v = string.format("%.2f", min_v_num)
+              end
+              local max_t_num = tonumber(tmp_str) or 0
+              if max_t_num > 0 and (st.max_t == "-" or max_t_num > (tonumber(st.max_t) or 0)) then
+                st.max_t = string.format("%.0f", max_t_num)
+              end
+              st.tot_dur_s = (st.tot_dur_s or 0) + dur_s
+              st.tot_flights = (st.tot_flights or 0) + 1
+              local avg_s = math.floor(st.tot_dur_s / math.max(1, st.tot_flights))
+              st.avg_dur = string.format("%02d:%02d", math.floor(avg_s / 60), avg_s % 60)
+              saveFleetData(w)
+            end
+          end
         end
         if w.needs_flight_log_save then
           saveFlightLog(w)
@@ -1657,7 +1674,10 @@ local function serviceTelemetry(w)
   td.tesc = tesc
   td.tspd = sensor(17)
   td.max_tspd = stat(17, "max")
+  td.bank_str = bankText(w)
   td.telemetry = telemetry
+  td.rssi = sensor(8)
+  td.link_qual = sensor(10)
   w.telem_data = td
   return td
 end
@@ -1666,210 +1686,12 @@ end
 -- Popups Sub-view Rendering (Battery Health & Headspeed / Power Chart)
 -- =========================================================================
 local function drawPopups(w, ctx)
-  if w.active_popup == "battery" then
-    ctx.panel(ctx.X(150), ctx.Y(60), ctx.W(500), ctx.H(370), false, false)
-    if ctx.lcd.drawRectangle then
-      ctx.lcd.drawRectangle(ctx.X(150), ctx.Y(60), ctx.W(500), ctx.H(370), ctx.C.white)
-    end
-    ctx.text(400, 75, T(w, "pop_bat_hlth"), ctx.CENTER + ctx.f_mid, ctx.C.white)
-
-    local bat_pct = math.max(0, math.min(100, ctx.sensor(5)))
-    local bar_w = 460
-    local fill_w = math.floor((bat_pct / 100) * bar_w)
-    local bar_c = ctx.C.green
-    if bat_pct < 20 then bar_c = ctx.C.red elseif bat_pct < 40 then bar_c = ctx.C.yellow end
-    if ctx.lcd.drawFilledRectangle then
-      ctx.lcd.drawRectangle(ctx.X(170), ctx.Y(120), ctx.W(bar_w), ctx.H(30), ctx.C.dim)
-      ctx.lcd.drawFilledRectangle(ctx.X(170), ctx.Y(120), ctx.W(fill_w), ctx.H(30), bar_c)
-    end
-    local cap_str = string.format(T(w, "pop_capacity"), bat_pct)
-    if ctx.lcd.drawText then
-      ctx.lcd.drawText(ctx.X(400) + 1, ctx.Y(125) + 1, cap_str, ctx.CENTER + ctx.f_0 + ctx.C.black)
-    end
-    ctx.text(400, 125, cap_str, ctx.CENTER + ctx.f_0, ctx.C.white)
-
-    local v_max = ctx.stat(1, "max")
-    local v_min = ctx.stat(1, "min")
-    local a_max = ctx.stat(2, "max")
-    local sag = v_max - v_min
-    local ir_est = 0
-    if a_max > 0 then ir_est = (sag / a_max) * 1000 end
-
-    local sag_str = (sag > 0) and string.format("-%.2f V", sag) or "-- V"
-    local ir_str = (a_max >= 2 and ir_est > 0) and string.format("%.0f mohm", ir_est) or "---"
-    ctx.text(280, 175, T(w, "pop_sag_lbl"), ctx.CENTER + ctx.f_0, ctx.C.dim)
-    ctx.text(280, 205, sag_str, ctx.CENTER + ctx.f_dbl, ctx.C.white)
-    ctx.text(520, 175, T(w, "pop_ir_lbl"), ctx.CENTER + ctx.f_0, ctx.C.dim)
-    ctx.text(520, 205, ir_str, ctx.CENTER + ctx.f_dbl, ctx.C.yellow)
-
-    ctx.text(400, 260, T(w, "pop_trend"), ctx.CENTER + ctx.f_sml, ctx.C.dim)
-    if ctx.lcd.drawRectangle then
-      ctx.lcd.drawRectangle(ctx.X(170), ctx.Y(280), ctx.W(460), ctx.H(90), ctx.C.dim)
-    end
-
-    if w.chart_data and #w.chart_data > 1 then
-      local dx = 460 / #w.chart_data
-      local min_v, max_v = 999, 0
-      for i = 1, #w.chart_data do
-        local p = w.chart_data[i]
-        local v = (type(p) == "table") and (p.v or p[1] or 0) or 0
-        if v > 0 and v < min_v then min_v = v end
-        if v > max_v then max_v = v end
-      end
-      if max_v > min_v then
-        local range = max_v - min_v
-        if range < 2 then range = 2 end
-        for i = 2, #w.chart_data do
-          local p1 = w.chart_data[i - 1]
-          local p2 = w.chart_data[i]
-          local v1 = (type(p1) == "table") and (p1.v or p1[1] or 0) or 0
-          local v2 = (type(p2) == "table") and (p2.v or p2[1] or 0) or 0
-          local px1 = ctx.X(170 + (i - 2) * dx)
-          local py1 = ctx.Y(370 - ((v1 - min_v) / range) * 90)
-          local px2 = ctx.X(170 + (i - 1) * dx)
-          local py2 = ctx.Y(370 - ((v2 - min_v) / range) * 90)
-          ctx.lcd.drawLine(px1, py1, px2, py2, SOLID, ctx.C.green)
-        end
-      end
-    else
-      ctx.text(400, 315, T(w, "pop_insuf"), ctx.CENTER + ctx.f_mid, ctx.C.dim)
-    end
-
-    ctx.lcd.drawLine(ctx.X(170), ctx.Y(390), ctx.X(630), ctx.Y(390), SOLID, ctx.C.dim)
-    ctx.text(400, 400, T(w, "pop_tap_cls"), ctx.CENTER + ctx.f_sml, ctx.C.dim)
-
-  elseif w.active_popup == "power_stats" then
-    ctx.panel(ctx.X(110), ctx.Y(34), ctx.W(580), ctx.H(390), false, false)
-    if ctx.lcd.drawRectangle then ctx.lcd.drawRectangle(ctx.X(110), ctx.Y(34), ctx.W(580), ctx.H(390), ctx.C.white) end
-    ctx.text(400, 42, T(w, "pop_chart"), ctx.CENTER + ctx.f_0, ctx.C.white)
-
-    ctx.text(175, 64, T(w, "pop_leg_rpm"), ctx.f_sml, ctx.C.green)
-    ctx.text(265, 64, T(w, "pop_leg_volt"), ctx.f_sml, ctx.C.orange)
-    ctx.text(360, 64, T(w, "pop_leg_amps"), ctx.f_sml, ctx.C.red)
-    ctx.text(460, 64, T(w, "pop_leg_bec"), ctx.f_sml, ctx.C.blue)
-    ctx.text(545, 64, T(w, "pop_leg_temp"), ctx.f_sml, ctx.C.yellow)
-
-    local cx, cy, cw, ch = 175, 80, 450, 220
-    if ctx.lcd.drawRectangle then
-      ctx.lcd.drawRectangle(ctx.X(cx), ctx.Y(cy), ctx.W(cw), ctx.H(ch), ctx.C.dim)
-      ctx.lcd.drawLine(ctx.X(cx), ctx.Y(cy + ch / 2), ctx.X(cx + cw), ctx.Y(cy + ch / 2), DOTTED, ctx.C.dim)
-    end
-
-    local data = w.chart_data
-    local len = (data and type(data) == "table") and #data or 0
-    local peak_rpm_raw = ctx.stat(3, "max") or 0
-    local max_rpm = math.max(2000, math.ceil(peak_rpm_raw / 500) * 500)
-    local max_a = math.max(50, math.ceil(ctx.amps(ctx.stat(2, "max") or 0) / 50) * 50)
-    local cur_v = ctx.volts(ctx.sensor(1))
-    local max_v, min_v = 55, 40
-    if cur_v > 0 and cur_v <= 30 then
-      if cur_v > 15 then max_v, min_v = 26, 18 else max_v, min_v = 13, 6 end
-    end
-    local max_t, min_t = 120, 20
-    local max_b, min_b = 9.0, 5.0
-
-    ctx.text(cx - 5, cy - 2, string.format("%.0f", max_rpm), ctx.RIGHT + ctx.f_sml, ctx.C.green)
-    ctx.text(cx - 5, cy + ch - 14, "0", ctx.RIGHT + ctx.f_sml, ctx.C.green)
-    ctx.text(cx + cw + 5, cy - 2, string.format("%.0fV", max_v), ctx.f_sml, ctx.C.orange)
-    ctx.text(cx + cw + 5, cy + ch - 14, string.format("%.0fV", min_v), ctx.f_sml, ctx.C.orange)
-    ctx.text(cx - 5, cy + ch / 2 - 7, string.format("%.0fA", max_a), ctx.RIGHT + ctx.f_sml, ctx.C.red)
-    ctx.text(cx + cw + 5, cy + ch / 2 - 7, string.format("%.0f°C", max_t), ctx.f_sml, ctx.C.yellow)
-
-    if len >= 2 then
-      local max_pts = 50
-      local draw_len = math.min(len, max_pts)
-      local stride = (len - 1) / (draw_len - 1)
-      local step = cw / (draw_len - 1)
-      local base_y = cy + ch
-      local px, pyr, pyv, pya, pyb, pyt
-      for i = 1, draw_len do
-        local d_idx = math.max(1, math.min(len, math.floor(1 + (i - 1) * stride + 0.5)))
-        local p = data[d_idx] or {}
-        local scr_x = ctx.X(cx + (i - 1) * step)
-        local r_val = p.r or (p[1] or 0)
-        local v_val = p.v or (p[2] or 0)
-        local a_val = p.a or (p[3] or 0)
-        local b_val = p.b or (p[4] or 0)
-        local t_val = p.t or (p[5] or 0)
-        local scr_yr = ctx.Y(base_y - (math.max(0, math.min(max_rpm, r_val)) / max_rpm) * ch)
-        local scr_yv = ctx.Y(base_y - (math.max(0, math.min(max_v - min_v, v_val - min_v)) / math.max(1, max_v - min_v)) * ch)
-        local scr_ya = ctx.Y(base_y - (math.max(0, math.min(max_a, a_val)) / max_a) * ch)
-        local scr_yb = ctx.Y(base_y - (math.max(0, math.min(max_b - min_b, b_val - min_b)) / math.max(1, max_b - min_b)) * ch)
-        local scr_yt = ctx.Y(base_y - (math.max(0, math.min(max_t - min_t, t_val - min_t)) / math.max(1, max_t - min_t)) * ch)
-        if i > 1 then
-          ctx.lcd.drawLine(px, pyr, scr_x, scr_yr, SOLID, ctx.C.green)
-          ctx.lcd.drawLine(px, pyv, scr_x, scr_yv, SOLID, ctx.C.orange)
-          ctx.lcd.drawLine(px, pya, scr_x, scr_ya, SOLID, ctx.C.red)
-          ctx.lcd.drawLine(px, pyb, scr_x, scr_yb, SOLID, ctx.C.blue)
-          ctx.lcd.drawLine(px, pyt, scr_x, scr_yt, SOLID, ctx.C.yellow)
-        end
-        px, pyr, pyv, pya, pyb, pyt = scr_x, scr_yr, scr_yv, scr_ya, scr_yb, scr_yt
-      end
-    else
-      ctx.text(400, cy + ch / 2 - 8, T(w, "pop_no_crv"), ctx.CENTER + ctx.f_sml, ctx.C.dim)
-    end
-
-    local peak_rpm = ctx.stat(3, "max") or 0
-    local peak_a = ctx.amps(ctx.stat(2, "max") or 0)
-    local peak_t = ctx.stat(6, "max") or 0
-    local min_bec_v = ctx.volts(ctx.stat(12, "min") or 0)
-    local min_vbat = ctx.volts(ctx.stat(1, "min") or 0)
-    local pwr_str = ""
-    local max_p = (w and w.max_power and w.max_power > 0) and w.max_power or (min_vbat * peak_a)
-    if max_p and max_p >= 1000 then
-      pwr_str = string.format(" (%.1f kW)", max_p / 1000)
-    elseif max_p and max_p >= 30 then
-      pwr_str = string.format(" (%.0f W)", max_p)
-    end
-    ctx.text(400, 312, string.format(T(w, "pop_peak_fmt"), peak_rpm, peak_a, pwr_str, peak_t, min_vbat, min_bec_v), ctx.CENTER + ctx.f_sml, ctx.C.white)
-
-    -- Rotor Dynamics Physics: Tip G-Force, Tip Speed (Mach), Grip Pull
-    local rpm_eval = peak_rpm > 0 and peak_rpm or (ctx.sensor(3) or 0)
-    if rpm_eval > 300 then
-      local r_m, m_kg = 0.775, 0.19
-      local cells_est = (min_vbat > 0) and math.floor(min_vbat / 3.7 + 0.5) or 12
-      if cells_est <= 4 then
-        r_m = 0.425; m_kg = 0.06
-      elseif cells_est <= 6 then
-        r_m = 0.625; m_kg = 0.12
-      end
-      local omega = (rpm_eval * 2 * math.pi) / 60
-      local g_force = (omega * omega * r_m) / 9.80665
-      local tip_kmh = (omega * r_m) * 3.6
-      local mach = (omega * r_m) / 340.29
-      local pull_kg = (m_kg * omega * omega * (r_m * 0.45)) / 9.80665
-      ctx.text(400, 336, string.format(T(w, "pop_rotor_dyn"), g_force, tip_kmh, mach, pull_kg), ctx.CENTER + ctx.f_sml, ctx.C.cyan or ctx.C.yellow)
-    else
-      ctx.text(400, 336, T(w, "pop_rotor_idle"), ctx.CENTER + ctx.f_sml, ctx.C.dim)
-    end
-
-    if ctx.lcd.drawLine then ctx.lcd.drawLine(ctx.X(140), ctx.Y(360), ctx.X(660), ctx.Y(360), SOLID, ctx.C.dim) end
-    ctx.text(400, 372, T(w, "pop_tap_cls"), ctx.CENTER + ctx.f_sml, ctx.C.dim)
-
-  elseif w.active_popup == "session_stats" then
-    ctx.panel(ctx.X(150), ctx.Y(60), ctx.W(500), ctx.H(370), false, false)
-    if ctx.lcd.drawRectangle then ctx.lcd.drawRectangle(ctx.X(150), ctx.Y(60), ctx.W(500), ctx.H(370), ctx.C.white) end
-    ctx.text(400, 75, T(w, "pop_stat_hdr"), ctx.CENTER + ctx.f_mid, ctx.C.white)
-
-    local today_c = w.flight_count or 0
-    local total_c = w.lifetime_count or 0
-    ctx.text(280, 160, T(w, "pop_today"), ctx.CENTER + ctx.f_0, ctx.C.dim)
-    ctx.text(280, 190, tostring(today_c), ctx.CENTER + ctx.f_dbl, ctx.C.yellow)
-    ctx.text(520, 160, T(w, "pop_total"), ctx.CENTER + ctx.f_0, ctx.C.dim)
-    ctx.text(520, 190, tostring(total_c), ctx.CENTER + ctx.f_dbl, ctx.C.white)
-
-    if ctx.lcd.drawFilledRectangle then
-      -- Button 1: Reset Today
-      ctx.lcd.drawFilledRectangle(ctx.X(180), ctx.Y(280), ctx.W(200), ctx.H(55), ctx.C.red)
-      ctx.lcd.drawRectangle(ctx.X(180), ctx.Y(280), ctx.W(200), ctx.H(55), ctx.C.white)
-      -- Button 2: Reset Total
-      ctx.lcd.drawFilledRectangle(ctx.X(420), ctx.Y(280), ctx.W(200), ctx.H(55), ctx.C.red)
-      ctx.lcd.drawRectangle(ctx.X(420), ctx.Y(280), ctx.W(200), ctx.H(55), ctx.C.white)
-    end
-    ctx.text(280, 296, T(w, "pop_rst_btn"), ctx.CENTER + ctx.f_0, ctx.C.white)
-    ctx.text(520, 296, T(w, "pop_rst_tot"), ctx.CENTER + ctx.f_0, ctx.C.white)
-    ctx.lcd.drawLine(ctx.X(170), ctx.Y(385), ctx.X(630), ctx.Y(385), SOLID, ctx.C.dim)
-    ctx.text(400, 398, T(w, "pop_btn_cls"), ctx.CENTER + ctx.f_sml, ctx.C.dim)
+  local pop_mod = loadModule("popups")
+  if pop_mod and not pop_mod._initialized then
+    pop_mod.init({ T = T })
+  end
+  if pop_mod and pop_mod.drawPopups then
+    return pop_mod.drawPopups(w, ctx)
   end
 end
 
@@ -1887,11 +1709,15 @@ local function create(zone, opts)
     render_ctx = {}
   }
   -- Preload modules at widget startup so no SD card compilation happens in refresh()
+  loadModule("storage")
+  loadModule("popups")
+  loadModule("i18n")
   loadModule("battery")
   loadModule("logbook")
   loadModule("voice")
   loadModule("nitro")
   loadModule("turbine")
+  loadModule("layout_F-type")
   return w
 end
 
@@ -1926,7 +1752,7 @@ local function refresh(w, event, touchState)
   local t_val = parseThemeIndex(theme_opt)
   local is_trn = (t_val == 9)
   local is_transp = (getOption(w, "Transp BG") == 1 or getOption(w, "Transp BG") == true)
-  if t_val == 11 then is_transp = false; is_trn = false end
+  if t_val == 11 or t_val == 12 then is_transp = false; is_trn = false end
 
   local f_xxl, f_dbl, f_mid, f_sml, f_0 = XXLSIZE, DBLSIZE, MIDSIZE, SMLSIZE, 0
   if sw < 600 then
@@ -1942,17 +1768,16 @@ local function refresh(w, event, touchState)
     local is_break = (EVT_TOUCH_BREAK ~= nil and event == EVT_TOUCH_BREAK) or (event == 99) or (touchState.state == 2)
     if is_break then
       w.finger_touching = false
-      w.popup_just_opened = false
     else
       if not w.finger_touching then
         w.finger_touching = true
+        w.touch_seq = (w.touch_seq or 0) + 1
         tx, ty = cur_x, cur_y
         is_tap = true
       end
     end
   else
     w.finger_touching = false
-    w.popup_just_opened = false
   end
 
   if event == EVT_VIRTUAL_ENTER then
@@ -1975,11 +1800,52 @@ local function refresh(w, event, touchState)
     if is_banner and tx >= X(100) and tx <= X(700) and ty <= Y(65) then
       w.bat_prompt_timer = 0
       w.active_popup = "battery"
-      w.popup_opened_at = now_t
-      w.popup_just_opened = true
+      w.popup_open_t = now_t
     elseif w.active_popup then
-      if not w.popup_just_opened and (now_t - (w.popup_opened_at or 0) > 40) then
-        if w.active_popup == "session_stats" then
+      local popup_age = now_t - (w.popup_open_t or 0)
+      if popup_age > 35 then
+        if w.active_popup == "battery" then
+          local bat_idx = w.last_bat_idx or 1
+          local st = w.fleet_stats and w.fleet_stats[bat_idx]
+          -- 1. Status selector buttons (Y: 194 to 254)
+          if ty >= Y(194) and ty <= Y(254) then
+            if st then
+              if tx >= X(100) and tx <= X(242) then
+                st.status = "READY"
+                saveFleetData(w)
+                if playTone then playTone(1800, 80, 50, 0) end
+              elseif tx >= X(248) and tx <= X(392) then
+                st.status = "FLOWN"
+                saveFleetData(w)
+                if playTone then playTone(1600, 80, 50, 0) end
+              elseif tx >= X(398) and tx <= X(542) then
+                st.status = "STORAGE"
+                saveFleetData(w)
+                if playTone then playTone(1400, 80, 50, 0) end
+              elseif tx >= X(548) and tx <= X(705) then
+                st.status = "NONE"
+                saveFleetData(w)
+                if playTone then playTone(1200, 80, 50, 0) end
+              end
+            end
+          -- 2. Action Button A: Reset Today Count (Y: 256 to 318, X: 100 to 392)
+          elseif ty >= Y(256) and ty <= Y(318) and tx >= X(100) and tx <= X(392) then
+            if st then
+              st.today_count = 0
+              saveFleetData(w)
+              if playTone then playTone(2000, 120, 50, 0) end
+            end
+          -- 3. Action Button B: Set Active Battery (Y: 256 to 318, X: 408 to 705)
+          elseif ty >= Y(256) and ty <= Y(318) and tx >= X(408) and tx <= X(705) then
+            w.manual_bat_idx = bat_idx
+            w.last_bat_idx = bat_idx
+            saveFleetData(w)
+            if playTone then playTone(2200, 100, 50, 0) end
+          -- 4. Click anywhere else to close
+          else
+            w.active_popup = nil
+          end
+        elseif w.active_popup == "session_stats" then
           if tx >= X(180) and tx <= X(380) and ty >= Y(280) and ty <= Y(345) then
             w.flight_count = 0
             saveFlightLog(w)
@@ -1989,59 +1855,85 @@ local function refresh(w, event, touchState)
             saveFlightLog(w)
             if playTone then playTone(1800, 150, 100, 0) end
           end
+          w.active_popup = nil
+        else
+          -- telemetry_info or power_stats: tap anywhere to close
+          w.active_popup = nil
         end
-        w.active_popup = nil
       end
     elseif not w.show_logbook then
-      if tx <= X(295) and ty <= Y(315) then
-        w.active_popup = "session_stats"
-        w.popup_opened_at = now_t
-        w.popup_just_opened = true
-      elseif tx <= X(295) and ty > Y(315) and ty <= Y(410) then
-        w.active_popup = "battery"
-        w.popup_opened_at = now_t
-        w.popup_just_opened = true
-      elseif tx <= X(295) and ty > Y(410) then
-        -- Direct touch on Battery area cycles active battery 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 1
-        w.manual_bat_idx = ((w.last_bat_idx or 1) % 6) + 1
-        w.last_bat_idx = w.manual_bat_idx
-        w.bat_prompt_timer = now_t
-        w.log_loaded = false
-        w.fleet_data = nil
-        if playTone then pcall(playTone, 2200, 100, 50, 0) end
-      elseif tx > X(295) and ty <= Y(240) then
-        w.active_popup = "power_stats"
-        w.popup_opened_at = now_t
-        w.popup_just_opened = true
-      elseif tx > X(295) and ty > Y(240) and ty <= Y(410) then
-        w.active_popup = "power_stats"
-        w.popup_opened_at = now_t
-        w.popup_just_opened = true
+      local theme_opt = getOption(w, "Theme")
+      local t_val = parseThemeIndex(theme_opt)
+      local handled = false
+      if t_val == 12 then
+        local ftype_mod = loadModule("layout_F-type")
+        if ftype_mod and ftype_mod.handleTouch then
+          local ok, res = pcall(ftype_mod.handleTouch, w, tx, ty, { X = X, Y = Y, W = W, H = H, sw = sw, sh = sh, x = x, y = y })
+          if ok and res then handled = true end
+        end
+        -- F-type layout has independent calibrated touch boundaries; do not fall through to legacy theme areas
+        handled = true
+      end
+      if not handled then
+        if tx <= X(295) and ty <= Y(315) then
+          w.active_popup = "session_stats"
+          w.popup_open_seq = w.touch_seq
+        elseif tx <= X(295) and ty > Y(315) and ty <= Y(410) then
+          w.active_popup = "battery"
+          w.popup_open_seq = w.touch_seq
+        elseif tx <= X(295) and ty > Y(410) then
+          -- Direct touch on Battery area cycles active battery 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 1
+          w.manual_bat_idx = ((w.last_bat_idx or 1) % 6) + 1
+          w.last_bat_idx = w.manual_bat_idx
+          w.bat_prompt_timer = now_t
+          w.log_loaded = false
+          w.fleet_data = nil
+          if playTone then pcall(playTone, 2200, 100, 50, 0) end
+        elseif tx > X(295) and ty <= Y(240) then
+          w.active_popup = "power_stats"
+          w.popup_open_seq = w.touch_seq
+        elseif tx > X(295) and ty > Y(240) and ty <= Y(410) then
+          w.active_popup = "power_stats"
+          w.popup_open_seq = w.touch_seq
+        end
       end
     else
       -- In Logbook screen
       if w.logbook_tab == 2 and ty >= Y(85) and ty <= Y(420) then
-        -- Direct touch on Battery Fleet Manager table row selects that battery (1 to 6)!
+        -- Direct touch on Battery Fleet Manager table row opens battery health popup for that battery (1 to 6)!
         local row = math.floor((ty - Y(85)) / math.max(1, H(55))) + 1
         if row >= 1 and row <= 6 then
           w.manual_bat_idx = row
           w.last_bat_idx = row
-          w.log_loaded = false
-          w.fleet_data = nil
+          w.active_popup = "battery"
+          w.popup_open_seq = w.touch_seq
           if playTone then pcall(playTone, 2200, 100, 50, 0) end
+        end
+      elseif w.logbook_tab == 1 and ty >= Y(85) and ty < Y(225) then
+        -- Direct touch on Logbook table row selects that flight (1 to 5) and displays its chart!
+        local max_rows = (sh < 300) and 3 or 5
+        local row_step = (max_rows == 5) and 27 or 30
+        local clicked_row = math.floor((ty - Y(88)) / math.max(1, H(row_step))) + 1
+        local max_avail = math.min(max_rows, #(w.log_entries or {}))
+        if clicked_row >= 1 and clicked_row <= max_avail then
+          w.selected_chart_idx = clicked_row
+          loadChartData(w, clicked_row)
+          if playTone then pcall(playTone, 2000, 50, 50, 0) end
         end
       elseif ty < Y(85) then
         -- Tap top title toggles Tab 1 (Logbook) vs Tab 2 (Fleet Manager)
         w.logbook_tab = (w.logbook_tab == 1) and 2 or 1
         w.fleet_data = nil
         if playTone then pcall(playTone, 1500, 80, 50, 0) end
-      else
-        w.show_logbook = false
       end
     end
   end
 
-  loadModelImage()
+  -- F-type uses a wider but shorter model card than the standard dashboard.
+  -- Include those bounds in the load-time resize so every radio draws at 1:1.
+  local model_max_w, model_max_h = 240, 140
+  if t_val == 12 then model_max_w, model_max_h = 256, 106 end
+  loadModelImage(sx, sy, sw, sh, model_max_w, model_max_h)
 
   -- 3. Context Table for Rendering
   local is_modal_active = (w.show_logbook or w.active_popup ~= nil)
@@ -2064,6 +1956,12 @@ local function refresh(w, event, touchState)
   ctx.RIGHT = RIGHT; ctx.CENTER = CENTER; ctx.modelName = telemData.modelName
   ctx.ui_lang = w.ui_lang
   ctx.T = ctx.T or function(k) return T(w, k) end
+  ctx.fleet_stats = w.fleet_stats
+  ctx.heli_pic = heli_pic
+  ctx.heli_scale = heli_scale
+  ctx.drawHeliBitmap = drawHeliBitmap
+  ctx.data = telemData
+  w.last_telem = telemData
   w.render_ctx = ctx
 
   -- 4. Draw Dashboard (when not full-screen Logbook)
@@ -2096,7 +1994,6 @@ local function refresh(w, event, touchState)
       lcd.drawText(x + 10, y + 10, "LOGBOOK MODULE LOAD FAILED", 0)
       lcd.drawText(x + 10, y + 40, tostring(w_last_mod_err), 0)
     end
-    return
   end
 
   -- 6. Popups Modal Overlay
