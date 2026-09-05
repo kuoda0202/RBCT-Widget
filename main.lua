@@ -1359,8 +1359,21 @@ local function serviceTelemetry(w)
   local logSw = getOption(w, "Logbook Sw")
   if logSw and logSw ~= 0 then
     local l_val = getValue(logSw)
-    if w.last_log_sw == nil then w.last_log_sw = l_val end
-    if w.last_log_sw ~= l_val then
+    if w.last_log_sw == nil then
+      w.last_log_sw = l_val
+      if type(l_val) == "number" then
+        if l_val >= 50 or l_val == 2 then
+          w.show_logbook = true
+          w.logbook_tab = 2
+        elseif (l_val > -50 and l_val < 50) or l_val == 1 then
+          w.show_logbook = true
+          w.logbook_tab = 1
+        end
+      elseif type(l_val) == "boolean" and l_val then
+        w.show_logbook = true
+        w.logbook_tab = 1
+      end
+    elseif w.last_log_sw ~= l_val then
       w.last_log_sw = l_val
       if type(l_val) == "boolean" then
         w.show_logbook = l_val
