@@ -18,7 +18,20 @@ local function update(w, ctx)
   end
   local state = w._theme_state
   
-  local should_be_hivis = (val > 500)
+  local should_be_hivis = state.is_hivis
+  if should_be_hivis then
+    if type(val) == "number" and val < 90 then
+      should_be_hivis = false
+    elseif type(val) == "boolean" and not val then
+      should_be_hivis = false
+    end
+  else
+    if type(val) == "number" and val > 150 then
+      should_be_hivis = true
+    elseif type(val) == "boolean" and val then
+      should_be_hivis = true
+    end
+  end
   
   if should_be_hivis and not state.is_hivis then
     -- 备份颜色

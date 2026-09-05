@@ -341,14 +341,43 @@ local function applyDynamicTheme(w, arm_on)
     local s_val = getValue(light_sens_src)
     if type(s_val) == "boolean" then
       is_light_sens_active = s_val
+      w._light_active = s_val
     elseif type(s_val) == "number" then
-      is_light_sens_active = s_val > 500
+      local cur_state = w._light_active or false
+      if cur_state then
+        -- 遲滯下限：光線降到 90 以下才切回原主題，避免臨界頻繁閃爍
+        if s_val < 90 then
+          cur_state = false
+        end
+      else
+        -- 觸發上限：光線達到 150 以上即切換為 LCD 高反差主題（檯燈/亮室內/戶外陽光均靈敏觸發）
+        if s_val > 150 then
+          cur_state = true
+        end
+      end
+      w._light_active = cur_state
+      is_light_sens_active = cur_state
+    end
+  else
+    w._light_active = false
+  end
+
+  -- 解鎖保護：飛行解鎖中鎖定當前色彩主題，避免穿過樹蔭或雲層陰影時畫面色彩突變
+  if arm_on then
+    if w._theme_locked_idx ~= nil then
+      t_val = w._theme_locked_idx
+    else
+      if is_light_sens_active then t_val = 11 end
+      w._theme_locked_idx = t_val
+    end
+  else
+    w._theme_locked_idx = nil
+    if is_light_sens_active then
+      t_val = 11 -- Force LCD theme under strong ambient light switch
     end
   end
 
-  if is_light_sens_active then
-    t_val = 11 -- Force LCD theme under strong ambient light switch
-  end
+  w.active_theme_idx = t_val
 
   if t_val == 1 then -- 1: Red (Ruby Crimson)
     C.bg = lcd.RGB(28, 6, 8)
@@ -945,7 +974,7 @@ end
 -- =========================================================================
 local function drawDashboard(w, data, ctx)
   local theme_opt = getOption(w, "Theme")
-  local t_val = parseThemeIndex(theme_opt)
+  local t_val = w.active_theme_idx or parseThemeIndex(theme_opt)
   if t_val == 12 then
     local ftype_mod = loadModule("layout_F-type")
     if ftype_mod and ftype_mod.draw then
@@ -1749,7 +1778,7 @@ local function refresh(w, event, touchState)
 
   w.ui_lang = getUiLang(w)
   local theme_opt = getOption(w, "Theme")
-  local t_val = parseThemeIndex(theme_opt)
+  local t_val = w.active_theme_idx or parseThemeIndex(theme_opt)
   local is_trn = (t_val == 9)
   local is_transp = (getOption(w, "Transp BG") == 1 or getOption(w, "Transp BG") == true)
   if t_val == 11 or t_val == 12 then is_transp = false; is_trn = false end
@@ -1863,7 +1892,7 @@ local function refresh(w, event, touchState)
       end
     elseif not w.show_logbook then
       local theme_opt = getOption(w, "Theme")
-      local t_val = parseThemeIndex(theme_opt)
+      local t_val = w.active_theme_idx or parseThemeIndex(theme_opt)
       local handled = false
       if t_val == 12 then
         local ftype_mod = loadModule("layout_F-type")
