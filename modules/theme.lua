@@ -20,9 +20,9 @@ local function update(w, ctx)
   
   local should_be_hivis = state.is_hivis
   if type(val) == "number" then
-    if val == 1 or val == 2 or val > 50 then
+    if val == 1 or val == 2 or val > 10 then
       should_be_hivis = true
-    elseif val <= 25 then
+    elseif val <= 4 then
       should_be_hivis = false
     end
   elseif type(val) == "boolean" then

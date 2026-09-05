@@ -253,7 +253,18 @@ local function draw(w, data, ctx)
     bat_tag = string.format("BAT %d (%d/%dc)", bat_idx, st.today_count or 0, st.lifetime_cycles or 0)
   end
   lcd.drawText(X(248), Y(16), ver_str, CENTER + f_sml + C_DIM)
-  lcd.drawText(X(248), Y(46), bat_tag, CENTER + f_sml + C_DIM)
+
+  local l_val = data.light_val or (w and w._last_s_val)
+  if l_val ~= nil then
+    local l_col = (data.light_active) and C_CYAN or C_DIM
+    local l_str = tostring(l_val)
+    if type(l_val) == "boolean" then l_str = l_val and "ON" or "OFF" end
+    local l_txt = "LGT: " .. l_str
+    lcd.drawText(X(192), Y(46), bat_tag, f_sml + C_DIM)
+    lcd.drawText(X(306), Y(46), l_txt, f_sml + l_col)
+  else
+    lcd.drawText(X(248), Y(46), bat_tag, CENTER + f_sml + C_DIM)
+  end
 
   -- (B) Top Center: MODEL 01 (Bold) & RadioMaster Logo & BANK 1
   local m_name = (data.modelName and data.modelName ~= "") and data.modelName or "MODEL 01"

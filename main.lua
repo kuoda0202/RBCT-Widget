@@ -351,9 +351,9 @@ local function applyDynamicTheme(w, arm_on)
       local cur_state = w._light_active or false
       if s_val == 1 or s_val == 2 then
         cur_state = true
-      elseif s_val > 50 then
+      elseif s_val > 10 then
         cur_state = true
-      elseif s_val <= 25 then
+      elseif s_val <= 4 then
         cur_state = false
       end
       w._light_active = cur_state
@@ -1182,6 +1182,11 @@ local function drawDashboard(w, data, ctx)
       bat_info_str = VERSION .. " | BAT " .. w.last_bat_idx
     end
   end
+  if w._last_s_val ~= nil then
+    local l_str = tostring(w._last_s_val)
+    if type(w._last_s_val) == "boolean" then l_str = w._last_s_val and "ON" or "OFF" end
+    bat_info_str = bat_info_str .. string.format(" | LGT: %s", l_str)
+  end
   text(145, 434, bat_info_str, CENTER + f_sml, C.dim)
 
   -- 4. Right Top Panel (RPM Card)
@@ -1770,6 +1775,8 @@ local function refresh(w, event, touchState)
   local telemData = serviceTelemetry(w)
 
   applyDynamicTheme(w, telemData.arm_on)
+  telemData.light_val = w._last_s_val
+  telemData.light_active = (w.active_theme_idx == 11)
 
   local z = w.zone or { x = 0, y = 0, w = 480, h = 272 }
   local x, y, sw, sh = math.floor(z.x or 0), math.floor(z.y or 0), math.floor(z.w or 480), math.floor(z.h or 272)
