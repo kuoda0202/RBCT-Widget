@@ -3,7 +3,7 @@
 -- Model picture order: Rotorflight Craft Name (/modelImage or /IMAGES),
 -- EdgeTX model name (/modelImage or /IMAGES), Model Setup bitmap, then default.png.
 local NAME = "RBCT"
-local VERSION = "v1.0.9"
+local VERSION = "v1.0.901"
 
 -- Keep this list byte-for-byte compatible with standard telemetry. The order is
 -- deliberately arranged to ensure standard telemetry setup works here.
@@ -582,19 +582,31 @@ end
 local function resolveModelImagePath()
   local craft = getCraftName()
   local candidates = {}
-  if craft ~= "" then
-    table.insert(candidates, "/modelImage/" .. craft .. ".png")
-    table.insert(candidates, "/IMAGES/" .. craft .. ".png")
+  local function addNameVariants(name)
+    if not name or name == "" then return end
+    table.insert(candidates, basePath .. "/modelImage/" .. name .. ".png")
+    table.insert(candidates, "/modelImage/" .. name .. ".png")
+    table.insert(candidates, "/IMAGES/" .. name .. ".png")
+    -- Handle cases with leading marker (e.g. >RS5, >Rotorflight)
+    local stripped = string.gsub(name, "^[>]+", "")
+    if stripped ~= "" and stripped ~= name then
+      table.insert(candidates, basePath .. "/modelImage/" .. stripped .. ".png")
+      table.insert(candidates, "/modelImage/" .. stripped .. ".png")
+      table.insert(candidates, "/IMAGES/" .. stripped .. ".png")
+    end
   end
+
+  addNameVariants(craft)
   if model and model.getInfo then
     local info = model.getInfo()
-    if info and info.name and info.name ~= "" then
-      table.insert(candidates, "/modelImage/" .. info.name .. ".png")
-      table.insert(candidates, "/IMAGES/" .. info.name .. ".png")
+    if info and info.name and info.name ~= "" and info.name ~= craft then
+      addNameVariants(info.name)
     end
     if info and info.bitmap and info.bitmap ~= "" then
       table.insert(candidates, info.bitmap)
-      table.insert(candidates, "/IMAGES/" .. info.bitmap)
+      if string.sub(info.bitmap, 1, 1) ~= "/" then
+        table.insert(candidates, "/IMAGES/" .. info.bitmap)
+      end
     end
   end
   table.insert(candidates, basePath .. "/Pic/default.png")
@@ -649,24 +661,10 @@ local function loadModelImage(sx, sy, viewport_w, viewport_h, logical_max_w, log
           local max_h = math.max(1, math.floor(logical_max_h * sy))
           local scale_w = (max_w / w) * 100
           local scale_h = (max_h / h) * 100
-          heli_scale = math.min(100, math.floor(math.min(scale_w, scale_h)))
+          heli_scale = math.max(1, math.min(100, math.floor(math.min(scale_w, scale_h))))
           local final_w = math.floor(w * (heli_scale / 100))
           local final_h = math.floor(h * (heli_scale / 100))
-          -- Resize once at load time for faster repeated drawing and exact
-          -- physical dimensions on every supported RadioMaster display.
-          local bitmap_api = nil
-          if Bitmap and Bitmap.resize then
-            bitmap_api = Bitmap
-          elseif bitmap and bitmap.resize then
-            bitmap_api = bitmap
-          end
-          if heli_scale < 100 and bitmap_api and bitmap_api.resize then
-            local resized_ok, resized = pcall(bitmap_api.resize, img, final_w, final_h)
-            if resized_ok and resized then
-              heli_pic = resized
-              heli_scale = 100
-            end
-          end
+
           local final_logical_w = final_w / sx
           local final_logical_h = final_h / sy
           heli_draw_x = 10 + math.floor((270 - final_logical_w) / 2)
@@ -1094,9 +1092,8 @@ local function drawDashboard(w, data, ctx)
   -- 3. Left Panel (Heli Picture, Flights, GOV, ARM/STATUS, Battery %)
   panel(X(10), Y(70), W(270), H(400), is_trn, is_transp)
 
-  -- All supported RadioMaster color radios render model bitmaps.  The image is
-  -- pre-sized when Bitmap.resize is available, otherwise drawBitmap uses its
-  -- documented percentage scale argument.
+  -- Render model bitmap. The image is dynamically scaled and 2D-centered via
+  -- drawBitmap's percentage scale argument without allocating uninitialized buffers.
   if heli_pic then
     drawHeliBitmap(X(heli_draw_x or 25), Y(heli_draw_y or 74), heli_pic, heli_scale)
   end
@@ -1972,7 +1969,7 @@ local function refresh(w, event, touchState)
   end
 
   -- F-type uses a wider but shorter model card than the standard dashboard.
-  -- Include those bounds in the load-time resize so every radio draws at 1:1.
+  -- Include those bounds so scaling and centering adapt cleanly to every radio.
   local model_max_w, model_max_h = 240, 140
   if t_val == 12 then model_max_w, model_max_h = 256, 106 end
   loadModelImage(sx, sy, sw, sh, model_max_w, model_max_h)

@@ -244,7 +244,7 @@ local function draw(w, data, ctx)
   lcd.drawText(X(120), Y(42), lq_str, f_sml + C_TEXT)
 
   -- (A2) Version & Active Battery Watermark (Positioned in slot X(195~305), Y(16~60))
-  local ver_str = "RBCT v1.0.9"
+  local ver_str = "RBCT v1.0.901"
   local bat_idx = (w and w.last_bat_idx) or 1
   if bat_idx < 1 or bat_idx > 6 then bat_idx = 1 end
   local bat_tag = "BAT " .. tostring(bat_idx)
@@ -581,7 +581,7 @@ local function draw(w, data, ctx)
         local max_h = H(106)
         local sw_pct = (max_w / bw) * 100
         local sh_pct = (max_h / bh) * 100
-        scale_pct = math.min(100, math.floor(math.min(sw_pct, sh_pct)))
+        scale_pct = math.max(1, math.min(100, math.floor(math.min(sw_pct, sh_pct))))
         img_w = math.floor(bw * (scale_pct / 100))
         img_h = math.floor(bh * (scale_pct / 100))
       end

@@ -85,7 +85,12 @@
 
 ## 📝 版本更新歷程 (Release Notes)
 
-### v1.0.9 (目前最新版)
+### v1.0.901 (目前最新版)
+* **錯誤修復**：**TX15 MAX 模型縮圖邊界雜訊小點修復** - 移除 EdgeTX 韌體底層 `Bitmap.resize` 記憶體未清零引起的右側垂直雜訊點，改由 `lcd.drawBitmap` 原生依比例繪製；保留完整動態等比縮放與雙向置中，徹底杜絕雜訊並大幅節省 RAM 記憶體。
+* **相容性優化**：**開頭符號與模型圖片路徑解析優化** - 自動支援過濾模型名稱開頭符號（如 `>Rotorflight` 自動搜尋 `Rotorflight.png`），並補齊 `/WIDGETS/RBCT/modelImage/` 目錄搜尋，確保 SD 卡自訂愛機圖片 100% 正常載入。
+* **防護升級**：**縮放比例安全下限防呆** - 加入 `math.max(1, ...)` 保護，防止極大解析度圖片引發 scale 為 0 導致的繪圖破框。
+
+### v1.0.9
 * **功能新增**：**F-type 專屬儀表主題** - 新增深藍灰航空儀表版面與獨立模組。
 * **錯誤修復**：**三機型模型縮圖與全 UI 響應式修復** 模型圖片依實體卡片像素等比縮放與雙向置中；完整支援 TX16S MK3 (800x480)、TX16S MKII (480x272) 與 TX15 MAX (480x320)，並修正 480px 螢幕誤用大型字型的問題。
 * **功能新增**：**機隊電池專屬檔案與快捷管理儀表板 (Battery Profile & Manager)** - 點擊機隊電池總表 (Tab 2) 的任意電池行 (BAT 1 ~ BAT 6)，即可秒開專屬的【BAT X 電池資訊】卡片視窗！
@@ -210,7 +215,12 @@ To customize the helicopter picture on the dashboard:
 
 ## 📝 Release Notes & Version History
 
-### v1.0.9 (Current Release)
+### v1.0.901 (Current Release)
+* **Bug Fix**: **TX15 MAX Model Thumbnail Edge Artifact Fix** - Removed EdgeTX firmware's `Bitmap.resize` call to eliminate uninitialized heap memory dots on the right edge, switching to native proportional rendering via `lcd.drawBitmap`; preserves complete dynamic scaling and 2D centering while freeing radio RAM.
+* **Compatibility Optimization**: **Leading Symbol & Model Image Path Resolution** - Automatically strips leading symbols from model names (e.g. `>Rotorflight` automatically finds `Rotorflight.png`) and restores search for `/WIDGETS/RBCT/modelImage/`, ensuring custom user pictures load reliably.
+* **Safety Upgrade**: **Scaling Ratio Lower Bound Guard** - Added `math.max(1, ...)` guard to prevent ultra-large images from calculating a scale of 0.
+
+### v1.0.9
 * **New Feature**: **F-type Dedicated Instrument Theme** - Added a slate-blue aviation dashboard layout and independent module.
 * **Bug Fix**: **Three-Radio Model Thumbnail & Full-UI Responsive Fix** - Model pictures are scaled proportionally to physical card pixels and 2D centered; fully supports TX16S MK3 (800x480), TX16S MKII (480x272), and TX15 MAX (480x320), and fixes the issue where 480px screens mistakenly used oversized fonts.
 * **New Feature**: **Dedicated Battery Profile & Quick Manager Modal (Battery Profile & Manager)** - Tap any battery row (BAT 1 ~ BAT 6) in the Battery Fleet Manager table (Tab 2) to instantly open the dedicated [BAT X Info] card modal!
