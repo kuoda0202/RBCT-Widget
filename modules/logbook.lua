@@ -74,6 +74,21 @@ local function loadFleetData(w, ctx)
   end
 end
 
+-- Build an axis from the actual valid samples.  Fixed 6-9V / 40-55V ranges
+-- make a 12V BEC or a 4S pack look like a clipped, flat line.
+local function computeVoltageScale(low, high, default_min, default_max, min_span, step)
+  if not low or not high or low <= 0 or high <= 0 or low > high then
+    return default_max, default_min
+  end
+
+  local span = math.max(min_span, high - low)
+  local margin = math.max(step, span * 0.12)
+  local axis_min = math.max(0, math.floor((low - margin) / step) * step)
+  local axis_max = math.ceil((high + margin) / step) * step
+  if axis_max - axis_min < min_span then axis_max = axis_min + min_span end
+  return axis_max, axis_min
+end
+
 local function computeChartScales(data)
   local max_rpm = 2500
   local max_v, min_v = 55, 40
@@ -103,29 +118,26 @@ local function computeChartScales(data)
     end
 
     if peak_rpm > 0 then
-      max_rpm = math.max(2000, math.ceil(peak_rpm / 500) * 500)
+      max_rpm = math.max(2000, math.ceil((peak_rpm * 1.05) / 500) * 500)
     end
 
-    if peak_v > 30 then
-      max_v, min_v = 55, 40
-    elseif peak_v > 15 then
-      max_v, min_v = 26, 20
-    elseif peak_v > 0 then
-      max_v, min_v = 13, 6
+    if peak_v > 0 and lowest_v < 999 then
+      local v_step = (peak_v >= 30) and 2 or ((peak_v >= 12) and 1 or 0.5)
+      local v_span = (peak_v >= 30) and 6 or ((peak_v >= 12) and 3 or 2)
+      max_v, min_v = computeVoltageScale(lowest_v, peak_v, min_v, max_v, v_span, v_step)
     end
 
     if peak_a > 0 then
-      max_a = math.max(50, math.ceil(peak_a / 50) * 50)
+      max_a = math.max(50, math.ceil((peak_a * 1.05) / 50) * 50)
     end
 
     if peak_t > 0 then
       max_t = math.max(80, math.ceil(peak_t / 20) * 20)
     end
 
-    if peak_b > 0 and peak_b <= 6.5 then
-      max_b, min_b = 6.5, 4.5
-    else
-      max_b, min_b = 9.0, 6.0
+    if peak_b > 0 and lowest_b < 999 then
+      local b_step = (peak_b >= 10) and 0.5 or 0.25
+      max_b, min_b = computeVoltageScale(lowest_b, peak_b, min_b, max_b, 1.5, b_step)
     end
   end
 
@@ -462,4 +474,3 @@ local function drawLogbook(w, ctx)
 end
 
 return { drawLogbook = drawLogbook }
-

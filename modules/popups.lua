@@ -19,6 +19,21 @@ local function T(w, key)
   return key
 end
 
+-- Use measured limits for pack and BEC axes.  This supports 2S through 12S
+-- packs and, importantly, 6V/8V/12V BEC systems without clipping their curve.
+local function computeVoltageScale(low, high, default_min, default_max, min_span, step)
+  if not low or not high or low <= 0 or high <= 0 or low > high then
+    return default_max, default_min
+  end
+
+  local span = math.max(min_span, high - low)
+  local margin = math.max(step, span * 0.12)
+  local axis_min = math.max(0, math.floor((low - margin) / step) * step)
+  local axis_max = math.ceil((high + margin) / step) * step
+  if axis_max - axis_min < min_span then axis_max = axis_min + min_span end
+  return axis_max, axis_min
+end
+
 function M.drawPopups(w, ctx)
   local telemData = ctx.data or w.last_telem or {}
   if w.active_popup == "battery" then
@@ -195,16 +210,87 @@ function M.drawPopups(w, ctx)
 
     local data = w.chart_data
     local len = (data and type(data) == "table") and #data or 0
-    local peak_rpm_raw = ctx.stat(3, "max") or 0
-    local max_rpm = math.max(2000, math.ceil(peak_rpm_raw / 500) * 500)
-    local max_a = math.max(50, math.ceil(ctx.amps(ctx.stat(2, "max") or 0) / 50) * 50)
-    local cur_v = ctx.volts(ctx.sensor(1))
-    local max_v, min_v = 55, 40
-    if cur_v > 0 and cur_v <= 30 then
-      if cur_v > 15 then max_v, min_v = 26, 18 else max_v, min_v = 13, 6 end
+
+    -- Extract peak and minimum telemetry points directly from chart_data
+    -- Ensures full adaptive scaling even when offline, disarmed, or powered off (e.g. S200 @ 5000 RPM)
+    -- Scanning all saved points is needed for unplugged-after-flight viewing,
+    -- but doing it again for every LCD refresh wastes CPU.  Rebuild only when
+    -- the chart table changes or samples were added; the renderer below still
+    -- draws its capped 35 points every frame.
+    if w._popup_chart_scan_data ~= data or w._popup_chart_scan_len ~= len then
+      local scan = { peak_r = 0, peak_a = 0, peak_v = 0, min_v = 999, peak_b = 0, min_b = 999, peak_t = 0 }
+      for i = 1, len do
+        local p = data[i]
+        if type(p) == "table" then
+          local r = p.r or (p[1] or 0)
+          local v = p.v or (p[2] or 0)
+          local a = p.a or (p[3] or 0)
+          local b = p.b or (p[4] or 0)
+          local t = p.t or (p[5] or 0)
+          if r > scan.peak_r then scan.peak_r = r end
+          if a > scan.peak_a then scan.peak_a = a end
+          if v > scan.peak_v then scan.peak_v = v end
+          if v > 0 and v < scan.min_v then scan.min_v = v end
+          if b > scan.peak_b then scan.peak_b = b end
+          if b > 0 and b < scan.min_b then scan.min_b = b end
+          if t > scan.peak_t then scan.peak_t = t end
+        end
+      end
+      w._popup_chart_scan = scan
+      w._popup_chart_scan_data = data
+      w._popup_chart_scan_len = len
     end
-    local max_t, min_t = 120, 20
+    local scan = w._popup_chart_scan or { peak_r = 0, peak_a = 0, peak_v = 0, min_v = 999, peak_b = 0, min_b = 999, peak_t = 0 }
+    local d_peak_r, d_peak_a = scan.peak_r, scan.peak_a
+    local d_peak_v, d_min_v = scan.peak_v, scan.min_v
+    local d_peak_b, d_min_b, d_peak_t = scan.peak_b, scan.min_b, scan.peak_t
+
+    local peak_rpm_raw = math.max(ctx.stat(3, "max") or 0, d_peak_r)
+    local max_rpm = math.max(2000, math.ceil((peak_rpm_raw * 1.05) / 500) * 500)
+
+    local peak_a_raw = math.max(ctx.amps(ctx.stat(2, "max") or 0), d_peak_a)
+    local max_a = math.max(50, math.ceil((peak_a_raw * 1.05) / 50) * 50)
+
+    local cur_v = ctx.volts(ctx.sensor(1))
+    local stat_min_v = ctx.volts(ctx.stat(1, "min") or 0)
+    local stat_max_v = ctx.volts(ctx.stat(1, "max") or 0)
+    local data_min_v = (d_min_v < 999) and d_min_v or 0
+    local low_v = data_min_v
+    local high_v = d_peak_v
+    if stat_min_v > 0 and (low_v <= 0 or stat_min_v < low_v) then low_v = stat_min_v end
+    if stat_max_v > high_v then high_v = stat_max_v end
+    if cur_v > 0 then
+      if low_v <= 0 or cur_v < low_v then low_v = cur_v end
+      if cur_v > high_v then high_v = cur_v end
+    end
+    local max_v, min_v = 55, 40
+    if high_v > 0 and low_v > 0 then
+      local v_step = (high_v >= 30) and 2 or ((high_v >= 12) and 1 or 0.5)
+      local v_span = (high_v >= 30) and 6 or ((high_v >= 12) and 3 or 2)
+      max_v, min_v = computeVoltageScale(low_v, high_v, min_v, max_v, v_span, v_step)
+    end
+
+    local peak_t_raw = math.max(ctx.stat(6, "max") or 0, d_peak_t)
+    local max_t = (peak_t_raw > 0) and math.max(80, math.ceil(peak_t_raw / 20) * 20) or 120
+    local min_t = 20
+
+    local cur_b = ctx.volts(ctx.sensor(12) or 0)
+    local stat_min_b = ctx.volts(ctx.stat(12, "min") or 0)
+    local stat_max_b = ctx.volts(ctx.stat(12, "max") or 0)
+    local data_min_b = (d_min_b < 999) and d_min_b or 0
+    local low_b = data_min_b
+    local high_b = d_peak_b
+    if stat_min_b > 0 and (low_b <= 0 or stat_min_b < low_b) then low_b = stat_min_b end
+    if stat_max_b > high_b then high_b = stat_max_b end
+    if cur_b > 0 then
+      if low_b <= 0 or cur_b < low_b then low_b = cur_b end
+      if cur_b > high_b then high_b = cur_b end
+    end
     local max_b, min_b = 9.0, 5.0
+    if high_b > 0 and low_b > 0 then
+      local b_step = (high_b >= 10) and 0.5 or 0.25
+      max_b, min_b = computeVoltageScale(low_b, high_b, min_b, max_b, 1.5, b_step)
+    end
 
     ctx.text(cx - 5, cy - 2, string.format("%.0f", max_rpm), ctx.RIGHT + ctx.f_sml, ctx.C.green)
     ctx.text(cx - 5, cy + ch - 14, "0", ctx.RIGHT + ctx.f_sml, ctx.C.green)
@@ -234,7 +320,7 @@ function M.drawPopups(w, ctx)
         local scr_yr = ctx.Y(base_y - (math.max(0, math.min(max_rpm, r_val)) / max_rpm) * ch)
         local scr_yv = ctx.Y(base_y - (math.max(0, math.min(max_v - min_v, v_val - min_v)) / math.max(1, max_v - min_v)) * ch)
         local scr_ya = ctx.Y(base_y - (math.max(0, math.min(max_a, a_val)) / max_a) * ch)
-        local scr_yb = ctx.Y(base_y - (math.max(0, math.min(max_b - min_b, b_val - min_b)) / math.max(1, max_b - min_b)) * ch)
+        local scr_yb = ctx.Y(base_y - (math.max(0, math.min(max_b - min_b, b_val - min_b)) / math.max(0.1, max_b - min_b)) * ch)
         local scr_yt = ctx.Y(base_y - (math.max(0, math.min(max_t - min_t, t_val - min_t)) / math.max(1, max_t - min_t)) * ch)
         if i > 1 then
           ctx.lcd.drawLine(px, pyr, scr_x, scr_yr, SOLID, ctx.C.green)
@@ -249,11 +335,13 @@ function M.drawPopups(w, ctx)
       ctx.text(400, cy + ch / 2 - 8, T(w, "pop_no_crv"), ctx.CENTER + ctx.f_sml, ctx.C.dim)
     end
 
-    local peak_rpm = ctx.stat(3, "max") or 0
-    local peak_a = ctx.amps(ctx.stat(2, "max") or 0)
-    local peak_t = ctx.stat(6, "max") or 0
-    local min_bec_v = ctx.volts(ctx.stat(12, "min") or 0)
-    local min_vbat = ctx.volts(ctx.stat(1, "min") or 0)
+    local peak_rpm = peak_rpm_raw
+    local peak_a = peak_a_raw
+    local peak_t = peak_t_raw
+    local stat_bec = ctx.volts(ctx.stat(12, "min") or 0)
+    local min_bec_v = (stat_bec > 0) and stat_bec or ((d_min_b < 999) and d_min_b or 0)
+    local stat_vbat = ctx.volts(ctx.stat(1, "min") or 0)
+    local min_vbat = (stat_vbat > 0) and stat_vbat or ((d_min_v < 999) and d_min_v or 0)
     local pwr_str = ""
     local max_p = (w and w.max_power and w.max_power > 0) and w.max_power or (min_vbat * peak_a)
     if max_p and max_p >= 1000 then

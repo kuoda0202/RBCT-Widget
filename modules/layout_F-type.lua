@@ -244,7 +244,7 @@ local function draw(w, data, ctx)
   lcd.drawText(X(120), Y(42), lq_str, f_sml + C_TEXT)
 
   -- (A2) Version & Active Battery Watermark (Positioned in slot X(195~305), Y(16~60))
-  local ver_str = "RBCT v1.0.902"
+  local ver_str = "RBCT v1.0.903"
   local bat_idx = (w and w.last_bat_idx) or 1
   if bat_idx < 1 or bat_idx > 6 then bat_idx = 1 end
   local bat_tag = "BAT " .. tostring(bat_idx)
@@ -743,12 +743,16 @@ local function handleTouch(w, tx, ty, ctx)
 
   -- Top Watermark Area (X: 190..305, Y: 10..65) -> Cycles Active Battery 1~6
   if tx >= X(190) and tx <= X(305) and ty >= Y(10) and ty <= Y(65) then
-    w.manual_bat_idx = ((w.last_bat_idx or 1) % 6) + 1
-    w.last_bat_idx = w.manual_bat_idx
-    w.bat_prompt_timer = now_t
-    w.log_loaded = false
-    w.fleet_data = nil
-    if playTone then pcall(playTone, 2200, 100, 50, 0) end
+    if not w.bat_assignment_locked then
+      w.manual_bat_idx = ((w.last_bat_idx or 1) % 6) + 1
+      w.last_bat_idx = w.manual_bat_idx
+      w.bat_prompt_timer = now_t
+      w.log_loaded = false
+      w.fleet_data = nil
+      if playTone then pcall(playTone, 2200, 100, 50, 0) end
+    else
+      if playTone then pcall(playTone, 400, 100, 50, 0) end
+    end
     return true
   end
 

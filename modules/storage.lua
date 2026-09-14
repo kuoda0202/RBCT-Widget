@@ -37,6 +37,14 @@ end
 M.getCraftName = getCraftName
 
 local function getActiveBatIndex(w)
+  -- A touch-selected battery is an explicit operator choice.  It must take
+  -- priority over the optional 6-position source, otherwise the UI can say
+  -- "Set Active" while flight records still go to the hardware-selected pack.
+  local manual_idx = w and tonumber(w.manual_bat_idx)
+  if manual_idx and manual_idx >= 1 and manual_idx <= 6 then
+    return math.floor(manual_idx)
+  end
+
   local bat_mod = fn_loadModule and fn_loadModule("battery")
   if bat_mod and bat_mod.getBatIndex then
     local bat_src = fn_getOption and fn_getOption(w, "Bat Track")

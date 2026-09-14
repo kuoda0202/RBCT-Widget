@@ -85,7 +85,7 @@
 
 ## 📝 版本更新歷程 (Release Notes)
 
-### v1.0.902 (目前最新版)
+### v1.0.903 (目前最新版)
 * **穩定性修復**：**徹底根治長時長飛行後單包電池彈窗 CPU Limit 報錯** -
   * **走勢圖步進降採樣 (Stride Downsampling)**：重構 `modules/popups.lua` [BAT PROFILE] 單包電池視窗底部的放電走勢圖，限制渲染特徵點為最大 35 點，並導入座標連續換算快取，消除累積滿額 200 點引發的 199 次 C-API 高頻重繪，單次繪圖耗時由 12ms 降至 0.7ms。
   * **動力曲線同步優化**：動力曲線 (Power Stats) 抽樣上限由 50 點下調至 35 點，單幀再節省 75 次線條計算。
@@ -227,7 +227,7 @@ To customize the helicopter picture on the dashboard:
 
 ## 📝 Release Notes & Version History
 
-### v1.0.902 (Current Release)
+### v1.0.903 (Current Release)
 * **Stability Fix**: **Eradicated Battery Profile Modal CPU Limit on Extended Flights** -
   * **Discharge Curve Stride Downsampling**: Refactored the bottom discharge trend curve in `modules/popups.lua` [BAT PROFILE] modal to cap render points at `max_pts = 35` with continuous single-transform caching, eliminating 199 high-frequency C-API `drawLine` redraws across 200 raw points and slashing render latency from 12ms to 0.7ms.
   * **Power Stats Synchronous Optimization**: Lowered `power_stats` curve sampling cap from 50 to 35 points, saving an additional 75 line computations per frame.

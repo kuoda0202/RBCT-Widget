@@ -3,7 +3,7 @@
 -- Model picture order: Rotorflight Craft Name (/modelImage or /IMAGES),
 -- EdgeTX model name (/modelImage or /IMAGES), Model Setup bitmap, then default.png.
 local NAME = "RBCT"
-local VERSION = "v1.0.902"
+local VERSION = "v1.0.903"
 
 -- Keep this list byte-for-byte compatible with standard telemetry. The order is
 -- deliberately arranged to ensure standard telemetry setup works here.
@@ -1403,25 +1403,6 @@ local function serviceTelemetry(w)
     w.bat_prompt_timer = getTime()
     if playTone then pcall(playTone, 1800, 120, 80, 0) end
   end
-  if cur_bat_idx ~= w.last_bat_idx and w.last_bat_idx ~= -1 then
-    w.bat_prompt_timer = getTime()
-    if playTone then pcall(playTone, 2200, 100, 50, 0) end
-    w.log_loaded = false
-    w.fleet_data = nil
-  end
-
-  local cur_vcel = volts(sensor(15))
-  if cur_vcel <= 0 and cur_vbat > 0 then
-    local cell_cnt = math.max(1, math.floor(cur_vbat / 4.2 + 0.5))
-    cur_vcel = cur_vbat / cell_cnt
-  end
-  if cur_bat_idx >= 1 and cur_bat_idx <= 6 and not arm_on and cur_vbat >= 5.0 then
-    updateBatteryStatusOnVoltage(w, cur_bat_idx, cur_vcel, cur_vbat)
-  end
-
-  w.last_vbat = cur_vbat
-  w.last_bat_idx = cur_bat_idx
-
   -- Logbook switch listener (Edge-triggered so manual touch opening is NOT instantly overridden!)
   local logSw = getOption(w, "Logbook Sw")
   if logSw and logSw ~= 0 then
@@ -1462,6 +1443,37 @@ local function serviceTelemetry(w)
   -- Telemetry connectivity & smart composite in-flight detection
   local is_online = (cur_vbat >= 5.0) or (cur_vbec >= 3.5)
   local valid_arm = arm_on and is_online
+
+  -- Freeze the battery assignment as soon as the model is armed.  This
+  -- prevents a mid-flight touch or a noisy 6-position source from moving the
+  -- flight record to another pack.  The assignment becomes selectable again
+  -- only after disarming.
+  w.bat_assignment_locked = arm_on
+  if arm_on and (not w.flight_bat_idx) and cur_bat_idx >= 1 and cur_bat_idx <= 6 then
+    w.flight_bat_idx = cur_bat_idx
+  elseif not arm_on then
+    w.flight_bat_idx = nil
+  end
+  if w.flight_bat_idx then cur_bat_idx = w.flight_bat_idx end
+
+  if cur_bat_idx ~= w.last_bat_idx and w.last_bat_idx ~= -1 then
+    w.bat_prompt_timer = getTime()
+    if playTone then pcall(playTone, 2200, 100, 50, 0) end
+    w.log_loaded = false
+    w.fleet_data = nil
+  end
+
+  local cur_vcel = volts(sensor(15))
+  if cur_vcel <= 0 and cur_vbat > 0 then
+    local cell_cnt = math.max(1, math.floor(cur_vbat / 4.2 + 0.5))
+    cur_vcel = cur_vbat / cell_cnt
+  end
+  if cur_bat_idx >= 1 and cur_bat_idx <= 6 and not arm_on and cur_vbat >= 5.0 then
+    updateBatteryStatusOnVoltage(w, cur_bat_idx, cur_vcel, cur_vbat)
+  end
+
+  w.last_vbat = cur_vbat
+  w.last_bat_idx = cur_bat_idx
 
   local cur_thr = sensor(11) or 0
   local cur_rpm = sensor(3) or 0
@@ -2001,45 +2013,56 @@ local function innerRefresh(w, event, touchState)
           if not is_inside then
             handleOutsideTap("battery")
           else
-            local is_close_bar = (ty >= Y(385) and ty <= max_y and tx >= X(200) and tx <= X(600))
+            -- Match the visible footer button exactly: x=250..550, y=396..428.
+            local is_close_bar = (ty >= Y(396) and ty <= Y(428) and tx >= X(250) and tx <= X(550))
             if is_close_bar then
               doClosePopup()
             else
               local bat_idx = w.viewing_bat_idx or (w.last_bat_idx and w.last_bat_idx > 0 and w.last_bat_idx) or 1
               local st = w.fleet_stats and w.fleet_stats[bat_idx]
-              -- 1. Status selector buttons (Y: 194 to 254)
-              if ty >= Y(194) and ty <= Y(254) then
+              -- 1. Status selector buttons: exact rendered bounds, Y=198..250.
+              if ty >= Y(198) and ty <= Y(250) then
                 if st then
-                  if tx >= X(100) and tx <= X(242) then
+                  if tx >= X(100) and tx <= X(240) then
                     st.status = "READY"
                     saveFleetData(w)
                     if playTone then pcall(playTone, 1800, 80, 50, 0) end
-                  elseif tx >= X(248) and tx <= X(392) then
+                  elseif tx >= X(250) and tx <= X(390) then
                     st.status = "FLOWN"
                     saveFleetData(w)
                     if playTone then pcall(playTone, 1600, 80, 50, 0) end
-                  elseif tx >= X(398) and tx <= X(542) then
+                  elseif tx >= X(400) and tx <= X(540) then
                     st.status = "STORAGE"
                     saveFleetData(w)
                     if playTone then pcall(playTone, 1400, 80, 50, 0) end
-                  elseif tx >= X(548) and tx <= X(705) then
+                  elseif tx >= X(550) and tx <= X(700) then
                     st.status = "NONE"
                     saveFleetData(w)
                     if playTone then pcall(playTone, 1200, 80, 50, 0) end
                   end
                 end
-              -- 2. Action Button A: Reset Today Count (Y: 256 to 318, X: 100 to 392)
-              elseif ty >= Y(256) and ty <= Y(318) and tx >= X(100) and tx <= X(392) then
+              -- 2. Reset Today: exact rendered bounds, x=100..390, y=260..314.
+              elseif ty >= Y(260) and ty <= Y(314) and tx >= X(100) and tx <= X(390) then
                 if st then
                   st.today_count = 0
                   saveFleetData(w)
                   if playTone then pcall(playTone, 2000, 120, 50, 0) end
                 end
-              -- 3. Action Button B: Set Active Battery (Y: 256 to 318, X: 408 to 705)
-              elseif ty >= Y(256) and ty <= Y(318) and tx >= X(408) and tx <= X(705) then
-                w.manual_bat_idx = bat_idx
-                saveFleetData(w)
-                if playTone then pcall(playTone, 2200, 100, 50, 0) end
+              -- 3. Set Active Battery: exact rendered bounds, x=410..700, y=260..314.
+              elseif ty >= Y(260) and ty <= Y(314) and tx >= X(410) and tx <= X(700) then
+                if not w.bat_assignment_locked then
+                  -- This is the authoritative selection used by getActiveBatIndex().
+                  -- It is deliberately blocked once armed; the current flight keeps
+                  -- the battery captured at arm time until the model is disarmed.
+                  w.manual_bat_idx = bat_idx
+                  w.last_bat_idx = bat_idx
+                  w.bat_prompt_timer = now_t
+                  w.log_loaded = false
+                  w.fleet_data = nil
+                  if playTone then pcall(playTone, 2200, 100, 50, 0) end
+                else
+                  if playTone then pcall(playTone, 400, 100, 50, 0) end
+                end
               end
               -- Any other tap inside modal: MAINTAIN DISPLAY!
             end
@@ -2051,15 +2074,16 @@ local function innerRefresh(w, event, touchState)
           if not is_inside then
             handleOutsideTap("session_stats")
           else
-            local is_close_bar = (ty >= Y(380) and ty <= max_y and tx >= X(200) and tx <= X(600))
+            -- Match the visible footer button exactly: x=250..550, y=391..423.
+            local is_close_bar = (ty >= Y(391) and ty <= Y(423) and tx >= X(250) and tx <= X(550))
             if is_close_bar then
               doClosePopup()
             else
-              if tx >= X(180) and tx <= X(380) and ty >= Y(280) and ty <= Y(345) then
+              if tx >= X(180) and tx <= X(380) and ty >= Y(280) and ty <= Y(335) then
                 w.flight_count = 0
                 saveFlightLog(w)
                 if playTone then pcall(playTone, 1500, 100, 100, 0) end
-              elseif tx >= X(420) and tx <= X(620) and ty >= Y(280) and ty <= Y(345) then
+              elseif tx >= X(420) and tx <= X(620) and ty >= Y(280) and ty <= Y(335) then
                 w.lifetime_count = 0
                 saveFlightLog(w)
                 if playTone then pcall(playTone, 1800, 150, 100, 0) end
@@ -2074,7 +2098,8 @@ local function innerRefresh(w, event, touchState)
           if not is_inside then
             handleOutsideTap("power_stats")
           else
-            local is_close_bar = (ty >= Y(360) and ty <= max_y and tx >= X(200) and tx <= X(600))
+            -- Match the visible footer button exactly: x=250..550, y=366..398.
+            local is_close_bar = (ty >= Y(366) and ty <= Y(398) and tx >= X(250) and tx <= X(550))
             if is_close_bar then
               doClosePopup()
             else
@@ -2083,11 +2108,9 @@ local function innerRefresh(w, event, touchState)
           end
 
         else -- telemetry_info
-          local min_x, max_x, min_y, max_y = X(50), X(750), Y(20), Y(460)
-          local is_inside = (tx >= min_x and tx <= max_x and ty >= min_y and ty <= max_y)
-          if not is_inside or ty >= Y(405) then
-            doClosePopup()
-          end
+          -- The rendered hint says "Tap anywhere to close" and this page has
+          -- no interactive controls, so every fresh tap must do exactly that.
+          doClosePopup()
         end
       end
     elseif not w.show_logbook then
@@ -2134,10 +2157,14 @@ local function innerRefresh(w, event, touchState)
       end
     else
       -- In Logbook screen
-      if w.logbook_tab == 2 and ty >= Y(85) and ty <= Y(420) then
+      if w.logbook_tab == 2 and ty >= Y(90) and ty <= Y(415) then
         -- Direct touch on Battery Fleet Manager table row opens battery health popup for that battery (1 to 6)!
-        local row = math.floor((ty - Y(85)) / math.max(1, H(55))) + 1
-        if row >= 1 and row <= 6 then
+        local row = math.floor((ty - Y(90)) / math.max(1, H(55))) + 1
+        -- Rows are rendered at Y=90 + n*55 with a 50-pixel height.  Keep the
+        -- five-pixel separators inert so a header/gap tap cannot select a pack.
+        local row_top = Y(90 + (row - 1) * 55)
+        local row_bottom = row_top + H(50)
+        if row >= 1 and row <= 6 and ty >= row_top and ty <= row_bottom then
           w.viewing_bat_idx = row
           w.active_popup = "battery"
           w.popup_open_t = now_t
