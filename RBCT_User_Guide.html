@@ -3634,10 +3634,76 @@ save</pre>
           <span class="lang-en">📜 14. Version Release History & Changelog</span>
         </h2>
 
+        <!-- v1.0.903 -->
+        <div class="topic-sub-title">
+          <span class="lang-zh">🚀 v1.0.903 (目前最新版)</span>
+          <span class="lang-en">🚀 v1.0.903 (Current Release)</span>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">
+              <span class="lang-zh">📈 曲線、G 力與高壓 BEC 動態刻度</span>
+              <span class="lang-en">📈 Dynamic Chart, G-Force and High-Voltage BEC Scaling</span>
+            </div>
+            <div class="card-desc">
+              <span class="lang-zh"><strong>【錯誤修復】</strong>HEADSPEED &amp; POWER CHART 與飛行日誌改讀保存的飛行採樣資料。飛後拔機子電池時，仍可顯示最高 RPM、Rotor Dynamics G 力、主電池與 BEC 曲線；主電池與 BEC 軸依每趟有效最高／最低值自動縮放，不再固定受限於 13V、26V、55V 或 9V。</span>
+              <span class="lang-en"><strong>[Bug Fix]</strong> HEADSPEED &amp; POWER CHART and Logbook now use saved flight samples. After aircraft power-off, peak RPM, Rotor Dynamics G-force, pack and BEC curves remain available. Pack and BEC axes auto-scale from each flight's valid extrema instead of fixed 13V, 26V, 55V or 9V limits.</span>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">
+              <span class="lang-zh">🔋 電池歸屬鎖定與直接斷電保護</span>
+              <span class="lang-en">🔋 Battery Assignment Lock and Direct Power-Cut Protection</span>
+            </div>
+            <div class="card-desc">
+              <span class="lang-zh"><strong>【資料保護】</strong><code>Set Active Battery</code> 現在會選定實際飛行記錄電池；解鎖後自動鎖定本趟歸屬，飛行中不能誤切換。若飛友未上鎖即拔掉機子電池，RBCT 會用最後有效的飛行摘要結算日誌與 Fleet，避免即時遙測歸零覆蓋 RPM、電流、單電、BEC、溫度與 mAh。</span>
+              <span class="lang-en"><strong>[Data Protection]</strong> <code>Set Active Battery</code> now selects the actual flight-log pack and locks it once armed. If aircraft power is removed before disarming, RBCT finalizes Logbook and Fleet data from the last valid in-flight summary instead of allowing zeroed telemetry to overwrite RPM, current, cell voltage, BEC, temperature and mAh.</span>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">
+              <span class="lang-zh">👆 觸控子頁校正與低負荷曲線</span>
+              <span class="lang-en">👆 Calibrated Touch Subpages and Low-Load Charts</span>
+            </div>
+            <div class="card-desc">
+              <span class="lang-zh"><strong>【介面與效能】</strong>電池、飛行統計與曲線彈窗的按鈕／關閉列熱區已對齊畫面；Fleet Manager 六列電池僅在實際列內可點。Power Stats 曲線維持最多 35 點繪製，且只在資料變更時重掃最高／最低值。</span>
+              <span class="lang-en"><strong>[UI and Performance]</strong> Exact rendered hit areas now govern Battery, Flight Statistics and Power Chart popup controls; Fleet Manager opens a battery only when its visible row is tapped. Power Stats retains a 35-point render cap and rescans extrema only when chart data changes.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- v1.0.902 -->
+        <div class="topic-sub-title" style="margin-top: 2rem;">
+          <span class="lang-zh">⚙️ v1.0.902</span>
+          <span class="lang-en">⚙️ v1.0.902</span>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">
+              <span class="lang-zh">⚡ 長時飛行彈窗 CPU Limit 修復</span>
+              <span class="lang-en">⚡ Extended-Flight Popup CPU Limit Fix</span>
+            </div>
+            <div class="card-desc">
+              <span class="lang-zh"><strong>【穩定性修復】</strong>Battery Profile 放電走勢圖與 Power Stats 曲線加入降採樣，限制繪製特徵點；彈窗開啟時略過被遮擋的模型圖片縮放，降低長時飛行與低速 SD 卡的 CPU 壓力。</span>
+              <span class="lang-en"><strong>[Stability Fix]</strong> Battery Profile discharge and Power Stats charts gained point downsampling, while covered model-image scaling is skipped when a popup is open to reduce CPU load during extended flights and on slower SD cards.</span>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">
+              <span class="lang-zh">💾 SD 寫入與設定相容性優化</span>
+              <span class="lang-en">💾 SD Write and Settings Compatibility Improvements</span>
+            </div>
+            <div class="card-desc">
+              <span class="lang-zh"><strong>【效能優化】</strong>曲線資料改為單次原子寫入，減少降落時 SD I/O；新設定以尾端追加方式保留既有選項索引，並新增可調的光感進入／退出值與強光主題選擇。</span>
+              <span class="lang-en"><strong>[Performance Improvement]</strong> Chart data is buffered for a single atomic SD write to reduce landing-time I/O. New options are appended without changing legacy indices, alongside configurable light enter/exit thresholds and a selectable bright-light theme.</span>
+            </div>
+          </div>
+        </div>
+
         <!-- v1.0.9 -->
         <div class="topic-sub-title">
-          <span class="lang-zh">🚀 v1.0.9 (目前最新版)</span>
-          <span class="lang-en">🚀 v1.0.9 (Current Stable Release)</span>
+          <span class="lang-zh">🚀 v1.0.9</span>
+          <span class="lang-en">🚀 v1.0.9</span>
         </div>
         <div class="grid-2">
           <div class="card">

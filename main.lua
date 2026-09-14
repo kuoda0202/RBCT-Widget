@@ -1541,6 +1541,11 @@ local function serviceTelemetry(w)
         w.flight_counted_this_arm = false
         w.chart_reset_this_arm = false
         w.last_sample_time = w.arm_start_time
+        -- Keep an in-RAM summary while telemetry is valid.  If a pilot cuts
+        -- aircraft power before disarming, EdgeTX clears live min/max values
+        -- before this function reaches the normal landing finalization.
+        w.flight_summary = { bat_idx = cur_bat_idx, max_rpm = 0, max_amp = 0,
+          min_cell = 0, min_bec = 0, max_temp = 0, capacity = 0, max_power = 0 }
       elseif not w.flight_counted_this_arm and w.arm_start_time then
         local elapsed = getTime() - w.arm_start_time
         local max_rpm = stat(3, "max") or 0
@@ -1576,27 +1581,51 @@ local function serviceTelemetry(w)
           end
         end
       end
+
+      -- Update only from live, valid telemetry; zeros caused by a power cut
+      -- can therefore never overwrite the last usable flight summary.
+      local summary = w.flight_summary
+      if summary then
+        local s_rpm = stat(3, "max") or 0
+        local s_amp = amps(stat(2, "max") or 0)
+        local s_cell = volts(stat(15, "min") or 0)
+        local s_bec = volts(stat(12, "min") or 0)
+        local s_temp = stat(6, "max") or 0
+        local s_capa = stat(4, "cur") or stat(4, "max") or 0
+        local s_power = math.max(w.max_power or 0, volts(cur_vbat) * cur_amp)
+        if s_rpm > summary.max_rpm then summary.max_rpm = s_rpm end
+        if s_amp > summary.max_amp then summary.max_amp = s_amp end
+        if s_cell > 0 and (summary.min_cell <= 0 or s_cell < summary.min_cell) then summary.min_cell = s_cell end
+        if s_bec > 0 and (summary.min_bec <= 0 or s_bec < summary.min_bec) then summary.min_bec = s_bec end
+        if s_temp > summary.max_temp then summary.max_temp = s_temp end
+        if s_capa > summary.capacity then summary.capacity = s_capa end
+        if s_power > summary.max_power then summary.max_power = s_power end
+      end
     else
       -- Landed & DISARMED: Safe point to perform SD card file I/O operations
       if w.flight_counted_this_arm and w.arm_start_time then
+        -- A live ARM state followed by telemetry loss is an unplanned power
+        -- cut.  Use the last valid snapshot rather than newly-cleared stats.
+        local use_disconnect_snapshot = (not is_online) and (w.last_arm_state == true) and w.flight_summary
+        local summary = use_disconnect_snapshot and w.flight_summary or nil
         local dur_s = math.floor((getTime() - w.arm_start_time) / 100)
         if dur_s >= 8 then
           local dur_str = string.format("%02d:%02d", math.floor(dur_s / 60), dur_s % 60)
           local time_str = w.takeoff_clock_str or string.format("%02d:%02d", dt.hour or 0, dt.min or 0)
-          local rpm_str = string.format("%.0f", stat(3, "max") or 0)
-          local amps_str = string.format("%.1f", amps(stat(2, "max") or 0))
-          local cell_str = string.format("%.2f", volts(stat(15, "min") or 0))
-          local bec_str = string.format("%.2f", volts(stat(12, "min") or 0))
-          local tmp_str = string.format("%.0f", stat(6, "max") or 0)
-          local capa_str = string.format("%.0f", stat(4, "cur") or stat(4, "max") or 0)
-          local pwr_str = string.format("%.0f", w.max_power or 0)
+          local rpm_str = string.format("%.0f", summary and summary.max_rpm or (stat(3, "max") or 0))
+          local amps_str = string.format("%.1f", summary and summary.max_amp or amps(stat(2, "max") or 0))
+          local cell_str = string.format("%.2f", summary and summary.min_cell or volts(stat(15, "min") or 0))
+          local bec_str = string.format("%.2f", summary and summary.min_bec or volts(stat(12, "min") or 0))
+          local tmp_str = string.format("%.0f", summary and summary.max_temp or (stat(6, "max") or 0))
+          local capa_str = string.format("%.0f", summary and summary.capacity or (stat(4, "cur") or stat(4, "max") or 0))
+          local pwr_str = string.format("%.0f", summary and summary.max_power or (w.max_power or 0))
           local parts = { time_str, dur_str, rpm_str, amps_str, cell_str, bec_str, tmp_str, capa_str, pwr_str }
           table.insert(w.log_entries, 1, parts)
           if #w.log_entries > 10 then table.remove(w.log_entries) end
           saveLogbook(w)
 
           -- Update battery fleet stats
-          local cur_bat = getActiveBatIndex(w) or 1
+          local cur_bat = (summary and summary.bat_idx) or getActiveBatIndex(w) or 1
           if cur_bat >= 1 and cur_bat <= 6 and w.fleet_stats then
             local st = w.fleet_stats[cur_bat]
             if st then
@@ -1632,6 +1661,7 @@ local function serviceTelemetry(w)
       w.flight_counted_this_arm = false
       w.chart_reset_this_arm = false
       w.has_flown_this_arm = false
+      w.flight_summary = nil
     end
     w.last_arm_state = valid_arm
   end

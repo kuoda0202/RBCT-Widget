@@ -86,22 +86,22 @@
 ## 📝 版本更新歷程 (Release Notes)
 
 ### v1.0.903 (目前最新版)
-* 修正Fleet Manager 六顆電池列的觸控範圍仍比實際列高 5 px
-* 修正掃描完整歷史資料、找最高／最低值	曲線資料更換或新增採樣點時，才執行一次，繪製曲線	每幀仍只畫最多 35 點，開啟彈窗但資料未變直接使用已快取的極值，不再重掃最多 200 筆資料。
-* 修正統一三個彈窗的關閉／操作熱區與實際繪製座標，約是局部修改與檢查；10% 足夠完成程式修正與靜態檢查。
-* 修正觸控子頁動態表格標示。
+* **曲線與斷電檢視修復**：HEADSPEED & POWER CHART 與飛行日誌改由保存的曲線資料計算 RPM、主電池與 BEC 的動態刻度；飛後拔機子電池仍能顯示峰值、G 力與 BEC 曲線，不再因即時遙測歸零而顯示 `0 RPM` 或固定 9V BEC 軸。
+* **高壓相容性**：主電池與 BEC 軸依每趟有效最高／最低採樣值自動縮放，支援微型機至高壓機型與 6V／8V／12V／更高 BEC，不再使用固定 13V、26V、55V 或 9V 上限。
+* **電池歸屬與斷電資料保護**：`Set Active Battery` 現在會成為實際飛行記錄來源；解鎖後鎖定本趟電池，避免飛行中誤切換。若未上鎖直接斷電，則以飛行中的有效摘要快照結算日誌與 Fleet，避免極值被 0 覆蓋。
+* **觸控子頁校正與效能優化**：彈窗按鈕、關閉列與 Fleet Manager 六列電池的熱區皆與實際繪製位置對齊；Power Stats 僅在曲線資料變更時重掃極值，平時維持最多 35 點繪製，降低彈窗 CPU 負荷。
 
 ### v1.0.902
-* 穩定性修復：徹底根治長時長飛行後單包電池彈窗 CPU Limit 報錯 -
-* 走勢圖步進降採樣 (Stride Downsampling)：重構 modules/popups.lua [BAT PROFILE] 單包電池視窗底部的放電走勢圖，限制渲染特徵點為最大 35 點，並導入座標連續換算快取，消除累積滿額 200 點引發的 199 次 C-API 高頻重繪，單次繪圖耗時由 12ms 降至 0.7ms。
-* 動力曲線同步優化：動力曲線 (Power Stats) 抽樣上限由 50 點下調至 35 點，單幀再節省 75 次線條計算。
-* 彈窗檢視與硬體開關變數解耦：觸控點選電池查看專用 viewing_bat_idx 變數，與實體開關偵測變數 last_bat_idx 徹底分離，杜絕點開彈窗誤判「切換實體電池」而在單幀觸發 32KB 記憶卡重新讀取的突發卡頓。
-* 彈窗遮擋圖資動態跳過：當任意子頁彈窗開啟時，背景自動略過被遮擋之直升機圖片 (drawHeliBitmap) 縮放運算，騰出 5~8ms CPU 餘裕。
-* 旋翼空氣動力指標升級與拉力參數修復：動力曲線視窗底部的旋翼物理指標 (Rotor Dynamics) 導入轉速感知智慧翼展匹配，3000+ RPM 高轉速自動匹配 380/420 級中小機型，杜絕大槳半徑誤判引發的數值虛高；修正參數順序，使大槳夾橫軸真實離心拉力 (PULL: xxx kg) 精確顯示。
-* 硬體 6POS 掃描零 GC：預先分配靜態開關名稱陣列，消除每幀 60 次字串拼接與記憶體垃圾回收負擔。
-* 功能新增：光感應自訂切換門檻與強光主題自選 - 小工具設定新增「光感進入值」(預設 850) 與「光感退出值」(預設 750)，支援獨立雙向回差門檻調整，徹底解決光線臨界點頻繁跳動問題；新增「光感強光主題」(預設 LCD)，使用者可自由指派強光觸發時套用的主題風格。
-* 架構優化：追加選項無痛相容 (Option A) - 採用尾端追加配置，維持舊版 1~22 項索引不變，老飛友升級設定檔絕不跑位。
-* 效能優化：SD 卡遙測曲線單次原子寫入 (Atomic Single-Write) - 重構 saveChartData，將 200 點遙測曲線在記憶體打包為單一字串以單次 io.write 寫入，取代舊版 200 次迴圈呼叫，寫入耗時從 25ms 降至 2ms，徹底杜絕慢速 SD 卡或 TX15 MAX 在降落 * * DISARM 瞬間引發的 CPU Limit 逾時。
+穩定性修復：徹底根治長時長飛行後單包電池彈窗 CPU Limit 報錯 -
+走勢圖步進降採樣 (Stride Downsampling)：重構 modules/popups.lua [BAT PROFILE] 單包電池視窗底部的放電走勢圖，限制渲染特徵點為最大 35 點，並導入座標連續換算快取，消除累積滿額 200 點引發的 199 次 C-API 高頻重繪，單次繪圖耗時由 12ms 降至 0.7ms。
+動力曲線同步優化：動力曲線 (Power Stats) 抽樣上限由 50 點下調至 35 點，單幀再節省 75 次線條計算。
+彈窗檢視與硬體開關變數解耦：觸控點選電池查看專用 viewing_bat_idx 變數，與實體開關偵測變數 last_bat_idx 徹底分離，杜絕點開彈窗誤判「切換實體電池」而在單幀觸發 32KB 記憶卡重新讀取的突發卡頓。
+彈窗遮擋圖資動態跳過：當任意子頁彈窗開啟時，背景自動略過被遮擋之直升機圖片 (drawHeliBitmap) 縮放運算，騰出 5~8ms CPU 餘裕。
+旋翼空氣動力指標升級與拉力參數修復：動力曲線視窗底部的旋翼物理指標 (Rotor Dynamics) 導入轉速感知智慧翼展匹配，3000+ RPM 高轉速自動匹配 380/420 級中小機型，杜絕大槳半徑誤判引發的數值虛高；修正參數順序，使大槳夾橫軸真實離心拉力 (PULL: xxx kg) 精確顯示。
+硬體 6POS 掃描零 GC：預先分配靜態開關名稱陣列，消除每幀 60 次字串拼接與記憶體垃圾回收負擔。
+功能新增：光感應自訂切換門檻與強光主題自選 - 小工具設定新增「光感進入值」(預設 850) 與「光感退出值」(預設 750)，支援獨立雙向回差門檻調整，徹底解決光線臨界點頻繁跳動問題；新增「光感強光主題」(預設 LCD)，使用者可自由指派強光觸發時套用的主題風格。
+架構優化：追加選項無痛相容 (Option A) - 採用尾端追加配置，維持舊版 1~22 項索引不變，老飛友升級設定檔絕不跑位。
+效能優化：SD 卡遙測曲線單次原子寫入 (Atomic Single-Write) - 重構 saveChartData，將 200 點遙測曲線在記憶體打包為單一字串以單次 io.write 寫入，取代舊版 200 次迴圈呼叫，寫入耗時從 25ms 降至 2ms，徹底杜絕慢速 SD 卡或 TX15 MAX 在降落 DISARM 瞬間引發的 CPU Limit 逾時。
 
 ### v1.0.901
 * **錯誤修復**：**TX15 MAX 模型縮圖邊界雜訊小點修復** - 移除 EdgeTX 韌體底層 `Bitmap.resize` 記憶體未清零引起的右側垂直雜訊點，改由 `lcd.drawBitmap` 原生依比例繪製；保留完整動態等比縮放與雙向置中，徹底杜絕雜訊並大幅節省 RAM 記憶體。
@@ -234,6 +234,12 @@ To customize the helicopter picture on the dashboard:
 ## 📝 Release Notes & Version History
 
 ### v1.0.903 (Current Release)
+* **Chart and Post-Power-Off Viewing Fix**: HEADSPEED & POWER CHART and Logbook now derive RPM, pack-voltage and BEC scales from saved flight samples. After aircraft power is removed, peak values, G-force and the BEC curve remain available instead of falling back to `0 RPM` or a fixed 9V BEC axis.
+* **High-Voltage Compatibility**: Pack and BEC axes scale from each flight's valid measured minimum and maximum, supporting micro to high-voltage models and 6V/8V/12V-or-higher BEC systems without fixed 13V, 26V, 55V or 9V limits.
+* **Battery Assignment and Power-Cut Data Protection**: `Set Active Battery` now selects the actual flight-log source and locks that pack once armed. If aircraft power is removed before disarming, the last valid in-flight summary finalizes Logbook and Fleet data instead of allowing zeroed telemetry to overwrite extrema.
+* **Touch Calibration and Performance**: Popup buttons, close bars and all six Fleet Manager battery rows now use their exact rendered hit areas. Power Stats rescans extrema only when chart data changes while retaining the capped 35-point renderer.
+
+### v1.0.902
 * **Stability Fix**: **Eradicated Battery Profile Modal CPU Limit on Extended Flights** -
   * **Discharge Curve Stride Downsampling**: Refactored the bottom discharge trend curve in `modules/popups.lua` [BAT PROFILE] modal to cap render points at `max_pts = 35` with continuous single-transform caching, eliminating 199 high-frequency C-API `drawLine` redraws across 200 raw points and slashing render latency from 12ms to 0.7ms.
   * **Power Stats Synchronous Optimization**: Lowered `power_stats` curve sampling cap from 50 to 35 points, saving an additional 75 line computations per frame.
