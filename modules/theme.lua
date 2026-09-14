@@ -1,5 +1,5 @@
 local function update(w, ctx)
-  local lightSens = (w.options and (w.options["Light Sens"] or w.options["光感開關"] or w.options[9]))
+  local lightSens = (w.options and (w.options["Light Sens"] or w.options["Light Theme Sw"] or w.options["光感主題開關"] or w.options["光感開關"] or w.options[10]))
   
   -- 如果没有 Light Sens，或者主题已经是 HiVis/F-35，就不做任何事情
   if not lightSens or lightSens == 0 then
@@ -18,11 +18,17 @@ local function update(w, ctx)
   end
   local state = w._theme_state
   
+  local on_th = (w.options and (w.options["Light Enter"] or w.options["光感進入值"] or w.options["光感切換值"] or w.options[23])) or 850
+  local off_th = (w.options and (w.options["Light Exit"] or w.options["光感退出值"] or w.options[24])) or 750
+  if type(on_th) ~= "number" or on_th <= 0 then on_th = 850 end
+  if type(off_th) ~= "number" or off_th <= 0 then off_th = 750 end
+  if off_th >= on_th then off_th = math.max(0, on_th - 50) end
+
   local should_be_hivis = state.is_hivis
   if type(val) == "number" then
-    if val == 1 or val == 2 or val >= 900 then
+    if val == 1 or val == 2 or val >= on_th then
       should_be_hivis = true
-    elseif val <= 850 then
+    elseif val == -1024 or val <= off_th then
       should_be_hivis = false
     end
   elseif type(val) == "boolean" then

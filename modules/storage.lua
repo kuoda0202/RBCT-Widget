@@ -350,19 +350,20 @@ function M.saveChartData(w)
 
   local f = io.open(path, "w")
   if f then
-    io.write(f, "#FLIGHT\n")
+    local out = { "#FLIGHT" }
     for i = 1, #w.chart_data do
       local p = w.chart_data[i]
-      io.write(f, string.format("%.2f,%.1f,%.0f,%.2f,%.0f\n", p.v or 0, p.a or 0, p.r or 0, p.b or 0, p.t or 0))
+      out[#out + 1] = string.format("%.2f,%.1f,%.0f,%.2f,%.0f", p.v or 0, p.a or 0, p.r or 0, p.b or 0, p.t or 0)
     end
 
     for i = 1, math.min(4, #existing_blocks) do
       local b = existing_blocks[i]
       if b and string.len(b) > 10 then
-        io.write(f, "#FLIGHT\n" .. b)
-        if string.sub(b, -1) ~= "\n" then io.write(f, "\n") end
+        out[#out + 1] = "#FLIGHT"
+        out[#out + 1] = (string.sub(b, -1) == "\n") and string.sub(b, 1, -2) or b
       end
     end
+    io.write(f, table.concat(out, "\n") .. "\n")
     io.close(f)
   end
   w.selected_chart_idx = 1

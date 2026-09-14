@@ -33,16 +33,21 @@ local function convertAnalogToPos(val)
   end
 end
 
+local SW_NAMES = {}
+for i = 1, 6 do
+  SW_NAMES[i] = {
+    "6p" .. i, "6P" .. i, "6pos" .. i, "6POS" .. i,
+    "sw" .. i, "SW" .. i, "l" .. i, "L" .. i,
+    "6p_" .. i, "6P_" .. i
+  }
+end
+
 local function getBatIndex(sourceVal)
   -- 1. ALWAYS scan individual hardware/logical switches first (6p1..6p6, sw1..sw6, L1..L6)
   --    This runs regardless of sourceVal, matching 1.0.701 behavior.
   if getValue then
     for i = 1, 6 do
-      local names = {
-        "6p" .. i, "6P" .. i, "6pos" .. i, "6POS" .. i,
-        "sw" .. i, "SW" .. i, "l" .. i, "L" .. i,
-        "6p_" .. i, "6P_" .. i
-      }
+      local names = SW_NAMES[i]
       for j = 1, #names do
         local sv = getValue(names[j])
         if sv and ((type(sv) == "number" and sv > 500) or sv == true) then

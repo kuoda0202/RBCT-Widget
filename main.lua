@@ -3,7 +3,7 @@
 -- Model picture order: Rotorflight Craft Name (/modelImage or /IMAGES),
 -- EdgeTX model name (/modelImage or /IMAGES), Model Setup bitmap, then default.png.
 local NAME = "RBCT"
-local VERSION = "v1.0.901"
+local VERSION = "v1.0.902"
 
 -- Keep this list byte-for-byte compatible with standard telemetry. The order is
 -- deliberately arranged to ensure standard telemetry setup works here.
@@ -79,6 +79,9 @@ local options_tw = {
   { "電池日誌", SOURCE, 0 },
   { "電池重置", SOURCE, 0 },
   { "UI 語言", CHOICE, 1, { "自動 (Auto)", "英文 (English)" } },
+  { "光感進入值", VALUE, 850, 0, 1024 },
+  { "光感退出值", VALUE, 750, 0, 1024 },
+  { "光感強光主題", CHOICE, 1, { "LCD", "Red", "Orange", "Yellow", "Green", "Blue", "Cyan", "Violet", "Black", "TRN", "Pink", "F-type" } },
 }
 
 local options_cn = {
@@ -104,6 +107,9 @@ local options_cn = {
   { "电池日志", SOURCE, 0 },
   { "电池重置", SOURCE, 0 },
   { "UI 语言", CHOICE, 1, { "自动 (Auto)", "英文 (English)" } },
+  { "光感进入值", VALUE, 850, 0, 1024 },
+  { "光感退出值", VALUE, 750, 0, 1024 },
+  { "光感强光主题", CHOICE, 1, { "LCD", "Red", "Orange", "Yellow", "Green", "Blue", "Cyan", "Violet", "Black", "TRN", "Pink", "F-type" } },
 }
 
 local options_en = {
@@ -129,6 +135,9 @@ local options_en = {
   { "Bat Track", SOURCE, 0 },
   { "Rst BatLog", SOURCE, 0 },
   { "UI Lang", CHOICE, 1, { "Auto", "English" } },
+  { "Light Enter", VALUE, 850, 0, 1024 },
+  { "Light Exit", VALUE, 750, 0, 1024 },
+  { "Light Theme", CHOICE, 1, { "LCD", "Red", "Orange", "Yellow", "Green", "Blue", "Cyan", "Violet", "Black", "TRN", "Pink", "F-type" } },
 }
 
 local options = is_tw and options_tw or (is_cn and options_cn or options_en)
@@ -167,6 +176,9 @@ local option_aliases = {
   ["Bat Low %"] = { "Bat Low %", "低電警報", "低电警报", "低電警示", "低电警示", "低電門檻", "低电门槛", "低電量警示", "低电量警示", "低電量警告", "低电量警告", "低電量門檻", "低电量门槛", "Bat Low" },
   ["Bat Crit %"] = { "Bat Crit %", "沒電警報", "没电警报", "沒電警示", "没电警示", "沒電門檻", "没电门槛", "臨界沒電門檻", "临界没电门槛", "Bat Crit" },
   ["UI Lang"] = { "UI Lang", "UI 語言", "UI 语言", "UI語言", "UI语言", "介面語言", "界面语言", "語言設定", "语言设置" },
+  ["Light Enter"] = { "Light Enter", "光感進入值", "光感进入值", "光感進入", "光感进入", "光感切換值", "光感切换值", "LightEnter", "Light Threshold" },
+  ["Light Exit"] = { "Light Exit", "光感退出值", "光感退出值", "光感退出", "LightExit" },
+  ["Light Theme"] = { "Light Theme", "光感強光主題", "光感强光主题", "強光主題", "强光主题", "光感主題", "光感主题", "LightTheme" },
 }
 
 local option_index_map = {
@@ -175,7 +187,8 @@ local option_index_map = {
   ["Bank Src"] = 9, ["Light Sens"] = 10, ["Voice Alarm"] = 11, ["BEC Warn V"] = 12,
   ["ESC Temp Warn"] = 13, ["Nitro Temp Warn"] = 14, ["Bat% Voice"] = 15,
   ["Bat Low %"] = 16, ["UserName"] = 17, ["Timer"] = 18, ["Reset FlyCount"] = 19,
-  ["Bat Track"] = 20, ["Reset Bat Log"] = 21, ["UI Lang"] = 22
+  ["Bat Track"] = 20, ["Reset Bat Log"] = 21, ["UI Lang"] = 22,
+  ["Light Enter"] = 23, ["Light Exit"] = 24, ["Light Theme"] = 25
 }
 
 local function getOption(w, key)
@@ -332,6 +345,42 @@ local function parseThemeIndex(val)
   return 5
 end
 
+local light_theme_to_theme_idx = {
+  [1] = 11, -- LCD
+  [2] = 1,  -- Red
+  [3] = 2,  -- Orange
+  [4] = 3,  -- Yellow
+  [5] = 4,  -- Green
+  [6] = 5,  -- Blue
+  [7] = 6,  -- Cyan
+  [8] = 7,  -- Violet
+  [9] = 8,  -- Black
+  [10] = 9, -- TRN
+  [11] = 10, -- Pink
+  [12] = 12  -- F-type
+}
+
+local function parseLightThemeIndex(val)
+  if val == nil then return 11 end
+  if type(val) == "string" then
+    local s = string.lower(val)
+    for k, idx in pairs(theme_names_map) do
+      if string.find(s, k) then return idx end
+    end
+    local n = tonumber(val)
+    if n then val = n end
+  end
+  if type(val) == "number" then
+    local n = math.floor(val)
+    if light_theme_to_theme_idx[n] then
+      return light_theme_to_theme_idx[n]
+    elseif n >= 1 and n <= 12 then
+      return n
+    end
+  end
+  return 11
+end
+
 local function applyDynamicTheme(w, arm_on)
   local theme_opt = getOption(w, "Theme")
   local t_val = parseThemeIndex(theme_opt)
@@ -348,10 +397,18 @@ local function applyDynamicTheme(w, arm_on)
       -- 1. 開關輸出 0 / 1 / 2 (UP / MID / DOWN)
       -- 2. 開關輸出 -1024 / 0 / +1024
       -- 3. 類比光感應器 0 ~ 1024 (或 0 ~ 100%)
+      local on_th = getOption(w, "Light Enter") or 850
+      local off_th = getOption(w, "Light Exit") or 750
+      if type(on_th) ~= "number" or on_th <= 0 then on_th = 850 end
+      if type(off_th) ~= "number" or off_th <= 0 then off_th = 750 end
+      if off_th >= on_th then
+        off_th = math.max(0, on_th - 50)
+      end
+
       local cur_state = w._light_active or false
-      if s_val == 1 or s_val == 2 or s_val >= 900 then
+      if s_val == 1 or s_val == 2 or s_val >= on_th then
         cur_state = true
-      elseif s_val <= 850 then
+      elseif s_val == -1024 or s_val <= off_th then
         cur_state = false
       end
       w._light_active = cur_state
@@ -362,7 +419,8 @@ local function applyDynamicTheme(w, arm_on)
   end
 
   if is_light_sens_active then
-    t_val = 11 -- Force LCD theme under strong ambient light or assigned switch
+    local light_theme_opt = getOption(w, "Light Theme")
+    t_val = parseLightThemeIndex(light_theme_opt)
   end
 
   w.active_theme_idx = t_val
@@ -1036,16 +1094,19 @@ local function drawDashboard(w, data, ctx)
 
     -- Real-time Light Sensor / Switch Indicator (Directly in top-right area, left of TX battery)
     local l_val = w._last_s_val
-    local l_str = (l_val ~= nil) and tostring(l_val) or "---"
-    if type(l_val) == "boolean" then l_str = l_val and "ON" or "OFF" end
-    local is_lcd = (w.active_theme_idx == 11)
-    local l_col = C.dim
-    if is_lcd then
-      l_col = C.black
-    elseif w._light_active then
-      l_col = C.cyan or C.green
+    local show_lgt = (l_val ~= nil) or (w and w.is_mk3)
+    if show_lgt then
+      local l_str = (l_val ~= nil) and tostring(l_val) or "---"
+      if type(l_val) == "boolean" then l_str = l_val and "ON" or "OFF" end
+      local is_lcd = (w.active_theme_idx == 11)
+      local l_col = C.dim
+      if is_lcd then
+        l_col = C.black
+      elseif w._light_active then
+        l_col = C.cyan or C.green
+      end
+      text(615, 18, "LGT: " .. l_str, RIGHT + f_sml, l_col)
     end
-    text(615, 18, "LGT: " .. l_str, RIGHT + f_sml, l_col)
 
     -- Transmitter Battery Gauge (Enlarged Capsule with Center Voltage)
     local tx_v = data.txVoltage or 0
@@ -1094,7 +1155,8 @@ local function drawDashboard(w, data, ctx)
 
   -- Render model bitmap. The image is dynamically scaled and 2D-centered via
   -- drawBitmap's percentage scale argument without allocating uninitialized buffers.
-  if heli_pic then
+  -- When a popup modal is active, skip drawing to eliminate CPU overhead.
+  if heli_pic and not w.active_popup then
     drawHeliBitmap(X(heli_draw_x or 25), Y(heli_draw_y or 74), heli_pic, heli_scale)
   end
 
@@ -1737,11 +1799,19 @@ end
 -- =========================================================================
 local function create(zone, opts)
   resetMinMax()
+  local is_mk3 = false
+  if getVersion then
+    local ok, ver, radio = pcall(getVersion)
+    if ok and radio and string.find(string.lower(tostring(radio)), "mk3") then
+      is_mk3 = true
+    end
+  end
   local w = {
     zone = zone, options = opts, active_popup = nil,
     bat_prompt_timer = -10000, last_vbat = -1, last_bat_idx = -1,
     has_armed = false, power_lost_triggered = false, power_lost_muted = false,
     last_alarm_time = 0, last_heartbeat = 0, needs_rebuild = true,
+    is_mk3 = is_mk3,
     telem_data = {},
     render_ctx = {}
   }
@@ -1768,15 +1838,27 @@ local function background(w)
   serviceTelemetry(w)
 end
 
-local function refresh(w, event, touchState)
+local function innerRefresh(w, event, touchState)
   if not w then return end
 
   -- 1. Run core telemetry, voice alarms, power-loss monitor, and logbook updates
   local telemData = serviceTelemetry(w)
 
+  if w.is_mk3 == nil then
+    local is_mk3 = false
+    if getVersion then
+      local ok, ver, radio = pcall(getVersion)
+      if ok and radio and string.find(string.lower(tostring(radio)), "mk3") then
+        is_mk3 = true
+      end
+    end
+    w.is_mk3 = is_mk3
+  end
+
   applyDynamicTheme(w, telemData.arm_on)
   telemData.light_val = w._last_s_val
-  telemData.light_active = (w.active_theme_idx == 11)
+  telemData.light_active = (w._light_active == true)
+  telemData.is_mk3 = w.is_mk3
 
   local z = w.zone or { x = 0, y = 0, w = 480, h = 272 }
   local x, y, sw, sh = math.floor(z.x or 0), math.floor(z.y or 0), math.floor(z.w or 480), math.floor(z.h or 272)
@@ -1798,25 +1880,40 @@ local function refresh(w, event, touchState)
     f_xxl, f_dbl, f_mid, f_sml, f_0 = DBLSIZE, MIDSIZE, 0, SMLSIZE, SMLSIZE
   end
 
-  -- 2. Touch event handling
+  -- 2. Touch event handling with ADC dropout filter
+  local now_t = getTime()
   local is_tap = false
   local tx, ty = 0, 0
-  if type(touchState) == "table" and touchState.x and touchState.x > 0 and touchState.y and touchState.y > 0 then
+  local has_touch = (type(touchState) == "table" and touchState.x and touchState.x > 0 and touchState.y and touchState.y > 0)
+
+  if has_touch then
+    w.last_raw_touch_t = now_t
     local cur_x = touchState.x
     local cur_y = touchState.y
     local is_break = (EVT_TOUCH_BREAK ~= nil and event == EVT_TOUCH_BREAK) or (event == 99) or (touchState.state == 2)
     if is_break then
       w.finger_touching = false
+      w.touch_up_t = now_t
+      w.wait_release = false
     else
-      if not w.finger_touching then
+      if not w.finger_touching and (now_t - (w.last_tap_t or 0) >= 20) then
         w.finger_touching = true
+        w.last_tap_t = now_t
         w.touch_seq = (w.touch_seq or 0) + 1
         tx, ty = cur_x, cur_y
         is_tap = true
       end
     end
   else
-    w.finger_touching = false
+    -- Only declare finger lifted if touchState has been absent for at least 6 ticks (60ms)
+    -- This filters out 1-frame ADC dropout glitches on STM32!
+    if (now_t - (w.last_raw_touch_t or 0)) >= 6 then
+      if w.finger_touching then
+        w.touch_up_t = now_t
+      end
+      w.finger_touching = false
+      w.wait_release = false
+    end
   end
 
   if event == EVT_VIRTUAL_ENTER then
@@ -1827,6 +1924,8 @@ local function refresh(w, event, touchState)
       w.power_lost_muted = true
     elseif w.active_popup then
       w.active_popup = nil
+      w.popup_close_t = now_t
+      w.wait_release = false
     elseif w.show_logbook then
       w.show_logbook = false
     elseif lcd.exitFullScreen then
@@ -1834,106 +1933,203 @@ local function refresh(w, event, touchState)
       return true
     end
   elseif is_tap then
-    local now_t = getTime()
     local is_banner = (now_t - w.bat_prompt_timer < 1000) and (not telemData.arm_on)
     if is_banner and tx >= X(100) and tx <= X(700) and ty <= Y(65) then
       w.bat_prompt_timer = 0
       w.active_popup = "battery"
       w.popup_open_t = now_t
+      w.popup_open_seq = w.touch_seq
+      w.wait_release = true
     elseif w.active_popup then
+      local is_new_gesture = (not w.wait_release) and ((w.touch_seq or 0) > (w.popup_open_seq or 0))
       local popup_age = now_t - (w.popup_open_t or 0)
-      if popup_age > 35 then
-        if w.active_popup == "battery" then
-          local bat_idx = w.last_bat_idx or 1
-          local st = w.fleet_stats and w.fleet_stats[bat_idx]
-          -- 1. Status selector buttons (Y: 194 to 254)
-          if ty >= Y(194) and ty <= Y(254) then
-            if st then
-              if tx >= X(100) and tx <= X(242) then
-                st.status = "READY"
-                saveFleetData(w)
-                if playTone then playTone(1800, 80, 50, 0) end
-              elseif tx >= X(248) and tx <= X(392) then
-                st.status = "FLOWN"
-                saveFleetData(w)
-                if playTone then playTone(1600, 80, 50, 0) end
-              elseif tx >= X(398) and tx <= X(542) then
-                st.status = "STORAGE"
-                saveFleetData(w)
-                if playTone then playTone(1400, 80, 50, 0) end
-              elseif tx >= X(548) and tx <= X(705) then
-                st.status = "NONE"
-                saveFleetData(w)
-                if playTone then playTone(1200, 80, 50, 0) end
-              end
+      if is_new_gesture and popup_age >= 35 then
+        local theme_opt = getOption(w, "Theme")
+        local t_val = w.active_theme_idx or parseThemeIndex(theme_opt)
+
+        local function doClosePopup()
+          w.active_popup = nil
+          w.popup_close_t = now_t
+          w.wait_release = true
+          if playTone then pcall(playTone, 1000, 60, 50, 0) end
+        end
+
+        local function doSwitchPopup(new_pop)
+          w.active_popup = new_pop
+          w.popup_open_t = now_t
+          w.popup_open_seq = w.touch_seq
+          w.wait_release = true
+          if playTone then pcall(playTone, 2000, 80, 50, 0) end
+        end
+
+        -- Check if an OUTSIDE tap lands on another subpage's trigger area
+        local function handleOutsideTap(cur_modal)
+          local next_pop = nil
+          if t_val == 12 then
+            if (tx >= X(24) and tx <= X(300) and ty >= Y(180) and ty < Y(245)) or (tx >= X(501) and tx <= X(776) and ty >= Y(194) and ty <= Y(417)) then
+              next_pop = "power_stats"
+            elseif (tx >= X(24) and tx <= X(300) and ty >= Y(245) and ty < Y(290)) or (tx >= X(20) and tx <= X(200) and ty >= Y(430) and ty <= Y(475)) then
+              next_pop = "session_stats"
+            elseif (tx >= X(24) and tx <= X(300) and ty >= Y(290) and ty < Y(378)) or (tx >= X(680) and tx <= X(780) and ty >= Y(10) and ty <= Y(76)) then
+              next_pop = "battery"
+            elseif tx >= X(24) and tx <= X(300) and ty >= Y(378) and ty <= Y(425) then
+              next_pop = "telemetry_info"
             end
-          -- 2. Action Button A: Reset Today Count (Y: 256 to 318, X: 100 to 392)
-          elseif ty >= Y(256) and ty <= Y(318) and tx >= X(100) and tx <= X(392) then
-            if st then
-              st.today_count = 0
-              saveFleetData(w)
-              if playTone then playTone(2000, 120, 50, 0) end
-            end
-          -- 3. Action Button B: Set Active Battery (Y: 256 to 318, X: 408 to 705)
-          elseif ty >= Y(256) and ty <= Y(318) and tx >= X(408) and tx <= X(705) then
-            w.manual_bat_idx = bat_idx
-            w.last_bat_idx = bat_idx
-            saveFleetData(w)
-            if playTone then playTone(2200, 100, 50, 0) end
-          -- 4. Click anywhere else to close
           else
-            w.active_popup = nil
+            if tx > X(285) and ty >= Y(65) and ty <= Y(415) then
+              next_pop = "power_stats"
+            elseif tx <= X(285) and ty >= Y(175) and ty < Y(250) then
+              next_pop = "session_stats"
+            elseif tx <= X(285) and ty >= Y(280) and ty <= Y(470) then
+              next_pop = "battery"
+            end
           end
+
+          if next_pop and next_pop ~= cur_modal then
+            doSwitchPopup(next_pop)
+          elseif next_pop and next_pop == cur_modal then
+            -- Tapped on the trigger card of the current modal: MAINTAIN DISPLAY!
+          else
+            -- Tapped on outside margin: close!
+            doClosePopup()
+          end
+        end
+
+        if w.active_popup == "battery" then
+          local min_x, max_x, min_y, max_y = X(80), X(720), Y(28), Y(440)
+          local is_inside = (tx >= min_x and tx <= max_x and ty >= min_y and ty <= max_y)
+          if not is_inside then
+            handleOutsideTap("battery")
+          else
+            local is_close_bar = (ty >= Y(385) and ty <= max_y and tx >= X(200) and tx <= X(600))
+            if is_close_bar then
+              doClosePopup()
+            else
+              local bat_idx = w.viewing_bat_idx or (w.last_bat_idx and w.last_bat_idx > 0 and w.last_bat_idx) or 1
+              local st = w.fleet_stats and w.fleet_stats[bat_idx]
+              -- 1. Status selector buttons (Y: 194 to 254)
+              if ty >= Y(194) and ty <= Y(254) then
+                if st then
+                  if tx >= X(100) and tx <= X(242) then
+                    st.status = "READY"
+                    saveFleetData(w)
+                    if playTone then pcall(playTone, 1800, 80, 50, 0) end
+                  elseif tx >= X(248) and tx <= X(392) then
+                    st.status = "FLOWN"
+                    saveFleetData(w)
+                    if playTone then pcall(playTone, 1600, 80, 50, 0) end
+                  elseif tx >= X(398) and tx <= X(542) then
+                    st.status = "STORAGE"
+                    saveFleetData(w)
+                    if playTone then pcall(playTone, 1400, 80, 50, 0) end
+                  elseif tx >= X(548) and tx <= X(705) then
+                    st.status = "NONE"
+                    saveFleetData(w)
+                    if playTone then pcall(playTone, 1200, 80, 50, 0) end
+                  end
+                end
+              -- 2. Action Button A: Reset Today Count (Y: 256 to 318, X: 100 to 392)
+              elseif ty >= Y(256) and ty <= Y(318) and tx >= X(100) and tx <= X(392) then
+                if st then
+                  st.today_count = 0
+                  saveFleetData(w)
+                  if playTone then pcall(playTone, 2000, 120, 50, 0) end
+                end
+              -- 3. Action Button B: Set Active Battery (Y: 256 to 318, X: 408 to 705)
+              elseif ty >= Y(256) and ty <= Y(318) and tx >= X(408) and tx <= X(705) then
+                w.manual_bat_idx = bat_idx
+                saveFleetData(w)
+                if playTone then pcall(playTone, 2200, 100, 50, 0) end
+              end
+              -- Any other tap inside modal: MAINTAIN DISPLAY!
+            end
+          end
+
         elseif w.active_popup == "session_stats" then
-          if tx >= X(180) and tx <= X(380) and ty >= Y(280) and ty <= Y(345) then
-            w.flight_count = 0
-            saveFlightLog(w)
-            if playTone then playTone(1500, 100, 100, 0) end
-          elseif tx >= X(420) and tx <= X(620) and ty >= Y(280) and ty <= Y(345) then
-            w.lifetime_count = 0
-            saveFlightLog(w)
-            if playTone then playTone(1800, 150, 100, 0) end
+          local min_x, max_x, min_y, max_y = X(150), X(650), Y(60), Y(430)
+          local is_inside = (tx >= min_x and tx <= max_x and ty >= min_y and ty <= max_y)
+          if not is_inside then
+            handleOutsideTap("session_stats")
+          else
+            local is_close_bar = (ty >= Y(380) and ty <= max_y and tx >= X(200) and tx <= X(600))
+            if is_close_bar then
+              doClosePopup()
+            else
+              if tx >= X(180) and tx <= X(380) and ty >= Y(280) and ty <= Y(345) then
+                w.flight_count = 0
+                saveFlightLog(w)
+                if playTone then pcall(playTone, 1500, 100, 100, 0) end
+              elseif tx >= X(420) and tx <= X(620) and ty >= Y(280) and ty <= Y(345) then
+                w.lifetime_count = 0
+                saveFlightLog(w)
+                if playTone then pcall(playTone, 1800, 150, 100, 0) end
+              end
+              -- Any other tap inside modal: MAINTAIN DISPLAY!
+            end
           end
-          w.active_popup = nil
-        else
-          -- telemetry_info or power_stats: tap anywhere to close
-          w.active_popup = nil
+
+        elseif w.active_popup == "power_stats" then
+          local min_x, max_x, min_y, max_y = X(110), X(690), Y(34), Y(424)
+          local is_inside = (tx >= min_x and tx <= max_x and ty >= min_y and ty <= max_y)
+          if not is_inside then
+            handleOutsideTap("power_stats")
+          else
+            local is_close_bar = (ty >= Y(360) and ty <= max_y and tx >= X(200) and tx <= X(600))
+            if is_close_bar then
+              doClosePopup()
+            else
+              -- Inside modal: MAINTAIN DISPLAY!
+            end
+          end
+
+        else -- telemetry_info
+          local min_x, max_x, min_y, max_y = X(50), X(750), Y(20), Y(460)
+          local is_inside = (tx >= min_x and tx <= max_x and ty >= min_y and ty <= max_y)
+          if not is_inside or ty >= Y(405) then
+            doClosePopup()
+          end
         end
       end
     elseif not w.show_logbook then
-      local theme_opt = getOption(w, "Theme")
-      local t_val = w.active_theme_idx or parseThemeIndex(theme_opt)
-      local handled = false
-      if t_val == 12 then
-        local ftype_mod = loadModule("layout_F-type")
-        if ftype_mod and ftype_mod.handleTouch then
-          local ok, res = pcall(ftype_mod.handleTouch, w, tx, ty, { X = X, Y = Y, W = W, H = H, sw = sw, sh = sh, x = x, y = y })
-          if ok and res then handled = true end
+      -- Prevent touch-through right after closing a popup!
+      if (now_t - (w.popup_close_t or 0)) >= 25 and (not w.wait_release) then
+        local theme_opt = getOption(w, "Theme")
+        local t_val = w.active_theme_idx or parseThemeIndex(theme_opt)
+        local handled = false
+        if t_val == 12 then
+          local ftype_mod = loadModule("layout_F-type")
+          if ftype_mod and ftype_mod.handleTouch then
+            local ok, res = pcall(ftype_mod.handleTouch, w, tx, ty, { X = X, Y = Y, W = W, H = H, sw = sw, sh = sh, x = x, y = y })
+            if ok and res then handled = true end
+          end
+          -- F-type layout has independent calibrated touch boundaries; do not fall through to legacy theme areas
+          handled = true
         end
-        -- F-type layout has independent calibrated touch boundaries; do not fall through to legacy theme areas
-        handled = true
-      end
-      if not handled then
-        if tx <= X(295) and ty <= Y(315) then
-          w.active_popup = "session_stats"
-          w.popup_open_seq = w.touch_seq
-        elseif tx <= X(295) and ty > Y(315) and ty <= Y(410) then
-          w.active_popup = "battery"
-          w.popup_open_seq = w.touch_seq
-        elseif tx <= X(295) and ty > Y(410) then
-          -- Direct touch on Battery area cycles active battery 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 1
-          w.manual_bat_idx = ((w.last_bat_idx or 1) % 6) + 1
-          w.last_bat_idx = w.manual_bat_idx
-          w.bat_prompt_timer = now_t
-          w.log_loaded = false
-          w.fleet_data = nil
-          if playTone then pcall(playTone, 2200, 100, 50, 0) end
-        elseif tx > X(295) and ty <= Y(240) then
-          w.active_popup = "power_stats"
-          w.popup_open_seq = w.touch_seq
-        elseif tx > X(295) and ty > Y(240) and ty <= Y(410) then
-          w.active_popup = "power_stats"
-          w.popup_open_seq = w.touch_seq
+        if not handled then
+          -- Standard Multi-Color Dashboard layout coordinates:
+          -- Right side (RPM card Y: 65..235, Telemetry 4-cell card Y: 240..415) -> Power & RPM Chart
+          if tx > X(285) and ty >= Y(65) and ty <= Y(415) then
+            w.active_popup = "power_stats"
+            w.popup_open_t = now_t
+            w.popup_open_seq = w.touch_seq
+            w.wait_release = true
+            if playTone then pcall(playTone, 2000, 80, 50, 0) end
+          -- Left side: Today/Total Flight counters (Y: 175..250) -> Session Stats
+          elseif tx <= X(285) and ty >= Y(175) and ty < Y(250) then
+            w.active_popup = "session_stats"
+            w.popup_open_t = now_t
+            w.popup_open_seq = w.touch_seq
+            w.wait_release = true
+            if playTone then pcall(playTone, 2000, 80, 50, 0) end
+          -- Left side: Battery bar & telemetry summary (Y: 280..465) -> Battery Health
+          elseif tx <= X(285) and ty >= Y(280) and ty <= Y(470) then
+            w.viewing_bat_idx = (w.last_bat_idx and w.last_bat_idx > 0) and w.last_bat_idx or 1
+            w.active_popup = "battery"
+            w.popup_open_t = now_t
+            w.popup_open_seq = w.touch_seq
+            w.wait_release = true
+            if playTone then pcall(playTone, 2000, 80, 50, 0) end
+          end
         end
       end
     else
@@ -1942,10 +2138,11 @@ local function refresh(w, event, touchState)
         -- Direct touch on Battery Fleet Manager table row opens battery health popup for that battery (1 to 6)!
         local row = math.floor((ty - Y(85)) / math.max(1, H(55))) + 1
         if row >= 1 and row <= 6 then
-          w.manual_bat_idx = row
-          w.last_bat_idx = row
+          w.viewing_bat_idx = row
           w.active_popup = "battery"
+          w.popup_open_t = now_t
           w.popup_open_seq = w.touch_seq
+          w.wait_release = true
           if playTone then pcall(playTone, 2200, 100, 50, 0) end
         end
       elseif w.logbook_tab == 1 and ty >= Y(85) and ty < Y(225) then
@@ -2043,8 +2240,23 @@ local function refresh(w, event, touchState)
       lcd.drawFilledRectangle(ctx.X(150), ctx.Y(60), ctx.W(500), ctx.H(370), ctx.C.panel2)
       lcd.drawText(ctx.X(400), ctx.Y(100), "POPUP RENDER ERROR", ctx.CENTER + ctx.f_mid + ctx.C.red)
       lcd.drawText(ctx.X(400), ctx.Y(150), tostring(err_pop), ctx.CENTER + ctx.f_sml + ctx.C.white)
-      lcd.drawText(ctx.X(400), ctx.Y(380), "Tap to close", ctx.CENTER + ctx.f_sml + ctx.C.dim)
     end
+  end
+end
+
+local function refresh(w, event, touchState)
+  if not w then return end
+  local ok, err = pcall(innerRefresh, w, event, touchState)
+  if not ok then
+    local z = w.zone or { x = 0, y = 0, w = 480, h = 272 }
+    local x, y, sw, sh = math.floor(z.x or 0), math.floor(z.y or 0), math.floor(z.w or 480), math.floor(z.h or 272)
+    if lcd.drawFilledRectangle then lcd.drawFilledRectangle(x, y, sw, sh, 0) end
+    if lcd.drawText then
+      lcd.drawText(x + 20, y + 20, "RBCT FAULT RECOVERY", 0x20 + 0x04)
+      lcd.drawText(x + 20, y + 60, tostring(err), 0x08)
+    end
+    w.active_popup = nil
+    w.show_logbook = false
   end
 end
 

@@ -22,7 +22,7 @@ end
 function M.drawPopups(w, ctx)
   local telemData = ctx.data or w.last_telem or {}
   if w.active_popup == "battery" then
-    local bat_idx = w.last_bat_idx or 1
+    local bat_idx = w.viewing_bat_idx or (w.last_bat_idx and w.last_bat_idx > 0 and w.last_bat_idx) or 1
     if bat_idx < 1 or bat_idx > 6 then bat_idx = 1 end
     local f_st = (w.fleet_stats and w.fleet_stats[bat_idx]) or (w.fleet_data and w.fleet_data[bat_idx]) or { id = bat_idx, today_count = 0, lifetime_cycles = 0, status = "NONE", min_v = "-", max_t = "-", avg_dur = "-", last_mah = 0 }
 
@@ -118,25 +118,36 @@ function M.drawPopups(w, ctx)
     end
 
     if w.chart_data and #w.chart_data > 1 then
-      local dx = 580 / #w.chart_data
+      local data = w.chart_data
+      local len = #data
+      local max_pts = 35
+      local draw_len = math.min(len, max_pts)
+      local stride = (len - 1) / (draw_len - 1)
+      local step = 580 / (draw_len - 1)
+
       local min_v, max_v = 999, 0
-      for i = 1, #w.chart_data do
-        local p = w.chart_data[i]
+      for i = 1, draw_len do
+        local d_idx = math.max(1, math.min(len, math.floor(1 + (i - 1) * stride + 0.5)))
+        local p = data[d_idx]
         local v = (type(p) == "table") and (p.v or p[1] or 0) or 0
         if v > 0 and v < min_v then min_v = v end
         if v > max_v then max_v = v end
       end
+
       if max_v > min_v then
         local range = math.max(2, max_v - min_v)
-        for i = 2, #w.chart_data do
-          local p1, p2 = w.chart_data[i - 1], w.chart_data[i]
-          local v1 = (type(p1) == "table") and (p1.v or p1[1] or 0) or 0
-          local v2 = (type(p2) == "table") and (p2.v or p2[1] or 0) or 0
-          local px1 = ctx.X(110 + (i - 2) * dx)
-          local py1 = ctx.Y(380 - ((v1 - min_v) / range) * 44)
-          local px2 = ctx.X(110 + (i - 1) * dx)
-          local py2 = ctx.Y(380 - ((v2 - min_v) / range) * 44)
-          ctx.lcd.drawLine(px1, py1, px2, py2, SOLID, ctx.C.green)
+        local base_y = 380
+        local prev_px, prev_py = nil, nil
+        for i = 1, draw_len do
+          local d_idx = math.max(1, math.min(len, math.floor(1 + (i - 1) * stride + 0.5)))
+          local p = data[d_idx]
+          local v = (type(p) == "table") and (p.v or p[1] or 0) or 0
+          local curr_px = ctx.X(110 + math.floor((i - 1) * step))
+          local curr_py = ctx.Y(base_y - math.floor(((v - min_v) / range) * 44))
+          if prev_px then
+            ctx.lcd.drawLine(prev_px, prev_py, curr_px, curr_py, SOLID, ctx.C.green)
+          end
+          prev_px, prev_py = curr_px, curr_py
         end
       end
       ctx.text(400, 330, T(w, "pop_trend"), ctx.CENTER + ctx.f_sml, ctx.C.dim)
@@ -155,8 +166,11 @@ function M.drawPopups(w, ctx)
       ctx.text(400, 362, string.format(T(w, "pop_capacity"), bat_pct) .. " | " .. T(w, "pop_chart"), ctx.CENTER + ctx.f_sml, ctx.C.dim)
     end
 
-    -- Footer Close Hint
-    ctx.text(400, 402, T(w, "pop_btn_cls"), ctx.CENTER + ctx.f_sml, ctx.C.dim)
+    -- Footer Close Button
+    if ctx.lcd.drawRectangle then
+      ctx.lcd.drawRectangle(ctx.X(250), ctx.Y(396), ctx.W(300), ctx.H(32), ctx.C.blue)
+    end
+    ctx.text(400, 403, T(w, "pop_btn_cls"), ctx.CENTER + ctx.f_sml, ctx.C.white)
 
   elseif w.active_popup == "power_stats" then
     ctx.panel(ctx.X(110), ctx.Y(34), ctx.W(580), ctx.H(390), false, false)
@@ -172,7 +186,7 @@ function M.drawPopups(w, ctx)
     local cx, cy, cw, ch = 175, 80, 450, 220
     if ctx.lcd.drawRectangle then
       ctx.lcd.drawRectangle(ctx.X(cx), ctx.Y(cy), ctx.W(cw), ctx.H(ch), ctx.C.dim)
-      ctx.lcd.drawLine(ctx.X(cx), ctx.Y(cy + ch / 2), ctx.X(cx + cw), ctx.Y(cy + ch / 2), DOTTED, ctx.C.dim)
+      ctx.lcd.drawLine(ctx.X(cx), ctx.Y(cy + ch / 2), ctx.X(cx + cw), ctx.Y(cy + ch / 2), DOTTED or SOLID or 0, ctx.C.dim)
     end
 
     local data = w.chart_data
@@ -196,7 +210,7 @@ function M.drawPopups(w, ctx)
     ctx.text(cx + cw + 5, cy + ch / 2 - 7, string.format("%.0f°C", max_t), ctx.f_sml, ctx.C.yellow)
 
     if len >= 2 then
-      local max_pts = 50
+      local max_pts = 35
       local draw_len = math.min(len, max_pts)
       local stride = (len - 1) / (draw_len - 1)
       local step = cw / (draw_len - 1)
@@ -264,7 +278,10 @@ function M.drawPopups(w, ctx)
     end
 
     if ctx.lcd.drawLine then ctx.lcd.drawLine(ctx.X(140), ctx.Y(360), ctx.X(660), ctx.Y(360), SOLID, ctx.C.dim) end
-    ctx.text(400, 372, T(w, "pop_tap_cls"), ctx.CENTER + ctx.f_sml, ctx.C.dim)
+    if ctx.lcd.drawRectangle then
+      ctx.lcd.drawRectangle(ctx.X(250), ctx.Y(366), ctx.W(300), ctx.H(32), ctx.C.blue or ctx.C.dim)
+    end
+    ctx.text(400, 373, T(w, "pop_tap_cls"), ctx.CENTER + ctx.f_sml, ctx.C.white)
 
   elseif w.active_popup == "session_stats" then
     ctx.panel(ctx.X(150), ctx.Y(60), ctx.W(500), ctx.H(370), false, false)
@@ -289,7 +306,10 @@ function M.drawPopups(w, ctx)
     ctx.text(280, 296, T(w, "pop_rst_btn"), ctx.CENTER + ctx.f_0, ctx.C.white)
     ctx.text(520, 296, T(w, "pop_rst_tot"), ctx.CENTER + ctx.f_0, ctx.C.white)
     ctx.lcd.drawLine(ctx.X(170), ctx.Y(385), ctx.X(630), ctx.Y(385), SOLID, ctx.C.dim)
-    ctx.text(400, 398, T(w, "pop_btn_cls"), ctx.CENTER + ctx.f_sml, ctx.C.dim)
+    if ctx.lcd.drawRectangle then
+      ctx.lcd.drawRectangle(ctx.X(250), ctx.Y(391), ctx.W(300), ctx.H(32), ctx.C.blue or ctx.C.dim)
+    end
+    ctx.text(400, 398, T(w, "pop_btn_cls"), ctx.CENTER + ctx.f_sml, ctx.C.white)
 
   elseif w.active_popup == "telemetry_info" then
     local sw = ctx.sw or 800

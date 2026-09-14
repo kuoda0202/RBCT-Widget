@@ -68,7 +68,7 @@ local UI_TEXT = {
   pop_ir_lbl   = { en = "Pack IR (Est):", tw = "預測 IR:", cn = "预测 IR:" },
   pop_trend    = { en = "DISCHARGE TREND", tw = "放電曲線", cn = "放电曲线" },
   pop_insuf    = { en = "Insufficient data", tw = "無放電記錄", cn = "无放电记录" },
-  pop_tap_cls  = { en = "Tap anywhere to close", tw = "點按任意位置關閉", cn = "点按任意位置关闭" },
+  pop_tap_cls  = { en = "Tap [Close] or RTN to exit", tw = "點按關閉 或 按 RTN 退出", cn = "点按关闭 或 按 RTN 退出" },
   pop_chart    = { en = "HEADSPEED & POWER CHART", tw = "轉速與飛行曲線", cn = "转速与飞行曲线" },
   pop_no_crv   = { en = "No flight curve recorded yet", tw = "無飛行曲線記錄", cn = "无飞行曲线记录" },
   pop_leg_rpm  = { en = "RPM",      tw = "轉速",     cn = "转速" },
@@ -84,7 +84,7 @@ local UI_TEXT = {
   pop_total    = { en = "LIFETIME TOTAL", tw = "總計", cn = "总计" },
   pop_rst_btn  = { en = "RESET TODAY", tw = "本日清零", cn = "本日清零" },
   pop_rst_tot  = { en = "RESET TOTAL", tw = "總計清零", cn = "总计清零" },
-  pop_btn_cls  = { en = "Tap anywhere to close", tw = "點按任意位置關閉", cn = "点按任意位置关闭" },
+  pop_btn_cls  = { en = "Tap [Close] or RTN to exit", tw = "點按關閉 或 按 RTN 退出", cn = "点按关闭 或 按 RTN 退出" },
 
   -- Logbook & Battery Fleet Table
   fleet_mgr    = { en = "BATTERY FLEET MANAGER", tw = "電池管理總表", cn = "电池管理总表" },

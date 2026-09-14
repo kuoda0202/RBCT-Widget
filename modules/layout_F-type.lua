@@ -244,7 +244,7 @@ local function draw(w, data, ctx)
   lcd.drawText(X(120), Y(42), lq_str, f_sml + C_TEXT)
 
   -- (A2) Version & Active Battery Watermark (Positioned in slot X(195~305), Y(16~60))
-  local ver_str = "RBCT v1.0.901"
+  local ver_str = "RBCT v1.0.902"
   local bat_idx = (w and w.last_bat_idx) or 1
   if bat_idx < 1 or bat_idx > 6 then bat_idx = 1 end
   local bat_tag = "BAT " .. tostring(bat_idx)
@@ -277,10 +277,14 @@ local function draw(w, data, ctx)
 
   -- Real-time Light Sensor / Switch Indicator (Directly to the left of TX Battery bx=684)
   local l_val = data.light_val or (w and w._last_s_val)
-  local l_str = (l_val ~= nil) and tostring(l_val) or "---"
-  if type(l_val) == "boolean" then l_str = l_val and "ON" or "OFF" end
-  local l_col = (data.light_active or (w and w.active_theme_idx == 11)) and C_CYAN or C_DIM
-  lcd.drawText(X(659), Y(22), "LGT: " .. l_str, RIGHT + f_sml + l_col)
+  local is_mk3 = (w and w.is_mk3) or (data and data.is_mk3) or false
+  local show_lgt = (l_val ~= nil) or is_mk3
+  if show_lgt then
+    local l_str = (l_val ~= nil) and tostring(l_val) or "---"
+    if type(l_val) == "boolean" then l_str = l_val and "ON" or "OFF" end
+    local l_col = (data.light_active or (w and w.active_theme_idx == 11)) and C_CYAN or C_DIM
+    lcd.drawText(X(659), Y(22), "LGT: " .. l_str, RIGHT + f_sml + l_col)
+  end
 
   -- (C) Top Right: TX Battery Level (Large Segmented Green Grid) & Voltage
   local tx_v = data.txVoltage or 0
@@ -678,33 +682,41 @@ local function handleTouch(w, tx, ty, ctx)
   local now_t = getTime()
 
   -- Peak summary -> headspeed/power chart.
-  if tx >= X(24) and tx <= X(300) and ty >= Y(188) and ty <= Y(240) then
+  if tx >= X(24) and tx <= X(300) and ty >= Y(180) and ty < Y(245) then
     w.active_popup = "power_stats"
     w.popup_open_t = now_t
+    w.popup_open_seq = w.touch_seq
+    w.wait_release = true
     if playTone then pcall(playTone, 2200, 80, 50, 0) end
     return true
   end
 
   -- Flight counters -> session statistics/reset.
-  if tx >= X(24) and tx <= X(300) and ty >= Y(248) and ty <= Y(287) then
+  if tx >= X(24) and tx <= X(300) and ty >= Y(245) and ty < Y(290) then
     w.active_popup = "session_stats"
     w.popup_open_t = now_t
+    w.popup_open_seq = w.touch_seq
+    w.wait_release = true
     if playTone then pcall(playTone, 1500, 80, 50, 0) end
     return true
   end
 
   -- Four-cell telemetry card -> battery health.
-  if tx >= X(24) and tx <= X(300) and ty >= Y(295) and ty <= Y(374) then
+  if tx >= X(24) and tx <= X(300) and ty >= Y(290) and ty < Y(378) then
     w.active_popup = "battery"
     w.popup_open_t = now_t
+    w.popup_open_seq = w.touch_seq
+    w.wait_release = true
     if playTone then pcall(playTone, 2000, 80, 50, 0) end
     return true
   end
 
   -- Information -> comprehensive telemetry popup.
-  if tx >= X(24) and tx <= X(300) and ty >= Y(382) and ty <= Y(417) then
+  if tx >= X(24) and tx <= X(300) and ty >= Y(378) and ty <= Y(425) then
     w.active_popup = "telemetry_info"
     w.popup_open_t = now_t
+    w.popup_open_seq = w.touch_seq
+    w.wait_release = true
     if playTone then pcall(playTone, 1600, 80, 50, 0) end
     return true
   end
@@ -713,6 +725,8 @@ local function handleTouch(w, tx, ty, ctx)
   if tx >= X(501) and tx <= X(776) and ty >= Y(194) and ty <= Y(417) then
     w.active_popup = "power_stats"
     w.popup_open_t = now_t
+    w.popup_open_seq = w.touch_seq
+    w.wait_release = true
     if playTone then pcall(playTone, 2200, 80, 50, 0) end
     return true
   end
@@ -721,6 +735,8 @@ local function handleTouch(w, tx, ty, ctx)
   if tx >= X(680) and tx <= X(780) and ty >= Y(10) and ty <= Y(76) then
     w.active_popup = "battery"
     w.popup_open_t = now_t
+    w.popup_open_seq = w.touch_seq
+    w.wait_release = true
     if playTone then pcall(playTone, 2000, 80, 50, 0) end
     return true
   end
@@ -740,6 +756,8 @@ local function handleTouch(w, tx, ty, ctx)
   if tx >= X(20) and tx <= X(200) and ty >= Y(430) and ty <= Y(475) then
     w.active_popup = "session_stats"
     w.popup_open_t = now_t
+    w.popup_open_seq = w.touch_seq
+    w.wait_release = true
     if playTone then pcall(playTone, 1500, 80, 50, 0) end
     return true
   end
