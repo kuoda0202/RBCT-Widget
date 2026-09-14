@@ -151,6 +151,10 @@ function M.drawPopups(w, ctx)
         end
       end
       ctx.text(400, 330, T(w, "pop_trend"), ctx.CENTER + ctx.f_sml, ctx.C.dim)
+      if max_v > min_v and min_v < 900 then
+        ctx.text(110, 330, string.format(T(w, "pop_max_v"), max_v), ctx.f_sml, ctx.C.orange)
+        ctx.text(690, 330, string.format(T(w, "pop_min_v"), min_v), ctx.RIGHT + ctx.f_sml, ctx.C.orange)
+      end
     else
       local v_max = ctx.stat(1, "max")
       local v_min = ctx.stat(1, "min")

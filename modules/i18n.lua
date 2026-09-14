@@ -67,6 +67,8 @@ local UI_TEXT = {
   pop_sag_lbl  = { en = "Voltage Sag:", tw = "最大壓降:", cn = "最大压降:" },
   pop_ir_lbl   = { en = "Pack IR (Est):", tw = "預測 IR:", cn = "预测 IR:" },
   pop_trend    = { en = "DISCHARGE TREND", tw = "放電曲線", cn = "放电曲线" },
+  pop_max_v    = { en = "MAX: %.1fV", tw = "最高: %.1fV", cn = "最高: %.1fV" },
+  pop_min_v    = { en = "MIN: %.1fV", tw = "最低: %.1fV", cn = "最低: %.1fV" },
   pop_insuf    = { en = "Insufficient data", tw = "無放電記錄", cn = "无放电记录" },
   pop_tap_cls  = { en = "Tap [Close] or RTN to exit", tw = "點按關閉 或 按 RTN 退出", cn = "点按关闭 或 按 RTN 退出" },
   pop_chart    = { en = "HEADSPEED & POWER CHART", tw = "轉速與飛行曲線", cn = "转速与飞行曲线" },
