@@ -76,7 +76,7 @@ local UI_TEXT = {
   pop_leg_amps = { en = "AMPS",     tw = "電流",     cn = "电流" },
   pop_leg_bec  = { en = "BEC",      tw = "接收",     cn = "接收" },
   pop_leg_temp = { en = "TEMP",     tw = "溫度",     cn = "温度" },
-  pop_peak_fmt = { en = "PEAK: %.0f RPM | %.1f A%s | %.0f°C   MIN: %.1f V | %.1f V BEC", tw = "最高: %.0f RPM | %.1f A%s | %.0f°C   最低: %.1f V | %.1f V 接收", cn = "最高: %.0f RPM | %.1f A%s | %.0f°C   最低: %.1f V | %.1f V 接收" },
+  pop_peak_fmt = { en = "PEAK: %.0f RPM | %.1fA%s | %.0f°C  MIN: %.1fV | %.1fV BEC", tw = "最高: %.0f RPM | %.1fA%s | %.0f°C  最低: %.1fV | %.1fV 接收", cn = "最高: %.0f RPM | %.1fA%s | %.0f°C  最低: %.1fV | %.1fV 接收" },
   pop_rotor_dyn= { en = "TIP: %.0f G | SPEED: %.0f km/h | PULL: %.0f kg", tw = "旋翼: %.0f G | 速度: %.0f km/h | 負載: %.0f kg", cn = "旋翼: %.0f G | 速度: %.0f km/h | 负载: %.0f kg" },
   pop_rotor_idle={ en = "ROTOR DYNAMICS: STANDBY (0 RPM)", tw = "旋翼動態: 等待中 (0 RPM)", cn = "旋翼动态: 等待中 (0 RPM)" },
   pop_stat_hdr = { en = "FLIGHT SESSION STATS", tw = "飛行統計",   cn = "飞行统计" },

@@ -2069,7 +2069,7 @@ local function innerRefresh(w, event, touchState)
           end
 
         elseif w.active_popup == "power_stats" then
-          local min_x, max_x, min_y, max_y = X(110), X(690), Y(34), Y(424)
+          local min_x, max_x, min_y, max_y = X(80), X(720), Y(34), Y(424)
           local is_inside = (tx >= min_x and tx <= max_x and ty >= min_y and ty <= max_y)
           if not is_inside then
             handleOutsideTap("power_stats")

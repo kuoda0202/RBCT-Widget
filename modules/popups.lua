@@ -173,17 +173,17 @@ function M.drawPopups(w, ctx)
     ctx.text(400, 403, T(w, "pop_btn_cls"), ctx.CENTER + ctx.f_sml, ctx.C.white)
 
   elseif w.active_popup == "power_stats" then
-    ctx.panel(ctx.X(110), ctx.Y(34), ctx.W(580), ctx.H(390), false, false)
-    if ctx.lcd.drawRectangle then ctx.lcd.drawRectangle(ctx.X(110), ctx.Y(34), ctx.W(580), ctx.H(390), ctx.C.white) end
+    ctx.panel(ctx.X(80), ctx.Y(34), ctx.W(640), ctx.H(390), false, false)
+    if ctx.lcd.drawRectangle then ctx.lcd.drawRectangle(ctx.X(80), ctx.Y(34), ctx.W(640), ctx.H(390), ctx.C.white) end
     ctx.text(400, 42, T(w, "pop_chart"), ctx.CENTER + ctx.f_0, ctx.C.white)
 
-    ctx.text(175, 64, T(w, "pop_leg_rpm"), ctx.f_sml, ctx.C.green)
-    ctx.text(265, 64, T(w, "pop_leg_volt"), ctx.f_sml, ctx.C.orange)
-    ctx.text(360, 64, T(w, "pop_leg_amps"), ctx.f_sml, ctx.C.red)
-    ctx.text(460, 64, T(w, "pop_leg_bec"), ctx.f_sml, ctx.C.blue)
-    ctx.text(545, 64, T(w, "pop_leg_temp"), ctx.f_sml, ctx.C.yellow)
+    ctx.text(170, 64, T(w, "pop_leg_rpm"), ctx.f_sml, ctx.C.green)
+    ctx.text(275, 64, T(w, "pop_leg_volt"), ctx.f_sml, ctx.C.orange)
+    ctx.text(375, 64, T(w, "pop_leg_amps"), ctx.f_sml, ctx.C.red)
+    ctx.text(475, 64, T(w, "pop_leg_bec"), ctx.f_sml, ctx.C.blue)
+    ctx.text(570, 64, T(w, "pop_leg_temp"), ctx.f_sml, ctx.C.yellow)
 
-    local cx, cy, cw, ch = 175, 80, 450, 220
+    local cx, cy, cw, ch = 160, 80, 480, 220
     if ctx.lcd.drawRectangle then
       ctx.lcd.drawRectangle(ctx.X(cx), ctx.Y(cy), ctx.W(cw), ctx.H(ch), ctx.C.dim)
       ctx.lcd.drawLine(ctx.X(cx), ctx.Y(cy + ch / 2), ctx.X(cx + cw), ctx.Y(cy + ch / 2), DOTTED or SOLID or 0, ctx.C.dim)
@@ -205,9 +205,11 @@ function M.drawPopups(w, ctx)
     ctx.text(cx - 5, cy - 2, string.format("%.0f", max_rpm), ctx.RIGHT + ctx.f_sml, ctx.C.green)
     ctx.text(cx - 5, cy + ch - 14, "0", ctx.RIGHT + ctx.f_sml, ctx.C.green)
     ctx.text(cx + cw + 5, cy - 2, string.format("%.0fV", max_v), ctx.f_sml, ctx.C.orange)
+    ctx.text(cx + cw + 5, cy + 42, string.format("%.1fV", max_b), ctx.f_sml, ctx.C.blue)
+    ctx.text(cx + cw + 5, cy + ch / 2 - 7, string.format("%.0f°C", max_t), ctx.f_sml, ctx.C.yellow)
+    ctx.text(cx + cw + 5, cy + ch - 54, string.format("%.1fV", min_b), ctx.f_sml, ctx.C.blue)
     ctx.text(cx + cw + 5, cy + ch - 14, string.format("%.0fV", min_v), ctx.f_sml, ctx.C.orange)
     ctx.text(cx - 5, cy + ch / 2 - 7, string.format("%.0fA", max_a), ctx.RIGHT + ctx.f_sml, ctx.C.red)
-    ctx.text(cx + cw + 5, cy + ch / 2 - 7, string.format("%.0f°C", max_t), ctx.f_sml, ctx.C.yellow)
 
     if len >= 2 then
       local max_pts = 35
@@ -251,9 +253,9 @@ function M.drawPopups(w, ctx)
     local pwr_str = ""
     local max_p = (w and w.max_power and w.max_power > 0) and w.max_power or (min_vbat * peak_a)
     if max_p and max_p >= 1000 then
-      pwr_str = string.format(" (%.1f kW)", max_p / 1000)
+      pwr_str = string.format(" (%.1fkW)", max_p / 1000)
     elseif max_p and max_p >= 30 then
-      pwr_str = string.format(" (%.0f W)", max_p)
+      pwr_str = string.format(" (%.0fW)", max_p)
     end
     ctx.text(400, 312, string.format(T(w, "pop_peak_fmt"), peak_rpm, peak_a, pwr_str, peak_t, min_vbat, min_bec_v), ctx.CENTER + ctx.f_sml, ctx.C.white)
 
@@ -291,7 +293,7 @@ function M.drawPopups(w, ctx)
       ctx.text(400, 336, T(w, "pop_rotor_idle"), ctx.CENTER + ctx.f_sml, ctx.C.dim)
     end
 
-    if ctx.lcd.drawLine then ctx.lcd.drawLine(ctx.X(140), ctx.Y(360), ctx.X(660), ctx.Y(360), SOLID, ctx.C.dim) end
+    if ctx.lcd.drawLine then ctx.lcd.drawLine(ctx.X(100), ctx.Y(360), ctx.X(700), ctx.Y(360), SOLID, ctx.C.dim) end
     if ctx.lcd.drawRectangle then
       ctx.lcd.drawRectangle(ctx.X(250), ctx.Y(366), ctx.W(300), ctx.H(32), ctx.C.blue or ctx.C.dim)
     end
