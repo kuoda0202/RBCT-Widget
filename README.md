@@ -91,6 +91,7 @@
   * **動力曲線同步優化**：動力曲線 (Power Stats) 抽樣上限由 50 點下調至 35 點，單幀再節省 75 次線條計算。
   * **彈窗檢視與硬體開關變數解耦**：觸控點選電池查看專用 `viewing_bat_idx` 變數，與實體開關偵測變數 `last_bat_idx` 徹底分離，杜絕點開彈窗誤判「切換實體電池」而在單幀觸發 32KB 記憶卡重新讀取的突發卡頓。
   * **彈窗遮擋圖資動態跳過**：當任意子頁彈窗開啟時，背景自動略過被遮擋之直升機圖片 (`drawHeliBitmap`) 縮放運算，騰出 5~8ms CPU 餘裕。
+  * **旋翼空氣動力指標升級與拉力參數修復**：動力曲線視窗底部的旋翼物理指標 (Rotor Dynamics) 導入轉速感知智慧翼展匹配，3000+ RPM 高轉速自動匹配 380/420 級中小機型，杜絕大槳半徑誤判引發的數值虛高；修正參數順序，使大槳夾橫軸真實離心拉力 (`PULL: xxx kg`) 精確顯示。
   * **硬體 6POS 掃描零 GC**：預先分配靜態開關名稱陣列，消除每幀 60 次字串拼接與記憶體垃圾回收負擔。
 * **功能新增**：**光感應自訂切換門檻與強光主題自選** - 小工具設定新增「光感進入值」(預設 850) 與「光感退出值」(預設 750)，支援獨立雙向回差門檻調整，徹底解決光線臨界點頻繁跳動問題；新增「光感強光主題」(預設 LCD)，使用者可自由指派強光觸發時套用的主題風格。
 * **架構優化**：**追加選項無痛相容 (Option A)** - 採用尾端追加配置，維持舊版 1~22 項索引不變，老飛友升級設定檔絕不跑位。
@@ -232,6 +233,7 @@ To customize the helicopter picture on the dashboard:
   * **Power Stats Synchronous Optimization**: Lowered `power_stats` curve sampling cap from 50 to 35 points, saving an additional 75 line computations per frame.
   * **Decoupled Viewing & Hardware Switch Variables**: Touch-selected battery viewing now exclusively reads/writes `viewing_bat_idx`, decoupled from the physical 6POS switch tracker `last_bat_idx`, preventing accidental SD card 32KB reloads inside `refresh()` when opening modals.
   * **Dynamic Background Clipping**: Automatically bypasses covered helicopter bitmap scaling (`drawHeliBitmap`) whenever any popup modal is open, freeing up 5~8ms of CPU headroom.
+  * **Rotor Dynamics Physics & Pull Fix**: Refined rotor dynamics calculation with RPM-aware blade sizing (3000+ RPM automatically maps to 380/420-class blades, preventing inflated G-force and tip speed); fixed argument order so blade grip centrifugal load (`PULL: xxx kg`) displays accurately.
   * **Zero-GC Hardware 6POS Switch Scanning**: Pre-allocated static switch name arrays, eliminating 60 per-frame string concatenations and garbage collection pauses.
 * **New Feature**: **Custom Light Sensor Thresholds & Selectable Light Theme** - Added independent "Light Enter" (default 850) and "Light Exit" (default 750) thresholds for customizable hysteresis, preventing flickering at light boundaries; added "Light Theme" option (default LCD) to allow users to assign their preferred theme under strong sunlight.
 * **Architecture Optimization**: **Non-Destructive Option Appending (Option A)** - Appends new options to the end of the option table, preserving legacy index order (1~22) so existing pilot configurations remain 100% intact.

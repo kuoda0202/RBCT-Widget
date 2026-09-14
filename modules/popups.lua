@@ -262,17 +262,31 @@ function M.drawPopups(w, ctx)
     if rpm_eval > 300 then
       local r_m, m_kg = 0.775, 0.19
       local cells_est = (min_vbat > 0) and math.floor(min_vbat / 3.7 + 0.5) or 12
-      if cells_est <= 4 then
-        r_m = 0.425; m_kg = 0.06
+      if rpm_eval > 3400 then
+        -- Micro / High-RPM 380 class (e.g. S200 / M2 / RAW 420 6S)
+        if cells_est <= 4 then
+          r_m = 0.22; m_kg = 0.025
+        else
+          r_m = 0.425; m_kg = 0.06
+        end
+      elseif rpm_eval > 2600 then
+        -- 380 / 420 class
+        r_m = 0.45; m_kg = 0.07
+      elseif cells_est <= 6 and rpm_eval > 2200 then
+        -- 500 / 550 class
+        r_m = 0.55; m_kg = 0.10
       elseif cells_est <= 6 then
-        r_m = 0.625; m_kg = 0.12
+        -- 600 class
+        r_m = 0.625; m_kg = 0.13
+      else
+        -- 700 / 800 class
+        r_m = 0.775; m_kg = 0.19
       end
       local omega = (rpm_eval * 2 * math.pi) / 60
       local g_force = (omega * omega * r_m) / 9.80665
       local tip_kmh = (omega * r_m) * 3.6
-      local mach = (omega * r_m) / 340.29
       local pull_kg = (m_kg * omega * omega * (r_m * 0.45)) / 9.80665
-      ctx.text(400, 336, string.format(T(w, "pop_rotor_dyn"), g_force, tip_kmh, mach, pull_kg), ctx.CENTER + ctx.f_sml, ctx.C.cyan or ctx.C.yellow)
+      ctx.text(400, 336, string.format(T(w, "pop_rotor_dyn"), g_force, tip_kmh, pull_kg), ctx.CENTER + ctx.f_sml, ctx.C.cyan or ctx.C.yellow)
     else
       ctx.text(400, 336, T(w, "pop_rotor_idle"), ctx.CENTER + ctx.f_sml, ctx.C.dim)
     end
